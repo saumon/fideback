@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+# Écoute sur toutes les interfaces (accès depuis le réseau local) sauf si BINDING est déjà défini.
+ENV["BINDING"] ||= "0.0.0.0"
+exec "./bin/rails", "server", *ARGV

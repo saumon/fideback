@@ -1,0 +1,20 @@
+quality:
+  campaign: running_campaign
+  position: 0
+  prompt: Qualité du travail
+  rating: true
+  comment: true
+
+strengths:
+  campaign: running_campaign
+  position: 1
+  prompt: Points forts
+  rating: false
+  comment: true
+
+draft_quality:
+  campaign: draft_campaign
+  position: 0
+  prompt: Qualité du travail
+  rating: true
+  comment: true

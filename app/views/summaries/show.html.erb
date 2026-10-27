@@ -1,0 +1,40 @@
+<h1>Synthèse : <%= @subject.name %></h1>
+<p>Campagne <%= link_to @subject.campaign.name, @subject.campaign %> —
+  <%= @summary.respondents_count %> sondé(s) ayant soumis leurs réponses.</p>
+
+<% if @summary.respondents_count.zero? %>
+  <p>Aucune réponse soumise pour le moment.</p>
+<% end %>
+
+<% @summary.questions.each do |qs| %>
+  <section class="question-summary" id="<%= dom_id(qs.question) %>">
+    <h2><%= qs.question.prompt %></h2>
+
+    <% if qs.question.rating? %>
+      <% if qs.average %>
+        <p>Moyenne : <strong><%= number_with_precision(qs.average, precision: 1) %> / 5</strong> (<%= qs.rating_count %> note(s))</p>
+        <ul class="ratings">
+          <% qs.entries.select(&:rating).each do |entry| %>
+            <li><%= entry.respondent.name %> : <%= entry.rating %> / 5</li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>Pas encore de note.</p>
+      <% end %>
+    <% end %>
+
+    <% if qs.question.comment? %>
+      <% if qs.comments.any? %>
+        <ul class="comments">
+          <% qs.comments.each do |entry| %>
+            <li><blockquote><%= simple_format(h(entry.body)) %></blockquote> — <cite><%= entry.respondent.name %></cite></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>Pas encore de commentaire.</p>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>
+
+<p><%= link_to "Retour à la campagne", @subject.campaign %></p>

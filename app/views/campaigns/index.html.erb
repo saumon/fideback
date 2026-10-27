@@ -1,0 +1,17 @@
+<h1>Mes campagnes</h1>
+
+<p><%= link_to "Nouvelle campagne", new_campaign_path %></p>
+
+<% if @campaigns.empty? %>
+  <p>Aucune campagne pour le moment.</p>
+<% else %>
+  <ul>
+    <% @campaigns.each do |campaign| %>
+      <li>
+        <%= link_to campaign.name, campaign %>
+        — <%= t("campaign_status.#{campaign.status}") %>
+        (avant le <%= l(campaign.deadline_on) %>)
+      </li>
+    <% end %>
+  </ul>
+<% end %>

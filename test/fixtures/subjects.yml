@@ -1,0 +1,19 @@
+dana:
+  campaign: running_campaign
+  name: Dana Managée
+  email: dana@example.com
+
+eli:
+  campaign: running_campaign
+  name: Eli Managé
+  email: eli@example.com
+
+draft_dana:
+  campaign: draft_campaign
+  name: Dana Managée
+  email: dana@example.com
+
+bobs_subject:
+  campaign: bobs_campaign
+  name: Fred Managé
+  email: fred@example.com

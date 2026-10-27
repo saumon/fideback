@@ -1,0 +1,9 @@
+Bonjour <%= @respondent.name %>,
+
+<%= @manager.name %> prépare ses entretiens individuels et vous invite à donner votre feedback dans la campagne « <%= @campaign.name %> ».
+
+Vos réponses seront communiquées nominativement à <%= @manager.name %>.
+
+Donner mon feedback : <%= @url %>
+
+Merci de répondre avant le <%= l(@campaign.deadline_on, format: :long) %>. Ce lien est personnel, ne le transmettez pas.

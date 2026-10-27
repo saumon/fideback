@@ -1,0 +1,23 @@
+rose:
+  campaign: running_campaign
+  name: Rose Sondée
+  email: rose@example.com
+  token: tokenrose0123456789012345678901234567
+
+sam:
+  campaign: running_campaign
+  name: Sam Sondé
+  email: sam@example.com
+  token: tokensam0123456789012345678901234567
+
+dana_as_respondent:
+  campaign: running_campaign
+  name: Dana Managée
+  email: dana@example.com
+  token: tokendana123456789012345678901234567
+
+draft_rose:
+  campaign: draft_campaign
+  name: Rose Sondée
+  email: rose@example.com
+  token: tokendraft23456789012345678901234567

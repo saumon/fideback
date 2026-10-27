@@ -1,0 +1,17 @@
+draft_campaign:
+  manager: alice
+  name: Entretiens 2026
+  deadline_on: <%= 30.days.from_now.to_date %>
+  status: 0
+
+running_campaign:
+  manager: alice
+  name: Campagne en cours
+  deadline_on: <%= 30.days.from_now.to_date %>
+  status: 1
+
+bobs_campaign:
+  manager: bob
+  name: Campagne de Bob
+  deadline_on: <%= 30.days.from_now.to_date %>
+  status: 0

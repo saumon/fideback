@@ -1,0 +1,27 @@
+fr:
+  activerecord:
+    models:
+      manager: Manager
+      campaign: Campagne
+    attributes:
+      manager:
+        name: Nom
+        email: E-mail
+        password: Mot de passe
+        password_confirmation: Confirmation du mot de passe
+        current_password: Mot de passe actuel
+        remember_me: Se souvenir de moi
+      campaign:
+        name: Nom
+        deadline_on: Date limite de réponse
+        subjects: Managés
+        respondents: Sondés
+        questions: Questions
+  campaign_status:
+    draft: Brouillon
+    running: En cours
+    closed: Clôturée
+  respondent_status:
+    pending: Pas encore répondu
+    in_progress: Réponse partielle
+    submitted: A répondu

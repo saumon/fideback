@@ -1,0 +1,7 @@
+<div class="field contact">
+  <%= f.text_field :name, placeholder: "Nom" %>
+  <%= f.email_field :email, placeholder: "E-mail" %>
+  <% if f.object.persisted? %>
+    <%= f.check_box :_destroy %> <%= f.label :_destroy, "Supprimer" %>
+  <% end %>
+</div>

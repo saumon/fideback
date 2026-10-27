@@ -1,0 +1,56 @@
+<h1><%= @campaign.name %></h1>
+
+<p>
+  Statut : <strong><%= t("campaign_status.#{@campaign.status}") %></strong> —
+  date limite : <%= l(@campaign.deadline_on, format: :long) %>
+</p>
+
+<% if @campaign.draft? %>
+  <p>
+    <%= link_to "Modifier", edit_campaign_path(@campaign) %>
+    <%= button_to "Lancer la campagne", launch_campaign_path(@campaign), form: { class: "inline", data: { turbo_confirm: "Envoyer les invitations aux sondés ?" } } %>
+    <%= button_to "Supprimer", @campaign, method: :delete, form: { class: "inline", data: { turbo_confirm: "Supprimer cette campagne ?" } } %>
+  </p>
+<% elsif @campaign.running? %>
+  <p><%= button_to "Clôturer la campagne", close_campaign_path(@campaign), form: { class: "inline", data: { turbo_confirm: "Clôturer la campagne ?" } } %></p>
+<% end %>
+
+<h2>Sondés</h2>
+<% submitted = @respondents.count(&:submitted?) %>
+<p id="response-rate">
+  <%= submitted %> / <%= @respondents.size %> réponses soumises
+  (<%= @respondents.empty? ? 0 : (100.0 * submitted / @respondents.size).round %> %)
+</p>
+<table>
+  <thead><tr><th>Nom</th><th>E-mail</th><th>Statut</th></tr></thead>
+  <tbody>
+    <% @respondents.each do |respondent| %>
+      <tr id="<%= dom_id(respondent) %>">
+        <td><%= respondent.name %></td>
+        <td><%= respondent.email %></td>
+        <td><%= t("respondent_status.#{respondent.status}") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h2>Managés</h2>
+<ul>
+  <% @subjects.each do |subject| %>
+    <li>
+      <%= subject.name %> (<%= subject.email %>)
+      <% unless @campaign.draft? %>
+        — <%= link_to "Synthèse", campaign_summary_path(@campaign, subject_id: subject.id) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<h2>Questions</h2>
+<ol>
+  <% @campaign.questions.each do |question| %>
+    <li><%= question.prompt %> <small>(<%= [ ("note" if question.rating?), ("commentaire" if question.comment?) ].compact.join(" + ") %>)</small></li>
+  <% end %>
+</ol>
+
+<p><%= link_to "Retour aux campagnes", campaigns_path %></p>

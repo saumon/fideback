@@ -1,0 +1,52 @@
+<%= form_with model: campaign do |f| %>
+  <% if campaign.errors.any? %>
+    <div class="flash flash-alert">
+      <ul>
+        <% campaign.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <p><%= f.label :name %></p>
+    <p><%= f.text_field :name %></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :deadline_on %></p>
+    <p><%= f.date_field :deadline_on %></p>
+  </div>
+
+  <fieldset>
+    <legend>Managés (personnes sur lesquelles porte le feedback)</legend>
+    <%= f.fields_for :subjects do |sf| %>
+      <%= render "contact_fields", f: sf %>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend>Sondés (personnes interrogées)</legend>
+    <%= f.fields_for :respondents do |rf| %>
+      <%= render "contact_fields", f: rf %>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend>Questions</legend>
+    <%= f.fields_for :questions do |qf| %>
+      <div class="field">
+        <%= qf.hidden_field :position %>
+        <%= qf.text_field :prompt, placeholder: "Question" %>
+        <%= qf.check_box :rating %> <%= qf.label :rating, "Note de 1 à 5" %>
+        <%= qf.check_box :comment %> <%= qf.label :comment, "Commentaire" %>
+        <% if qf.object.persisted? %>
+          <%= qf.check_box :_destroy %> <%= qf.label :_destroy, "Supprimer" %>
+        <% end %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <p><%= f.submit(campaign.persisted? ? "Enregistrer" : "Créer la campagne") %></p>
+<% end %>

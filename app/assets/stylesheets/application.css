@@ -1,0 +1,27 @@
+/*
+ * This is a manifest file that'll be compiled into application.css.
+ *
+ * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
+ * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
+ * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
+ * depending on specificity.
+ *
+ * Consider organizing styles into separate files for maintainability.
+ */
+
+body { font-family: system-ui, sans-serif; margin: 0; color: #1f2933; line-height: 1.5; }
+main { max-width: 52rem; margin: 2rem auto; padding: 0 1rem; }
+.site-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #d9e2ec; }
+.site-header nav { display: flex; gap: 1rem; align-items: center; }
+.brand { font-weight: 700; text-decoration: none; color: inherit; }
+form.inline, form.inline button { display: inline; }
+.flash { padding: 0.5rem 0.75rem; border-radius: 4px; }
+.flash-notice { background: #e3f9e5; }
+.flash-alert { background: #ffe3e3; }
+input[type=text], input[type=email], input[type=password], input[type=date], input[type=number], textarea { width: 100%; max-width: 28rem; padding: 0.4rem; box-sizing: border-box; }
+.field { margin-bottom: 1rem; }
+.field p { margin: 0.2rem 0; }
+fieldset { margin-bottom: 1.5rem; border: 1px solid #d9e2ec; border-radius: 4px; }
+.notice-transparency { background: #fff3c4; padding: 0.5rem 0.75rem; border-radius: 4px; }
+.field.missing { border-left: 3px solid #d64545; padding-left: 0.5rem; }
+.error { color: #b00020; }
