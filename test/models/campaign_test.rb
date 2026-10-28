@@ -21,6 +21,19 @@ class CampaignTest < ActiveSupport::TestCase
     assert campaign.questions.all? { |q| q.rating? || q.comment? }
   end
 
+  test "questions are renumbered in form order, ignoring those marked for destruction" do
+    campaign = campaigns(:draft_campaign)
+    first, second = campaign.questions.to_a.first(2)
+    campaign.update!(questions_attributes: [
+      { id: first.id, _destroy: "1" },
+      { prompt: "Nouvelle", rating: "1", comment: "0" }
+    ])
+    positions = campaign.reload.questions.map(&:position)
+    assert_equal (0...positions.size).to_a, positions
+    assert_not_includes campaign.questions, first
+    assert_equal "Nouvelle", campaign.questions.last.prompt
+  end
+
   test "launch! refuses a campaign without respondents" do
     campaign = campaigns(:draft_campaign)
     campaign.respondents.destroy_all

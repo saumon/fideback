@@ -21,31 +21,20 @@
 
   <fieldset>
     <legend>Managés (personnes sur lesquelles porte le feedback)</legend>
-    <%= f.fields_for :subjects do |sf| %>
-      <%= render "contact_fields", f: sf %>
-    <% end %>
+    <%= render "nested_rows", f: f, association: :subjects, partial: "contact_fields",
+                              blank: Subject.new, add_label: "Ajouter un managé" %>
   </fieldset>
 
   <fieldset>
     <legend>Sondés (personnes interrogées)</legend>
-    <%= f.fields_for :respondents do |rf| %>
-      <%= render "contact_fields", f: rf %>
-    <% end %>
+    <%= render "nested_rows", f: f, association: :respondents, partial: "contact_fields",
+                              blank: Respondent.new, add_label: "Ajouter un sondé" %>
   </fieldset>
 
   <fieldset>
     <legend>Questions</legend>
-    <%= f.fields_for :questions do |qf| %>
-      <div class="field">
-        <%= qf.hidden_field :position %>
-        <%= qf.text_field :prompt, placeholder: "Question" %>
-        <%= qf.check_box :rating %> <%= qf.label :rating, "Note de 1 à 5" %>
-        <%= qf.check_box :comment %> <%= qf.label :comment, "Commentaire" %>
-        <% if qf.object.persisted? %>
-          <%= qf.check_box :_destroy %> <%= qf.label :_destroy, "Supprimer" %>
-        <% end %>
-      </div>
-    <% end %>
+    <%= render "nested_rows", f: f, association: :questions, partial: "question_fields",
+                              blank: Question.new(rating: true, comment: true), add_label: "Ajouter une question" %>
   </fieldset>
 
   <p><%= f.submit(campaign.persisted? ? "Enregistrer" : "Créer la campagne") %></p>

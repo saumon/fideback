@@ -1,7 +1,6 @@
-<div class="field contact">
+<div class="field contact" data-nested-form-target="row" data-new-record="<%= f.object.new_record? %>" <%= "hidden" if f.object.marked_for_destruction? %>>
   <%= f.text_field :name, placeholder: "Nom" %>
   <%= f.email_field :email, placeholder: "E-mail" %>
-  <% if f.object.persisted? %>
-    <%= f.check_box :_destroy %> <%= f.label :_destroy, "Supprimer" %>
-  <% end %>
+  <%= f.hidden_field :_destroy, value: f.object.marked_for_destruction? ? "1" : "0" %>
+  <button type="button" data-action="nested-form#remove">Supprimer</button>
 </div>

@@ -1,6 +1,4 @@
 class CampaignsController < ApplicationController
-  BLANK_ROWS = 3
-
   before_action :set_campaign, only: %i[show edit update destroy launch close]
 
   def index
@@ -68,9 +66,8 @@ class CampaignsController < ApplicationController
   end
 
   def build_blank_rows
-    BLANK_ROWS.times do
-      @campaign.subjects.build
-      @campaign.respondents.build
+    [ @campaign.subjects, @campaign.respondents ].each do |rows|
+      rows.build unless rows.any?(&:new_record?)
     end
   end
 

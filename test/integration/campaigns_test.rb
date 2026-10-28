@@ -15,8 +15,82 @@ class CampaignsTest < ActionDispatch::IntegrationTest
   test "new form is prefilled with default questions" do
     get new_campaign_path
     assert_response :success
-    assert_select "input[name$='[prompt]']", count: Campaign::DEFAULT_QUESTIONS.size
+    assert_select "[data-nested-form-target=container] input[name$='[prompt]']", count: Campaign::DEFAULT_QUESTIONS.size
     assert_select "input[value='#{Campaign::DEFAULT_QUESTIONS.first[:prompt]}']"
+  end
+
+  test "new form has one blank subject row and one blank respondent row, plus a template for each list" do
+    get new_campaign_path
+    assert_select "[data-nested-form-target=container] input[name$='[name]'][placeholder=Nom]", count: 2
+    assert_select "template[data-nested-form-target=template]", count: 3
+    assert_select "template input[name='campaign[questions_attributes][NEW_RECORD][prompt]']"
+    assert_select "button[data-action='nested-form#add']", count: 3
+  end
+
+  test "edit form shows existing items, a delete button on each and one blank contact row" do
+    campaign = campaigns(:draft_campaign)
+    get edit_campaign_path(campaign)
+    assert_select "[data-nested-form-target=container] .question", count: campaign.questions.count
+    assert_select "[data-nested-form-target=container] .contact[data-new-record=false]", count: campaign.subjects.count + campaign.respondents.count
+    assert_select "[data-nested-form-target=container] .contact[data-new-record=true]", count: 2
+    assert_select "[data-nested-form-target=container] button", text: "Supprimer", minimum: campaign.questions.count
+  end
+
+  test "create with added items, a default question left out and blank rows ignored" do
+    post campaigns_path, params: { campaign: {
+      name: "Dynamique", deadline_on: 20.days.from_now.to_date,
+      subjects_attributes: { "1700000000001" => { name: "Gina", email: "gina@example.com", _destroy: "0" },
+                             "1700000000002" => { name: "Ivan", email: "ivan@example.com", _destroy: "0" },
+                             "1700000000003" => { name: "", email: "", _destroy: "0" } },
+      respondents_attributes: { "0" => { name: "Hugo", email: "hugo@example.com", _destroy: "0" } },
+      questions_attributes: { "1" => { prompt: "Première", rating: "1", comment: "0", _destroy: "0" },
+                              "2" => { prompt: "Seconde", rating: "0", comment: "1", _destroy: "0" } }
+    } }
+    campaign = Campaign.order(:id).last
+    assert_redirected_to campaign_path(campaign)
+    assert_equal %w[Gina Ivan], campaign.subjects.order(:id).map(&:name)
+    assert_equal [ [ "Première", 0 ], [ "Seconde", 1 ] ], campaign.questions.map { |q| [ q.prompt, q.position ] }
+  end
+
+  test "update adds a question and removes a persisted one" do
+    campaign = campaigns(:draft_campaign)
+    existing = campaign.questions.first
+    patch campaign_path(campaign), params: { campaign: {
+      questions_attributes: { "0" => { id: existing.id, prompt: existing.prompt, rating: "1", comment: "1", _destroy: "1" },
+                              "1700000000001" => { prompt: "Ajoutée", rating: "1", comment: "0", _destroy: "0" } },
+      subjects_attributes: { "0" => { id: campaign.subjects.first.id, _destroy: "1" } }
+    } }
+    assert_redirected_to campaign_path(campaign)
+    campaign.reload
+    assert_not_includes campaign.questions, existing
+    assert_equal "Ajoutée", campaign.questions.last.prompt
+    assert_equal (0...campaign.questions.size).to_a, campaign.questions.map(&:position)
+    assert_equal 0, campaign.subjects.count
+  end
+
+  test "a failed create keeps added rows, drops removed ones and does not pile up blank rows" do
+    post campaigns_path, params: { campaign: {
+      name: "", deadline_on: 20.days.from_now.to_date,
+      subjects_attributes: { "5" => { name: "Gina", email: "gina@example.com", _destroy: "0" } },
+      questions_attributes: { "7" => { prompt: "Seule question", rating: "1", comment: "0", _destroy: "0" } }
+    } }
+    assert_response :unprocessable_entity
+    assert_select "[data-nested-form-target=container] input[value='Gina']", count: 1
+    assert_select "[data-nested-form-target=container] .question", count: 1
+    assert_select "[data-nested-form-target=container] input[value='Seule question']"
+    assert_select "[data-nested-form-target=container] .contact[data-new-record=true]", count: 2 # Gina + une ligne vide de sondé
+  end
+
+  test "a failed update re-renders a persisted item marked for deletion as hidden" do
+    campaign = campaigns(:draft_campaign)
+    subject = campaign.subjects.first
+    patch campaign_path(campaign), params: { campaign: {
+      name: "",
+      subjects_attributes: { "0" => { id: subject.id, name: subject.name, email: subject.email, _destroy: "1" } }
+    } }
+    assert_response :unprocessable_entity
+    assert_select ".contact[hidden] input[name$='[_destroy]'][value='1']"
+    assert_equal subject, subject.reload
   end
 
   test "create a valid campaign" do

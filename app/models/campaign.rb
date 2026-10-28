@@ -20,6 +20,8 @@ class Campaign < ApplicationRecord
   validate :deadline_in_future, on: :create
   validate :content_frozen_once_launched, on: :update
 
+  before_validation :renumber_questions, if: :draft?
+
   def build_default_questions
     DEFAULT_QUESTIONS.each_with_index do |attrs, index|
       questions.build(attrs.merge(position: index))
@@ -58,6 +60,14 @@ class Campaign < ApplicationRecord
   end
 
   private
+
+  def renumber_questions
+    return unless questions.any?(&:changed_for_autosave?)
+
+    questions.reject(&:marked_for_destruction?).each_with_index do |question, index|
+      question.position = index
+    end
+  end
 
   def deadline_in_future
     errors.add(:deadline_on, :greater_than, count: Date.current) if deadline_on && deadline_on <= Date.current

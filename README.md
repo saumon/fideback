@@ -40,7 +40,7 @@ Redémarrez le serveur après toute modification. Les e-mails déjà intercepté
 ## Tests et qualité
 
 ```bash
-bin/rails test            # modèles, services, contrôleurs, mailers
+bin/rails test            # modèles, services, intégration, mailers
 bin/rails test:system     # parcours complet (Chrome headless)
 bin/rubocop               # style
 bin/brakeman              # analyse de sécurité
@@ -50,6 +50,7 @@ bin/ci                    # enchaîne l'ensemble (hors tests système)
 ## Fonctionnement
 
 - Les **managers** s'inscrivent librement et gèrent leurs campagnes (brouillon → en cours → clôturée).
+- Le formulaire de campagne (création et modification, tant qu'elle est en brouillon) est pré-rempli avec des **questions par défaut**. Les questions, les managés et les sondés s'y ajoutent et s'y suppriment directement avec les boutons *Ajouter* et *Supprimer*. Une fois la campagne lancée, ces listes ne sont plus modifiables.
 - Au lancement, chaque **sondé** reçoit un e-mail avec un lien personnel (`/repondre/<jeton>`). Il note (1 à 5) et/ou commente chaque managé, enregistre sa progression, puis soumet définitivement. Il est informé que ses réponses sont **nominatives**.
 - Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
 - Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.

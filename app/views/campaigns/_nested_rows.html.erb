@@ -1,0 +1,15 @@
+<div data-controller="nested-form">
+  <div data-nested-form-target="container">
+    <%= f.fields_for association do |rf| %>
+      <%= render partial, f: rf %>
+    <% end %>
+  </div>
+
+  <template data-nested-form-target="template">
+    <%= f.fields_for association, blank, child_index: "NEW_RECORD" do |rf| %>
+      <%= render partial, f: rf %>
+    <% end %>
+  </template>
+
+  <p><button type="button" data-action="nested-form#add"><%= add_label %></button></p>
+</div>
