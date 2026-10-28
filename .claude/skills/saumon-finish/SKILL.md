@@ -86,7 +86,9 @@ Affiche ensuite `git log --oneline -1`.
 
 ## 7. Push
 
-Demande : « Pousser maintenant ? » en indiquant la branche courante.
+Avant de poser la question, lance `git log --oneline @{u}..HEAD` (sans amont, `git log --oneline` limité aux derniers commits) pour connaître les commits réellement non poussés. N'annonce jamais un nombre ou une liste de commits que cette commande ne montre pas.
+
+Demande : « Pousser maintenant ? » en indiquant la branche courante et la liste exacte des commits non poussés. Comme pour le message de commit, cette information doit figurer dans la question elle-même.
 
 - Pas de `--force`, jamais.
 - Si la branche est `main` (ou `master`), avertis clairement que le push va directement sur la branche principale, et demande une confirmation explicite en le précisant dans la question.
