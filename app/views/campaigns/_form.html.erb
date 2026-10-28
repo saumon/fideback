@@ -1,4 +1,4 @@
-<%= form_with model: campaign do |f| %>
+<%= form_with model: campaign, class: "campaign-form" do |f| %>
   <% if campaign.errors.any? %>
     <div class="flash flash-alert">
       <ul>
@@ -14,19 +14,19 @@
     <p><%= f.text_field :name %></p>
   </div>
 
-  <div class="field">
+  <div class="field field-date">
     <p><%= f.label :deadline_on %></p>
     <p><%= f.date_field :deadline_on %></p>
   </div>
 
   <fieldset>
-    <legend>Managés (personnes sur lesquelles porte le feedback)</legend>
+    <legend>Managés <span>(personnes sur lesquelles porte le feedback)</span></legend>
     <%= render "nested_rows", f: f, association: :subjects, partial: "contact_fields",
                               blank: Subject.new, add_label: "Ajouter un managé" %>
   </fieldset>
 
   <fieldset>
-    <legend>Sondés (personnes interrogées)</legend>
+    <legend>Sondés <span>(personnes interrogées)</span></legend>
     <%= render "nested_rows", f: f, association: :respondents, partial: "contact_fields",
                               blank: Respondent.new, add_label: "Ajouter un sondé" %>
   </fieldset>
@@ -37,5 +37,5 @@
                               blank: Question.new(rating: true, comment: true), add_label: "Ajouter une question" %>
   </fieldset>
 
-  <p><%= f.submit(campaign.persisted? ? "Enregistrer" : "Créer la campagne") %></p>
+  <p class="actions"><%= f.submit(campaign.persisted? ? "Enregistrer" : "Créer la campagne") %></p>
 <% end %>

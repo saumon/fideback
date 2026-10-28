@@ -1,6 +1,8 @@
-<h1><%= @campaign.name %></h1>
-<p>Bonjour <%= @respondent.name %>, <%= @campaign.manager.name %> vous invite à donner votre feedback.</p>
-<p class="notice-transparency"><strong>Important :</strong> vos réponses seront communiquées nominativement à <%= @campaign.manager.name %>.</p>
+<header class="respondent-intro">
+  <h1><%= @campaign.name %></h1>
+  <p class="lead">Bonjour <%= @respondent.name %>, <%= @campaign.manager.name %> vous invite à donner votre feedback.</p>
+  <p class="notice-transparency"><strong>Important :</strong> vos réponses seront communiquées nominativement à <%= @campaign.manager.name %>.</p>
+</header>
 
 <% if @respondent.submitted? %>
   <p class="flash flash-notice">Vous avez soumis vos réponses. Merci ! Elles ne sont plus modifiables.</p>
@@ -11,15 +13,15 @@
 <% editable = @campaign.accepting_answers? && !@respondent.submitted? %>
 <% missing = (@missing || []).map { |subject, question| [ subject.id, question.id ] } %>
 
-<%= form_with url: respondent_form_path(token: @respondent.token), method: :patch do |f| %>
+<%= form_with url: respondent_form_path(token: @respondent.token), method: :patch, class: "answer-form" do |f| %>
   <% @respondent.subjects_to_rate.order(:name).each do |subject| %>
-    <fieldset>
+    <fieldset class="subject">
       <legend><%= subject.name %></legend>
       <% @campaign.questions.each do |question| %>
-        <div class="field<%= " missing" if missing.include?([ subject.id, question.id ]) %>">
-          <p><strong><%= question.prompt %></strong></p>
+        <div class="field answer<%= " missing" if missing.include?([ subject.id, question.id ]) %>">
+          <p class="prompt"><strong><%= question.prompt %></strong></p>
           <% if question.rating? %>
-            <p>
+            <p class="rating">
               <%= label_tag "answers_#{subject.id}_#{question.id}_rating", "Note (1 à 5)" %>
               <%= number_field_tag "answers[#{subject.id}][#{question.id}][rating]", input_value(subject, question, :rating),
                     min: 1, max: 5, step: 1, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_rating" %>
@@ -27,8 +29,8 @@
             </p>
           <% end %>
           <% if question.comment? %>
-            <p>
-              <%= label_tag "answers_#{subject.id}_#{question.id}_body", "Commentaire" %><br>
+            <p class="comment">
+              <%= label_tag "answers_#{subject.id}_#{question.id}_body", "Commentaire" %>
               <%= text_area_tag "answers[#{subject.id}][#{question.id}][body]", input_value(subject, question, :body),
                     rows: 3, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_body" %>
             </p>
@@ -39,9 +41,9 @@
   <% end %>
 
   <% if editable %>
-    <p>
-      <%= f.submit "Enregistrer et continuer plus tard" %>
-      <%= f.submit "Soumettre définitivement", formaction: submit_respondent_form_path(token: @respondent.token), formmethod: :post,
+    <p class="actions answer-actions">
+      <%= f.submit "Enregistrer et continuer plus tard", class: "btn" %>
+      <%= f.submit "Soumettre définitivement", class: "btn btn-primary", formaction: submit_respondent_form_path(token: @respondent.token), formmethod: :post,
             data: { turbo_confirm: "Après soumission, vous ne pourrez plus modifier vos réponses. Continuer ?" } %>
     </p>
   <% end %>

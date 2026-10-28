@@ -1,9 +1,11 @@
-<h1>Synthèse : <%= @subject.name %></h1>
-<p>Campagne <%= link_to @subject.campaign.name, @subject.campaign %> —
-  <%= @summary.respondents_count %> sondé(s) ayant soumis leurs réponses.</p>
+<div class="page-head">
+  <h1>Synthèse : <%= @subject.name %></h1>
+  <p class="campaign-meta">Campagne <%= link_to @subject.campaign.name, @subject.campaign %> —
+    <%= @summary.respondents_count %> sondé(s) ayant soumis leurs réponses.</p>
+</div>
 
 <% if @summary.respondents_count.zero? %>
-  <p>Aucune réponse soumise pour le moment.</p>
+  <p class="empty">Aucune réponse soumise pour le moment.</p>
 <% end %>
 
 <% @summary.questions.each do |qs| %>
@@ -11,30 +13,42 @@
     <h2><%= qs.question.prompt %></h2>
 
     <% if qs.question.rating? %>
-      <% if qs.average %>
-        <p>Moyenne : <strong><%= number_with_precision(qs.average, precision: 1) %> / 5</strong> (<%= qs.rating_count %> note(s))</p>
-        <ul class="ratings">
-          <% qs.entries.select(&:rating).each do |entry| %>
-            <li><%= entry.respondent.name %> : <%= entry.rating %> / 5</li>
-          <% end %>
-        </ul>
-      <% else %>
-        <p>Pas encore de note.</p>
-      <% end %>
+      <aside class="rating-notes">
+        <% if qs.average %>
+          <p class="average">Moyenne : <strong><%= number_with_precision(qs.average, precision: 1) %> / 5</strong> <span>(<%= qs.rating_count %> note(s))</span></p>
+          <ul class="ratings">
+            <% qs.entries.select(&:rating).each do |entry| %>
+              <li>
+                <span class="rater"><%= entry.respondent.name %> : <%= entry.rating %> / 5</span>
+                <span class="scale" aria-hidden="true"><% 5.times do |i| %><i class="<%= "on" if i < entry.rating %>"></i><% end %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="muted">Pas encore de note.</p>
+        <% end %>
+      </aside>
     <% end %>
 
     <% if qs.question.comment? %>
       <% if qs.comments.any? %>
         <ul class="comments">
           <% qs.comments.each do |entry| %>
-            <li><blockquote><%= simple_format(h(entry.body)) %></blockquote> — <cite><%= entry.respondent.name %></cite></li>
+            <li>
+              <blockquote>
+                <% entry.body.strip.split(/\r?\n(?:\s*\r?\n)+/).each do |paragraph| %>
+                  <p><mark><%= safe_join(paragraph.split(/\r?\n/), tag.br) %></mark></p>
+                <% end %>
+              </blockquote>
+              <cite><%= entry.respondent.name %></cite>
+            </li>
           <% end %>
         </ul>
       <% else %>
-        <p>Pas encore de commentaire.</p>
+        <p class="muted comments-empty">Pas encore de commentaire.</p>
       <% end %>
     <% end %>
   </section>
 <% end %>
 
-<p><%= link_to "Retour à la campagne", @subject.campaign %></p>
+<p class="back"><%= link_to "Retour à la campagne", @subject.campaign %></p>

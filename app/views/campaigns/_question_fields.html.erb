@@ -1,7 +1,7 @@
 <div class="field question" data-nested-form-target="row" data-new-record="<%= f.object.new_record? %>" <%= "hidden" if f.object.marked_for_destruction? %>>
   <%= f.text_field :prompt, placeholder: "Question" %>
-  <%= f.check_box :rating %> <%= f.label :rating, "Note de 1 à 5" %>
-  <%= f.check_box :comment %> <%= f.label :comment, "Commentaire" %>
+  <span class="check"><%= f.check_box :rating %> <%= f.label :rating, "Note de 1 à 5" %></span>
+  <span class="check"><%= f.check_box :comment %> <%= f.label :comment, "Commentaire" %></span>
   <%= f.hidden_field :_destroy, value: f.object.marked_for_destruction? ? "1" : "0" %>
-  <button type="button" data-action="nested-form#remove">Supprimer</button>
+  <button type="button" class="link link-remove" data-action="nested-form#remove">Supprimer</button>
 </div>

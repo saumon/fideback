@@ -1,16 +1,20 @@
-<h1>Mes campagnes</h1>
-
-<p><%= link_to "Nouvelle campagne", new_campaign_path %></p>
+<div class="page-head">
+  <h1>Mes campagnes</h1>
+  <p><%= link_to "Nouvelle campagne", new_campaign_path, class: "btn btn-primary" %></p>
+</div>
 
 <% if @campaigns.empty? %>
-  <p>Aucune campagne pour le moment.</p>
+  <div class="empty">
+    <p>Aucune campagne pour le moment.</p>
+    <p>Une campagne réunit vos managés, les personnes à interroger et vos questions.</p>
+  </div>
 <% else %>
-  <ul>
+  <ul class="ledger ledger-dated">
     <% @campaigns.each do |campaign| %>
       <li>
-        <%= link_to campaign.name, campaign %>
-        — <%= t("campaign_status.#{campaign.status}") %>
-        (avant le <%= l(campaign.deadline_on) %>)
+        <span class="margin-note">avant le <%= l(campaign.deadline_on) %></span>
+        <%= link_to campaign.name, campaign, class: "ledger-title" %>
+        <span class="status status-<%= campaign.status %>"><%= t("campaign_status.#{campaign.status}") %></span>
       </li>
     <% end %>
   </ul>

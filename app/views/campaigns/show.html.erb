@@ -1,18 +1,19 @@
-<h1><%= @campaign.name %></h1>
-
-<p>
-  Statut : <strong><%= t("campaign_status.#{@campaign.status}") %></strong> —
-  date limite : <%= l(@campaign.deadline_on, format: :long) %>
-</p>
+<div class="page-head">
+  <h1><%= @campaign.name %></h1>
+  <p class="campaign-meta">
+    Statut : <strong class="status status-<%= @campaign.status %>"><%= t("campaign_status.#{@campaign.status}") %></strong> —
+    date limite : <%= l(@campaign.deadline_on, format: :long) %>
+  </p>
+</div>
 
 <% if @campaign.draft? %>
-  <p>
-    <%= link_to "Modifier", edit_campaign_path(@campaign) %>
-    <%= button_to "Lancer la campagne", launch_campaign_path(@campaign), form: { class: "inline", data: { turbo_confirm: "Envoyer les invitations aux sondés ?" } } %>
-    <%= button_to "Supprimer", @campaign, method: :delete, form: { class: "inline", data: { turbo_confirm: "Supprimer cette campagne ?" } } %>
+  <p class="actions">
+    <%= link_to "Modifier", edit_campaign_path(@campaign), class: "btn" %>
+    <%= button_to "Lancer la campagne", launch_campaign_path(@campaign), class: "btn btn-primary", form: { class: "inline", data: { turbo_confirm: "Envoyer les invitations aux sondés ?" } } %>
+    <%= button_to "Supprimer", @campaign, method: :delete, class: "btn btn-danger", form: { class: "inline", data: { turbo_confirm: "Supprimer cette campagne ?" } } %>
   </p>
 <% elsif @campaign.running? %>
-  <p><%= button_to "Clôturer la campagne", close_campaign_path(@campaign), form: { class: "inline", data: { turbo_confirm: "Clôturer la campagne ?" } } %></p>
+  <p class="actions"><%= button_to "Clôturer la campagne", close_campaign_path(@campaign), class: "btn", form: { class: "inline", data: { turbo_confirm: "Clôturer la campagne ?" } } %></p>
 <% end %>
 
 <h2>Sondés</h2>
@@ -21,44 +22,52 @@
   <%= submitted %> / <%= @respondents.size %> réponses soumises
   (<%= @respondents.empty? ? 0 : (100.0 * submitted / @respondents.size).round %> %)
 </p>
-<table>
-  <thead><tr><th>Nom</th><th>E-mail</th><th>Statut</th><th>Invité le</th><% if @campaign.running? %><th></th><% end %></tr></thead>
-  <tbody>
-    <% @respondents.each do |respondent| %>
-      <tr id="<%= dom_id(respondent) %>">
-        <td><%= respondent.name %></td>
-        <td><%= respondent.email %></td>
-        <td><%= t("respondent_status.#{respondent.status}") %></td>
-        <td><%= respondent.last_invited_at ? l(respondent.last_invited_at, format: :short) : "—" %></td>
-        <% if @campaign.running? %>
-          <td>
-            <% if respondent.invitable? %>
-              <%= button_to "Renvoyer", resend_campaign_respondent_path(@campaign, respondent), form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{respondent.name} ?" } } %>
-            <% end %>
-          </td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<% if @respondents.any? %>
+  <p class="tally" aria-hidden="true">
+    <% @respondents.sort_by { |r| r.submitted? ? 0 : 1 }.each do |respondent| %><i class="<%= "on" if respondent.submitted? %>"></i><% end %>
+  </p>
+<% end %>
+<div class="table-scroll">
+  <table>
+    <thead><tr><th>Nom</th><th>E-mail</th><th>Statut</th><th>Invité le</th><% if @campaign.running? %><th><span class="visually-hidden">Actions</span></th><% end %></tr></thead>
+    <tbody>
+      <% @respondents.each do |respondent| %>
+        <tr id="<%= dom_id(respondent) %>">
+          <td><%= respondent.name %></td>
+          <td class="muted"><%= respondent.email %></td>
+          <td><span class="status status-<%= respondent.status %>"><%= t("respondent_status.#{respondent.status}") %></span></td>
+          <td class="muted"><%= respondent.last_invited_at ? l(respondent.last_invited_at, format: :short) : "—" %></td>
+          <% if @campaign.running? %>
+            <td class="cell-action">
+              <% if respondent.invitable? %>
+                <%= button_to "Renvoyer", resend_campaign_respondent_path(@campaign, respondent), class: "link", form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{respondent.name} ?" } } %>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
 <h2>Managés</h2>
-<ul>
+<ul class="ledger">
   <% @subjects.each do |subject| %>
     <li>
-      <%= subject.name %> (<%= subject.email %>)
+      <span class="ledger-title"><%= subject.name %></span>
+      <span class="muted"><%= subject.email %></span>
       <% unless @campaign.draft? %>
-        — <%= link_to "Synthèse", campaign_summary_path(@campaign, subject_id: subject.id) %>
+        <%= link_to "Synthèse", campaign_summary_path(@campaign, subject_id: subject.id), class: "ledger-action" %>
       <% end %>
     </li>
   <% end %>
 </ul>
 
 <h2>Questions</h2>
-<ol>
+<ol class="question-list">
   <% @campaign.questions.each do |question| %>
     <li><%= question.prompt %> <small>(<%= [ ("note" if question.rating?), ("commentaire" if question.comment?) ].compact.join(" + ") %>)</small></li>
   <% end %>
 </ol>
 
-<p><%= link_to "Retour aux campagnes", campaigns_path %></p>
+<p class="back"><%= link_to "Retour aux campagnes", campaigns_path %></p>

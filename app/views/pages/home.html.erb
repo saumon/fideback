@@ -1,3 +1,26 @@
-<h1>Fideback</h1>
-<p>Préparez vos entretiens individuels de fin d'année en recueillant les feedbacks de plusieurs personnes sur chacun de vos managés.</p>
-<p><%= link_to "Se connecter", new_manager_session_path %> · <%= link_to "Créer un compte", new_manager_registration_path %></p>
+<section class="home-hero">
+  <h1>Arrivez à chaque entretien avec ce que l'équipe a vraiment dit.</h1>
+  <p class="lead">Préparez vos entretiens individuels de fin d'année en recueillant les feedbacks de plusieurs personnes sur chacun de vos managés.</p>
+  <p class="actions">
+    <%= link_to "Créer un compte", new_manager_registration_path, class: "btn btn-primary" %>
+    <%= link_to "Se connecter", new_manager_session_path, class: "btn" %>
+  </p>
+</section>
+
+<figure class="home-specimen" aria-label="Exemple de synthèse">
+  <p class="specimen-title">Synthèse : Gaspard</p>
+  <div class="specimen-row">
+    <p class="specimen-note">Rita<br><span class="scale" aria-label="5 sur 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></p>
+    <blockquote><p><mark>Toujours disponible quand un client bloque, et il explique sans jamais faire la leçon.</mark></p></blockquote>
+  </div>
+  <div class="specimen-row">
+    <p class="specimen-note">Tom<br><span class="scale" aria-label="3 sur 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></p>
+    <blockquote><p><mark>Pourrait déléguer davantage les revues de code.</mark></p></blockquote>
+  </div>
+</figure>
+
+<ol class="home-steps">
+  <li><h2>Créez une campagne</h2><p>Listez vos managés, les personnes à interroger et vos questions.</p></li>
+  <li><h2>Les sondés répondent</h2><p>Chacun reçoit un lien personnel, sans compte à créer.</p></li>
+  <li><h2>Lisez la synthèse</h2><p>Notes et commentaires, nominatifs, regroupés par managé.</p></li>
+</ol>
