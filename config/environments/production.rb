@@ -53,21 +53,29 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Un e-mail d'activation qui ne part pas bloque l'inscription : on veut
+  # l'erreur, pas un échec silencieux.
+  config.action_mailer.raise_delivery_errors = true
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com"), protocol: "https" }
+  # Les liens des e-mails pointent vers le site public. APP_HOST, APP_PORT et
+  # APP_PROTOCOL (ou app.* dans les credentials) les surchargent.
+  config.action_mailer.default_url_options = Fideback::MailerSettings.default_url_options(
+    default_host: "example.com", default_protocol: "https"
+  )
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # SMTP depuis SMTP_* (ou smtp.* dans les credentials), activé seulement si
+  # adresse, port, identifiant et mot de passe sont tous là et que SMTP_ENABLED
+  # n'est pas false. Sans lui aucun compte ne peut s'activer : on le dit au
+  # démarrage, en précisant lequel des deux cas c'est.
+  if Fideback::MailerSettings.smtp_configured?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = Fideback::MailerSettings.smtp_settings
+  else
+    reason = Fideback::MailerSettings.smtp_enabled? ? "n'est pas configuré" : "est désactivé (SMTP_ENABLED=false)"
+    config.after_initialize do
+      Rails.logger.warn("[mail] SMTP #{reason} ; les e-mails (activation de compte, invitations) ne partiront pas")
+    end
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

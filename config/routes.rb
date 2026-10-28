@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  devise_for :managers
+  devise_for :managers, controllers: {
+    registrations: "managers/registrations",
+    confirmations: "managers/confirmations"
+  }
 
   resources :campaigns do
     member do

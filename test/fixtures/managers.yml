@@ -2,8 +2,10 @@ alice:
   name: Alice Manager
   email: alice@example.com
   encrypted_password: <%= Devise::Encryptor.digest(Manager, "password123") %>
+  confirmed_at: <%= 1.day.ago.to_fs(:db) %>
 
 bob:
   name: Bob Manager
   email: bob@example.com
   encrypted_password: <%= Devise::Encryptor.digest(Manager, "password123") %>
+  confirmed_at: <%= 1.day.ago.to_fs(:db) %>

@@ -3,16 +3,26 @@ require "test_helper"
 class ManagerAuthTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
 
-  test "sign up with valid data signs in and redirects to campaigns" do
+  test "sign up with valid data creates an inactive account, sends the activation email and does not sign in" do
     assert_difference "Manager.count", 1 do
-      post manager_registration_path, params: { manager: { name: "Carol", email: "carol@example.com", password: "password123", password_confirmation: "password123" } }
+      assert_emails 1 do
+        post manager_registration_path, params: { manager: { name: "Carol", email: "carol@example.com", password: "password123", password_confirmation: "password123" } }
+      end
     end
-    assert_redirected_to campaigns_path
+    assert_redirected_to new_manager_session_path
+    assert_not Manager.find_by(email: "carol@example.com").confirmed?
+    assert_equal [ "carol@example.com" ], ActionMailer::Base.deliveries.last.to
+    assert_equal I18n.t("devise.registrations.signed_up_but_unconfirmed"), flash[:notice]
+
+    get campaigns_path
+    assert_redirected_to new_manager_session_path
   end
 
   test "sign up with taken email fails" do
     assert_no_difference "Manager.count" do
-      post manager_registration_path, params: { manager: { name: "Dup", email: managers(:alice).email, password: "password123", password_confirmation: "password123" } }
+      assert_no_emails do
+        post manager_registration_path, params: { manager: { name: "Dup", email: managers(:alice).email, password: "password123", password_confirmation: "password123" } }
+      end
     end
     assert_response :unprocessable_entity
   end

@@ -1,0 +1,26 @@
+<h2><%= t('.title') %></h2>
+
+<% if @outcome %>
+  <div id="confirmation-outcome" role="alert">
+    <p><%= t(".outcome.#{@outcome}") %></p>
+    <% if @outcome == :already_active %>
+      <p><%= link_to t('.sign_in'), new_session_path(resource_name) %></p>
+    <% end %>
+  </div>
+<% end %>
+
+<p><%= t('.lead') %></p>
+
+<%# novalidate : toutes les réponses viennent du serveur, d'une seule voix, et ici c'est toujours la même. %>
+<%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, novalidate: true }) do |f| %>
+  <div class="field">
+    <p><%= f.label :email %></p>
+    <p><%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) %></p>
+  </div>
+
+  <div class="actions">
+    <%= f.submit t('.submit') %>
+  </div>
+<% end %>
+
+<p><%= link_to t('.back'), new_session_path(resource_name) %></p>

@@ -6,6 +6,9 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Lu par les fichiers d'environnement, l'initialiseur Devise et ApplicationMailer.
+require_relative "mailer_settings"
+
 module Fideback
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.

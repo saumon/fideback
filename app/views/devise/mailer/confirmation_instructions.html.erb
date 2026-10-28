@@ -1,0 +1,9 @@
+<p><%= t('.greeting', recipient: @resource.name) %></p>
+
+<%# Une action Devise, deux e-mails : activer un nouveau compte, ou confirmer une adresse modifiée (envoyé à la nouvelle adresse). %>
+<p><%= @resource.pending_reconfirmation? ? t('.instruction_reconfirmation') : t('.instruction') %></p>
+
+<p><%= link_to t('.action'), confirmation_url(@resource, confirmation_token: @token) %></p>
+
+<p><%= t('.validity') %></p>
+<p><%= t('.not_you') %></p>

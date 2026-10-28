@@ -1,0 +1,8 @@
+<%= t('.greeting', recipient: @resource.name) %>
+
+<%= @resource.pending_reconfirmation? ? t('.instruction_reconfirmation') : t('.instruction') %>
+
+<%= t('.action') %> : <%= confirmation_url(@resource, confirmation_token: @token) %>
+
+<%= t('.validity') %>
+<%= t('.not_you') %>

@@ -13,7 +13,19 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
     fill_in "Mot de passe", with: "password123", match: :prefer_exact
     fill_in "Confirmation du mot de passe", with: "password123"
     click_on "Inscription", match: :first
+    assert_text "lien de confirmation vous a été envoyé"
+
+    # Activation par le lien reçu par e-mail, puis connexion
+    activation = ActionMailer::Base.deliveries.last
+    assert_equal [ "claire@example.com" ], activation.to
+    link = activation.html_part.body.to_s[/href="([^"]*confirmation_token[^"]*)"/, 1]
+    visit URI(CGI.unescapeHTML(link)).request_uri # le lien pointe vers l'hôte du mailer, pas vers le serveur de test
+    assert_text "Votre compte est activé"
+    fill_in "E-mail", with: "claire@example.com"
+    fill_in "Mot de passe", with: "password123"
+    click_on "Connexion", match: :first
     assert_text "Mes campagnes"
+    ActionMailer::Base.deliveries.clear # ne garde que les invitations pour la suite
 
     # Création de la campagne
     click_on "Nouvelle campagne", match: :first

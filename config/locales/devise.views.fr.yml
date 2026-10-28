@@ -32,9 +32,19 @@ fr:
         other: Utilisateur
   devise:
     confirmations:
-      confirmed: Votre compte a bien été confirmé.
+      confirmed: Votre compte est activé. Vous pouvez maintenant vous connecter.
+      email_changed: Votre nouvelle adresse e-mail est confirmée.
       new:
+        back: Retour à la connexion
+        lead: Saisissez l'adresse e-mail de votre compte pour recevoir un nouveau lien d'activation.
+        outcome:
+          already_active: Ce compte est déjà activé.
+          expired: Ce lien d'activation a expiré. Demandez-en un nouveau ci-dessous.
+          unrecognised: Ce lien d'activation n'est pas reconnu. Il a peut-être été remplacé par un lien plus récent. Demandez-en un nouveau ci-dessous.
         resend_confirmation_instructions: Renvoyer les instructions de confirmation
+        sign_in: Se connecter
+        submit: Recevoir un nouveau lien
+        title: Activer mon compte
       send_instructions: Vous allez recevoir sous quelques minutes un email comportant des instructions pour confirmer votre compte.
       send_paranoid_instructions: "Si votre email existe sur notre base de données, vous recevrez sous quelques minutes un message avec des instructions pour confirmer votre compte."
     failure:
@@ -46,13 +56,16 @@ fr:
       not_found_in_database: "%{authentication_keys} ou mot de passe incorrect."
       timeout: "Votre session est expirée, veuillez vous reconnecter pour continuer."
       unauthenticated: Vous devez vous connecter ou vous enregistrer pour continuer.
-      unconfirmed: Vous devez confirmer votre compte par email.
+      unconfirmed: Vous devez activer votre compte avec le lien reçu par e-mail.
     mailer:
       confirmation_instructions:
-        action: Confirmer mon email
-        greeting: "Bienvenue %{recipient} !"
-        instruction: 'Vous pouvez confirmer votre email grâce au lien ci-dessous :'
-        subject: Instructions de confirmation
+        action: Activer mon compte
+        greeting: "Bonjour %{recipient},"
+        instruction: "Bienvenue sur Fideback. Pour activer votre compte, suivez le lien ci-dessous :"
+        instruction_reconfirmation: "Vous avez demandé à changer l'adresse e-mail de votre compte Fideback. Pour confirmer cette nouvelle adresse, suivez le lien ci-dessous :"
+        not_you: "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message : rien ne sera modifié."
+        subject: Activez votre compte Fideback
+        validity: Ce lien est valable 24 heures.
       email_changed:
         greeting: "Bonjour %{recipient} !"
         message: "Nous vous contactons pour vous informer que votre email a été changé en %{email}."

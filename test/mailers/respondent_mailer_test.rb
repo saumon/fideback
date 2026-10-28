@@ -15,4 +15,12 @@ class RespondentMailerTest < ActionMailer::TestCase
       assert_includes body, "nominativement"
     end
   end
+
+  test "invitation and Devise emails share one sender" do
+    invitation = RespondentMailer.invitation(respondents(:rose))
+    reset = Devise::Mailer.reset_password_instructions(managers(:alice), "token")
+
+    assert_equal Fideback::MailerSettings.mailer_sender, invitation[:from].value
+    assert_equal invitation[:from].value, reset[:from].value
+  end
 end

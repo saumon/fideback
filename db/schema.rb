@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_100000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -44,6 +44,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_090000) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.index ["confirmation_token"], name: "index_managers_on_confirmation_token", unique: true
     t.index ["email"], name: "index_managers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_managers_on_reset_password_token", unique: true
   end
