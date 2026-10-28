@@ -15,16 +15,23 @@
 
 <%= form_with url: respondent_form_path(token: @respondent.token), method: :patch, class: "answer-form" do |f| %>
   <% @respondent.subjects_to_rate.order(:name).each do |subject| %>
-    <fieldset class="subject">
-      <legend><%= subject.name %></legend>
+    <fieldset class="subject <%= voice_class(subject) %>">
+      <legend data-initials="<%= initials(subject.name) %>"><%= subject.name %></legend>
       <% @campaign.questions.each do |question| %>
         <div class="field answer<%= " missing" if missing.include?([ subject.id, question.id ]) %>">
           <p class="prompt"><strong><%= question.prompt %></strong></p>
           <% if question.rating? %>
-            <p class="rating">
+            <p class="rating" data-controller="rating">
               <%= label_tag "answers_#{subject.id}_#{question.id}_rating", "Note (1 à 5)" %>
+              <span class="rating-picks">
+                <% 1.upto(5) do |value| %>
+                  <button type="button" class="rating-pick" data-rating-target="pick" data-action="rating#pick" data-rating-value-param="<%= value %>"
+                          aria-label="Note <%= value %>" aria-pressed="false" <%= "disabled" unless editable %>><%= value %></button>
+                <% end %>
+              </span>
               <%= number_field_tag "answers[#{subject.id}][#{question.id}][rating]", input_value(subject, question, :rating),
-                    min: 1, max: 5, step: 1, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_rating" %>
+                    min: 1, max: 5, step: 1, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_rating",
+                    data: { rating_target: "input", action: "input->rating#sync" } %>
               <% if missing.include?([ subject.id, question.id ]) %><em class="error">Note manquante</em><% end %>
             </p>
           <% end %>

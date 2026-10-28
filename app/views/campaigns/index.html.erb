@@ -9,11 +9,12 @@
     <p>Une campagne réunit vos managés, les personnes à interroger et vos questions.</p>
   </div>
 <% else %>
-  <ul class="ledger ledger-dated">
-    <% @campaigns.each do |campaign| %>
-      <li>
-        <span class="margin-note">avant le <%= l(campaign.deadline_on) %></span>
-        <%= link_to campaign.name, campaign, class: "ledger-title" %>
+  <ul class="campaign-list">
+    <% @campaigns.each_with_index do |campaign, index| %>
+      <li class="voice-<%= index % ApplicationHelper::VOICE_COUNT %>">
+        <span class="campaign-badge" aria-hidden="true"><%= initials(campaign.name) %></span>
+        <%= link_to campaign.name, campaign, class: "campaign-name" %>
+        <span class="campaign-deadline">avant le <%= l(campaign.deadline_on) %></span>
         <span class="status status-<%= campaign.status %>"><%= t("campaign_status.#{campaign.status}") %></span>
       </li>
     <% end %>

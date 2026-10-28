@@ -25,7 +25,7 @@
 
   <body class="page-<%= controller_name %>">
     <header class="site-header">
-      <%= link_to "Fideback", root_path, class: "brand" %>
+      <%= link_to root_path, class: "brand" do %><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Fideback<% end %>
       <nav aria-label="Navigation principale">
         <% if manager_signed_in? %>
           <%= link_to "Mes campagnes", campaigns_path %>

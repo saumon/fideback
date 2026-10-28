@@ -1,8 +1,8 @@
 <div class="page-head">
   <h1><%= @campaign.name %></h1>
   <p class="campaign-meta">
-    Statut : <strong class="status status-<%= @campaign.status %>"><%= t("campaign_status.#{@campaign.status}") %></strong> —
-    date limite : <%= l(@campaign.deadline_on, format: :long) %>
+    Statut&nbsp;: <strong class="status status-<%= @campaign.status %>"><%= t("campaign_status.#{@campaign.status}") %></strong> —
+    date limite&nbsp;: <%= l(@campaign.deadline_on, format: :long) %>
   </p>
 </div>
 
@@ -23,8 +23,10 @@
   (<%= @respondents.empty? ? 0 : (100.0 * submitted / @respondents.size).round %> %)
 </p>
 <% if @respondents.any? %>
-  <p class="tally" aria-hidden="true">
-    <% @respondents.sort_by { |r| r.submitted? ? 0 : 1 }.each do |respondent| %><i class="<%= "on" if respondent.submitted? %>"></i><% end %>
+  <p class="chorus" aria-hidden="true">
+    <% @respondents.sort_by { |r| r.submitted? ? 0 : 1 }.each_with_index do |respondent, index| %>
+      <%= avatar(respondent, css_class: ("is-waiting" unless respondent.submitted?), title: respondent.name, style: "--i: #{index}") %>
+    <% end %>
   </p>
 <% end %>
 <div class="table-scroll">
@@ -33,10 +35,10 @@
     <tbody>
       <% @respondents.each do |respondent| %>
         <tr id="<%= dom_id(respondent) %>">
-          <td><%= respondent.name %></td>
-          <td class="muted"><%= respondent.email %></td>
-          <td><span class="status status-<%= respondent.status %>"><%= t("respondent_status.#{respondent.status}") %></span></td>
-          <td class="muted"><%= respondent.last_invited_at ? l(respondent.last_invited_at, format: :short) : "—" %></td>
+          <td class="cell-person"><%= avatar(respondent) %><%= respondent.name %></td>
+          <td class="muted cell-email"><%= respondent.email %></td>
+          <td class="cell-status"><span class="status status-<%= respondent.status %>"><%= t("respondent_status.#{respondent.status}") %></span></td>
+          <td class="muted cell-invited" data-label="Invité le"><%= respondent.last_invited_at ? l(respondent.last_invited_at, format: :short) : "—" %></td>
           <% if @campaign.running? %>
             <td class="cell-action">
               <% if respondent.invitable? %>
@@ -54,6 +56,7 @@
 <ul class="ledger">
   <% @subjects.each do |subject| %>
     <li>
+      <%= avatar(subject) %>
       <span class="ledger-title"><%= subject.name %></span>
       <span class="muted"><%= subject.email %></span>
       <% unless @campaign.draft? %>

@@ -9,6 +9,7 @@ export default class extends Controller {
     event.preventDefault()
     const html = this.templateTarget.innerHTML.replaceAll("NEW_RECORD", Date.now().toString())
     this.containerTarget.insertAdjacentHTML("beforeend", html)
+    this.containerTarget.lastElementChild.classList.add("is-added")
   }
 
   remove(event) {

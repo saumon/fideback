@@ -1,5 +1,5 @@
 <div class="page-head">
-  <h1>Synthèse : <%= @subject.name %></h1>
+  <h1><%= avatar(@subject, css_class: "avatar-large") %>Synthèse : <%= @subject.name %></h1>
   <p class="campaign-meta">Campagne <%= link_to @subject.campaign.name, @subject.campaign %> —
     <%= @summary.respondents_count %> sondé(s) ayant soumis leurs réponses.</p>
 </div>
@@ -13,39 +13,48 @@
     <h2><%= qs.question.prompt %></h2>
 
     <% if qs.question.rating? %>
-      <aside class="rating-notes">
-        <% if qs.average %>
-          <p class="average">Moyenne : <strong><%= number_with_precision(qs.average, precision: 1) %> / 5</strong> <span>(<%= qs.rating_count %> note(s))</span></p>
-          <ul class="ratings">
-            <% qs.entries.select(&:rating).each do |entry| %>
-              <li>
-                <span class="rater"><%= entry.respondent.name %> : <%= entry.rating %> / 5</span>
-                <span class="scale" aria-hidden="true"><% 5.times do |i| %><i class="<%= "on" if i < entry.rating %>"></i><% end %></span>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <p class="muted">Pas encore de note.</p>
-        <% end %>
-      </aside>
+      <% if qs.average %>
+        <% rated = qs.entries.select(&:rating) %>
+        <div class="track" aria-hidden="true">
+          <span class="track-avg" style="--pos: <%= ((qs.average - 1) / 4 * 100).round(1) %>%"><%= number_with_precision(qs.average, precision: 1) %></span>
+          <% stacked = Hash.new(0) %>
+          <% rated.each_with_index do |entry, index| %>
+            <%= avatar(entry.respondent, title: entry.respondent.name,
+                       style: "--pos: #{(entry.rating - 1) * 25}%; --stack: #{stacked[entry.rating]}; --i: #{index}") %>
+            <% stacked[entry.rating] += 1 %>
+          <% end %>
+          <ol class="track-scale"><% 1.upto(5) do |n| %><li><%= n %></li><% end %></ol>
+        </div>
+        <p class="average">Moyenne : <strong><%= number_with_precision(qs.average, precision: 1) %> / 5</strong> <span>(<%= qs.rating_count %> note(s))</span></p>
+        <ul class="ratings">
+          <% rated.each do |entry| %>
+            <li class="<%= voice_class(entry.respondent) %>"><%= entry.respondent.name %> : <%= entry.rating %> / 5</li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="muted">Pas encore de note.</p>
+      <% end %>
     <% end %>
 
     <% if qs.question.comment? %>
       <% if qs.comments.any? %>
         <ul class="comments">
-          <% qs.comments.each do |entry| %>
-            <li>
-              <blockquote>
-                <% entry.body.strip.split(/\r?\n(?:\s*\r?\n)+/).each do |paragraph| %>
-                  <p><mark><%= safe_join(paragraph.split(/\r?\n/), tag.br) %></mark></p>
-                <% end %>
-              </blockquote>
-              <cite><%= entry.respondent.name %></cite>
+          <% qs.comments.each_with_index do |entry, index| %>
+            <li class="<%= voice_class(entry.respondent) %>" style="--i: <%= index %>">
+              <%= avatar(entry.respondent) %>
+              <div>
+                <blockquote>
+                  <% entry.body.strip.split(/\r?\n(?:\s*\r?\n)+/).each do |paragraph| %>
+                    <p><%= safe_join(paragraph.split(/\r?\n/), tag.br) %></p>
+                  <% end %>
+                </blockquote>
+                <cite><%= entry.respondent.name %></cite>
+              </div>
             </li>
           <% end %>
         </ul>
       <% else %>
-        <p class="muted comments-empty">Pas encore de commentaire.</p>
+        <p class="muted">Pas encore de commentaire.</p>
       <% end %>
     <% end %>
   </section>
