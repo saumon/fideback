@@ -1,0 +1,5 @@
+<% if Rails.env.development? %>
+  <footer class="dev-footer">
+    Dev : <%= link_to "boîte mail (letter_opener)", letter_opener_web.letters_path, target: "_blank", rel: "noopener" %>
+  </footer>
+<% end %>

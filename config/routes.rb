@@ -16,7 +16,10 @@ Rails.application.routes.draw do
     post "soumettre", action: :submit, as: :submit_respondent_form
   end
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Boîte mail de développement : les emails interceptés par letter_opener_web.
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+
+  get "up" =>"rails/health#show", as: :rails_health_check
 
   root "pages#home"
 end

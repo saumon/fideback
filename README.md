@@ -22,7 +22,20 @@ bin/setup --skip-server   # installe les gems et prépare la base
 bin/dev                   # http://localhost:3000, joignable sur le réseau local (BINDING=127.0.0.1 pour restreindre)
 ```
 
-En développement les e-mails (invitations, réinitialisation de mot de passe) ne sont pas envoyés ; consultez le journal `log/development.log`.
+## E-mails en développement
+
+En développement aucun e-mail (invitations, réinitialisation de mot de passe) n'est envoyé : ils sont tous interceptés par [letter_opener_web](https://github.com/fgrehm/letter_opener_web) et consultables dans le navigateur sur `/letter_opener` (par exemple http://localhost:3000/letter_opener). La boîte est servie par l'application elle-même, ce qui fonctionne aussi quand le développement se fait sur une machine distante.
+
+Un lien « Dev : boîte mail (letter_opener) » est affiché tout en bas de chaque page, côté manager comme côté sondé, **uniquement en développement**. La route et le lien n'existent ni en test ni en production.
+
+Les liens contenus dans les e-mails utilisent l'hôte et le port définis par `APP_HOST` et `APP_PORT` (par défaut `localhost` et `3000`). Si vous accédez à l'application par une autre adresse, par exemple depuis le réseau local, créez un fichier `.env` à la racine (ignoré par git, chargé par `dotenv-rails`) :
+
+```bash
+APP_HOST=192.168.1.23
+APP_PORT=3000
+```
+
+Redémarrez le serveur après toute modification. Les e-mails déjà interceptés conservent l'ancien lien : videz la boîte avec « Clear » ou renvoyez-les.
 
 ## Tests et qualité
 
@@ -43,7 +56,7 @@ bin/ci                    # enchaîne l'ensemble (hors tests système)
 
 ## Déploiement (Kamal)
 
-Le déploiement est configuré dans `config/deploy.yml` (voir la [documentation Kamal](https://kamal-deploy.org)). À renseigner avant le premier déploiement : serveur, registre d'images, domaine, et la variable `APP_HOST` (hôte utilisé dans les liens des e-mails). Les paramètres SMTP se placent dans les credentials (`bin/rails credentials:edit`, clés `smtp`) puis se décommentent dans `config/environments/production.rb`.
+Le déploiement est configuré dans `config/deploy.yml` (voir la [documentation Kamal](https://kamal-deploy.org)). À renseigner avant le premier déploiement : serveur, registre d'images, domaine, et la variable `APP_HOST` (hôte utilisé dans les liens des e-mails ; en développement, la même variable se règle dans `.env`, voir plus haut). Les paramètres SMTP se placent dans les credentials (`bin/rails credentials:edit`, clés `smtp`) puis se décommentent dans `config/environments/production.rb`.
 
 ```bash
 bin/kamal setup           # premier déploiement

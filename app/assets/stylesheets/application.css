@@ -25,3 +25,4 @@ fieldset { margin-bottom: 1.5rem; border: 1px solid #d9e2ec; border-radius: 4px;
 .notice-transparency { background: #fff3c4; padding: 0.5rem 0.75rem; border-radius: 4px; }
 .field.missing { border-left: 3px solid #d64545; padding-left: 0.5rem; }
 .error { color: #b00020; }
+.dev-footer { margin-top: 2rem; padding: 0.5rem 1rem; border-top: 1px dashed #bcccdc; font-size: 0.8rem; color: #627d98; }

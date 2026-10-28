@@ -60,6 +60,14 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Loads .env (APP_HOST, APP_PORT…) into ENV in development.
+  gem "dotenv-rails"
+
+  # Mail intercepted in development lands in a web inbox served by the app
+  # itself (/letter_opener); development runs on a remote box, so a local-browser
+  # opener or files on the server's disk would not work.
+  gem "letter_opener_web"
 end
 
 group :test do
