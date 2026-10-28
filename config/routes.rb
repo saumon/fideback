@@ -7,6 +7,9 @@ Rails.application.routes.draw do
       post :close
     end
     resources :summaries, only: :show, param: :subject_id
+    resources :respondents, only: [] do
+      post :resend, on: :member
+    end
   end
 
   # Espace sondé : accès par lien personnel à jeton, sans compte.

@@ -94,4 +94,20 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:sam))}", /Réponse partielle/
     assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:dana_as_respondent))}", /Pas encore répondu/
   end
+
+  test "show offers a resend button only to respondents who can still answer" do
+    respondents(:rose).update!(submitted_at: Time.current)
+    respondents(:sam).update!(last_invited_at: Time.zone.local(2026, 10, 20, 9, 30))
+    get campaign_path(campaigns(:running_campaign))
+    assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:rose))} form", count: 0
+    assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:sam))} form[action='#{resend_campaign_respondent_path(campaigns(:running_campaign), respondents(:sam))}']"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:sam))}", /20 oct\./
+    assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:dana_as_respondent))}", /—/
+  end
+
+  test "show has no resend button outside a running campaign" do
+    get campaign_path(campaigns(:draft_campaign))
+    assert_select "button", text: "Renvoyer", count: 0
+    assert_select "th", text: "Invité le"
+  end
 end

@@ -35,7 +35,7 @@ APP_HOST=192.168.1.23
 APP_PORT=3000
 ```
 
-Redémarrez le serveur après toute modification. Les e-mails déjà interceptés conservent l'ancien lien : videz la boîte avec « Clear » ou renvoyez-les.
+Redémarrez le serveur après toute modification. Les e-mails déjà interceptés conservent l'ancien lien : videz la boîte avec « Clear » ou renvoyez-les (bouton *Renvoyer* sur la page de la campagne).
 
 ## Tests et qualité
 
@@ -51,6 +51,7 @@ bin/ci                    # enchaîne l'ensemble (hors tests système)
 
 - Les **managers** s'inscrivent librement et gèrent leurs campagnes (brouillon → en cours → clôturée).
 - Au lancement, chaque **sondé** reçoit un e-mail avec un lien personnel (`/repondre/<jeton>`). Il note (1 à 5) et/ou commente chaque managé, enregistre sa progression, puis soumet définitivement. Il est informé que ses réponses sont **nominatives**.
+- Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
 - Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.
 - Les réponses sont fermées à la clôture de la campagne ou à la date limite.
 

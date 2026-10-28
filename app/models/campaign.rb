@@ -31,7 +31,7 @@ class Campaign < ApplicationRecord
 
     transaction do
       running!
-      respondents.each { |respondent| RespondentMailer.invitation(respondent).deliver_later }
+      respondents.each(&:invite!)
     end
   end
 

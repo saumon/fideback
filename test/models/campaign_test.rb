@@ -43,6 +43,7 @@ class CampaignTest < ActiveSupport::TestCase
       campaign.launch!
     end
     assert campaign.reload.running?
+    assert campaign.respondents.all?(&:last_invited_at)
   end
 
   test "close! only works on a running campaign" do

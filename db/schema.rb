@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_215544) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_090000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_215544) do
     t.datetime "submitted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "last_invited_at"
     t.index ["campaign_id", "email"], name: "index_respondents_on_campaign_id_and_email", unique: true
     t.index ["campaign_id"], name: "index_respondents_on_campaign_id"
     t.index ["token"], name: "index_respondents_on_token", unique: true

@@ -14,6 +14,19 @@ class Respondent < ApplicationRecord
     submitted_at.present?
   end
 
+  # Le lien personnel est encore utilisable et le sondé n'a pas fini de répondre.
+  def invitable?
+    campaign.accepting_answers? && !submitted?
+  end
+
+  # Date l'invitation à la mise en file de l'email, pas à sa livraison.
+  def invite!
+    transaction do
+      update!(last_invited_at: Time.current)
+      RespondentMailer.invitation(self).deliver_later
+    end
+  end
+
   # Managés sur lesquels ce sondé doit répondre (jamais lui-même).
   def subjects_to_rate
     campaign.subjects.where.not("LOWER(subjects.email) = ?", email.downcase)

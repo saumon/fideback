@@ -22,13 +22,21 @@
   (<%= @respondents.empty? ? 0 : (100.0 * submitted / @respondents.size).round %> %)
 </p>
 <table>
-  <thead><tr><th>Nom</th><th>E-mail</th><th>Statut</th></tr></thead>
+  <thead><tr><th>Nom</th><th>E-mail</th><th>Statut</th><th>Invité le</th><% if @campaign.running? %><th></th><% end %></tr></thead>
   <tbody>
     <% @respondents.each do |respondent| %>
       <tr id="<%= dom_id(respondent) %>">
         <td><%= respondent.name %></td>
         <td><%= respondent.email %></td>
         <td><%= t("respondent_status.#{respondent.status}") %></td>
+        <td><%= respondent.last_invited_at ? l(respondent.last_invited_at, format: :short) : "—" %></td>
+        <% if @campaign.running? %>
+          <td>
+            <% if respondent.invitable? %>
+              <%= button_to "Renvoyer", resend_campaign_respondent_path(@campaign, respondent), form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{respondent.name} ?" } } %>
+            <% end %>
+          </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
