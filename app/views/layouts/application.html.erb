@@ -26,20 +26,30 @@
   </head>
 
   <body class="page-<%= controller_name %>">
-    <header class="site-header">
+    <header class="site-header" data-controller="nav-drawer">
       <%= link_to root_path, class: "brand" do %><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="brand-name">Fideback</span><% end %>
-      <nav aria-label="Navigation principale">
-        <% if manager_signed_in? %>
-          <%= nav_link "Mes campagnes", campaigns_path, :campaigns %>
-          <%= nav_link "Mon équipe", team_path, :team %>
-          <%= nav_link "Administration", admin_root_path, :admin if current_manager.admin? %>
-          <%= nav_link current_manager.name, edit_manager_registration_path, :account %>
-          <%= button_to "Se déconnecter", destroy_manager_session_path, method: :delete, class: "link", form: { class: "inline" } %>
-        <% else %>
-          <%= nav_link "Se connecter", new_manager_session_path, :sign_in %>
-          <%= link_to "Créer un compte", new_manager_registration_path, class: "btn btn-small" %>
-        <% end %>
-      </nav>
+      <div class="header-end">
+        <nav id="site-nav" aria-label="Navigation principale" data-nav-drawer-target="panel">
+          <% if manager_signed_in? %>
+            <%= nav_link "Mes campagnes", campaigns_path, :campaigns %>
+            <%= nav_link "Mon équipe", team_path, :team %>
+            <%= nav_link "Administration", admin_root_path, :admin if current_manager.admin? %>
+            <div class="nav-account">
+              <p class="nav-who">Connecté</p>
+              <%= nav_link current_manager.name, edit_manager_registration_path, :account %>
+              <%= button_to "Se déconnecter", destroy_manager_session_path, method: :delete, class: "link", form: { class: "inline" } %>
+            </div>
+          <% else %>
+            <%= nav_link "Se connecter", new_manager_session_path, :sign_in %>
+          <% end %>
+        </nav>
+        <%# Hors du <nav> : sur mobile, il reste dans l'en-tête quand le tiroir est fermé. %>
+        <%= link_to "Créer un compte", new_manager_registration_path, class: "btn btn-small" unless manager_signed_in? %>
+        <%# Masqué tant que le contrôleur n'est pas connecté : sans JavaScript, la navigation reste empilée. %>
+        <button type="button" class="nav-toggle" hidden aria-controls="site-nav" aria-expanded="false" aria-label="Ouvrir le menu"
+                data-nav-drawer-target="toggle" data-action="nav-drawer#toggle"><span></span><span></span><span></span></button>
+      </div>
+      <div class="nav-scrim" aria-hidden="true" data-action="click->nav-drawer#close"></div>
     </header>
 
     <main>

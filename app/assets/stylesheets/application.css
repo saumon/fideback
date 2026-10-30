@@ -33,6 +33,7 @@
   --font: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
   --page: 56rem;
   --bounce: cubic-bezier(.34, 1.56, .64, 1);
+  --glide: cubic-bezier(.2, .8, .2, 1);
 
   color-scheme: light;
 }
@@ -196,6 +197,122 @@ a.brand:hover { color: var(--ink); }
 }
 @keyframes nav-unroll { from { transform: scaleX(0); } }
 @keyframes nav-flow { to { background-position: 200% 0; } }
+
+/* Conteneur de la navigation, du bouton « Créer un compte » et du bouton de menu */
+.header-end { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 0.8rem; }
+.nav-account { display: contents; }
+.nav-who, .nav-toggle, .nav-scrim { display: none; }
+
+/* Tiroir des petits écrans. Il n'existe qu'une fois le contrôleur connecté (data-nav-ready) : sans JavaScript,
+   la navigation reste empilée dans l'en-tête. Les entrées sont visibles par défaut et seule leur animation part
+   de « masqué » : sous prefers-reduced-motion, la règle globale coupe l'animation et tout s'affiche d'emblée. */
+@media (max-width: 40rem) {
+  .site-header[data-nav-ready] { position: relative; z-index: 30; flex-wrap: nowrap; gap: 0.5rem; padding: 0.7rem max(1rem, env(safe-area-inset-right, 0px)) 0.7rem max(1rem, env(safe-area-inset-left, 0px)); }
+  .site-header[data-nav-ready] .header-end { flex-wrap: nowrap; gap: 0.6rem; }
+  .site-header[data-nav-ready] .header-end > .btn { white-space: nowrap; }
+
+  .site-header[data-nav-ready] .nav-toggle {
+    display: block;
+    position: relative;
+    z-index: 50;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 2px 2px 0 var(--saffron);
+    cursor: pointer;
+    transition: background-color 200ms, box-shadow 200ms;
+  }
+  .nav-toggle[hidden] { display: none !important; }
+  .nav-toggle span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.1rem;
+    height: 2.5px;
+    margin: -1.25px 0 0 -0.55rem;
+    border-radius: 2px;
+    background: var(--ink);
+    transition: transform 320ms var(--bounce), opacity 160ms;
+  }
+  .nav-toggle span:nth-child(1) { transform: translateY(-6px); }
+  .nav-toggle span:nth-child(3) { transform: translateY(6px); }
+  .site-header.is-open .nav-toggle { background: var(--saffron); box-shadow: 2px 2px 0 var(--pink); }
+  .site-header.is-open .nav-toggle span:nth-child(1) { transform: rotate(45deg); }
+  .site-header.is-open .nav-toggle span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .site-header.is-open .nav-toggle span:nth-child(3) { transform: rotate(-45deg); }
+  .nav-toggle:focus-visible, .site-header nav a:focus-visible, .site-header nav button:focus-visible { outline: 3px solid var(--azure); outline-offset: 3px; }
+
+  .site-header[data-nav-ready] .nav-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: color-mix(in srgb, var(--ink) 55%, transparent);
+    opacity: 0;
+    visibility: hidden;
+  }
+  /* Plus spécifique que la règle d'armement des transitions (plus bas) : sinon sa visibilité à l'ouverture serait retardée. */
+  .site-header[data-nav-ready].is-open .nav-scrim { opacity: 1; visibility: visible; transition-delay: 0s; }
+
+  .site-header[data-nav-ready] nav {
+    position: fixed;
+    z-index: 40;
+    inset: 0 0 0 auto;
+    width: min(82%, 19rem);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 0.2rem;
+    padding: calc(5rem + env(safe-area-inset-top, 0px)) 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    background: var(--surface);
+    border-left: 2px solid var(--ink);
+    font-size: 1.25rem;
+    transform: translateX(104%);
+    visibility: hidden;
+  }
+  /* Les transitions n'arment qu'après le premier rendu : sinon le tiroir glisserait vers sa position fermée à chaque chargement. */
+  .site-header[data-nav-armed] .nav-scrim { transition: opacity 300ms ease, visibility 0s linear 300ms; }
+  .site-header[data-nav-armed] nav { transition: transform 380ms var(--glide), visibility 0s linear 380ms; }
+  .site-header[data-nav-ready].is-open nav { transform: none; visibility: visible; transition-delay: 0s; }
+  .site-header[data-nav-ready] nav a:not(.btn) { padding: 0.75rem 0.45rem; overflow-wrap: anywhere; }
+  .site-header[data-nav-ready] nav a:not(.btn)::after { bottom: 0.4rem; }
+
+  .site-header[data-nav-ready] .nav-account {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 0.2rem;
+    margin-top: 0.9rem;
+    padding-top: 0.6rem;
+    border-top: 2px solid var(--line);
+  }
+  .site-header[data-nav-ready] .nav-who { display: block; margin: 0.2rem 0.45rem 0; font-size: 0.8125rem; color: var(--ink-soft); }
+  .site-header[data-nav-ready] nav form.inline { display: block; }
+  .site-header[data-nav-ready] nav button.link { min-height: 3rem; padding: 0.75rem 0.45rem; font-size: 1.0625rem; color: var(--ink-soft); }
+
+  /* Cascade d'apparition ; la barre de l'entrée active se déroule une fois le tiroir en place. */
+  .site-header.is-open nav > a, .site-header.is-open .nav-account > * {
+    animation: nav-item-in 420ms var(--glide) both;
+    animation-delay: calc(var(--i, 0) * 60ms + 120ms);
+  }
+  .site-header[data-nav-ready] nav a[aria-current="page"]::after { animation: none; }
+  .site-header[data-nav-ready].is-open nav a[aria-current="page"]::after {
+    animation: nav-unroll 450ms var(--bounce) 380ms both, nav-flow 3s linear 830ms infinite;
+  }
+}
+/* Très petits écrans : le logo cède ses points pour que « Créer un compte » et le bouton de menu tiennent sur une ligne. */
+@media (max-width: 24rem) {
+  .site-header[data-nav-ready] .brand-dots { display: none; }
+  .site-header[data-nav-ready] .header-end > .btn { padding-inline: 0.6rem; font-size: 0.8125rem; }
+}
+@keyframes nav-item-in { from { opacity: 0; transform: translateX(1.25rem); } }
+html.nav-open { overflow: hidden; }
 
 /* Page */
 
