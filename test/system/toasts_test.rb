@@ -7,6 +7,7 @@ class ToastsTest < ApplicationSystemTestCase
     fill_in "E-mail", with: "alice@example.com"
     fill_in "Mot de passe", with: "password123"
     click_on "Connexion", match: :first
+    assert_selector "h1", text: "Mes campagnes" # la session existe avant toute autre visite
   end
 
   test "a notice shows up as a toast and leaves on its own" do

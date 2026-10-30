@@ -1,5 +1,10 @@
 <section class="home-hero">
-  <h1>Arrivez à chaque entretien avec ce que l'équipe a vraiment dit.</h1>
+  <% title = "Arrivez à chaque entretien avec ce que l'équipe a vraiment dit." %>
+  <%# Chaque mot arrive avec son rebond et sa voix ; les lecteurs d'écran lisent la phrase entière, une seule fois. %>
+  <h1>
+    <span class="visually-hidden"><%= title %></span>
+    <span aria-hidden="true"><% title.split.each_with_index do |word, index| %><span class="word voice-<%= index % 6 %>" style="--i: <%= index %>"><%= word %></span> <% end %></span>
+  </h1>
   <p class="lead">Préparez vos entretiens individuels de fin d'année en recueillant les feedbacks de plusieurs personnes sur chacun de vos managés.</p>
   <p class="actions">
     <%= link_to "Créer un compte", new_manager_registration_path, class: "btn btn-primary" %>

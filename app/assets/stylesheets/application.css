@@ -693,7 +693,11 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
   line-height: 0.98;
   letter-spacing: -0.01em;
   margin-bottom: 1.5rem;
-  animation: settle 1100ms cubic-bezier(.2, .8, .2, 1) both;
+}
+/* Mot par mot : seuls l'opacité, la transformation et la couleur bougent, la mise en page du titre ne change jamais. */
+.home-hero h1 .word {
+  display: inline-block;
+  animation: word-in 640ms calc(var(--i) * 70ms) var(--bounce) both;
 }
 .lead { font-size: 1.25rem; line-height: 1.5; max-width: 36rem; color: var(--ink-soft); }
 .home-hero .actions { margin-top: 2rem; }
@@ -962,8 +966,9 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 
 /* Mouvements */
 
-@keyframes settle {
-  from { opacity: 0; font-weight: 300; font-stretch: 100%; letter-spacing: 0.02em; }
+@keyframes word-in {
+  from { opacity: 0; color: var(--voice); transform: translateY(0.45em) scale(0.85) rotate(-6deg); }
+  60% { opacity: 1; color: var(--voice); }
 }
 @keyframes scene-in {
   from { opacity: 0; transform: translateY(1.5rem) rotate(3deg); }
