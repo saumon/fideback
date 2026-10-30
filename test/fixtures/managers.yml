@@ -1,6 +1,7 @@
 alice:
   name: Alice Manager
   email: alice@example.com
+  role: admin
   encrypted_password: <%= Devise::Encryptor.digest(Manager, "password123") %>
   confirmed_at: <%= 1.day.ago.to_fs(:db) %>
 

@@ -5,6 +5,13 @@ class Manager < ApplicationRecord
   devise :database_authenticatable, :registerable, :confirmable,
          :recoverable, :rememberable, :validatable
 
+  enum :role, { manager: "manager", admin: "admin" }, default: :manager
+
+  # Le tout premier compte créé administre le site. Dans la transaction de
+  # l'insertion, pour que deux inscriptions simultanées ne l'obtiennent pas
+  # toutes les deux ; personne ne le reprend si ce compte disparaît.
+  before_create { self.role = :admin if Manager.none? }
+
   has_many :campaigns, dependent: :destroy
   has_many :contacts, -> { order(:name, :id) }, dependent: :destroy, inverse_of: :manager
 

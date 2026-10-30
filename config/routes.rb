@@ -4,6 +4,11 @@ Rails.application.routes.draw do
     confirmations: "managers/confirmations"
   }
 
+  # Espace réservé à l'Admin du site.
+  namespace :admin do
+    root "dashboard#show"
+  end
+
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
   resource :team, only: %i[show update]
 

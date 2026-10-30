@@ -3,6 +3,31 @@ require "test_helper"
 class ManagerTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
 
+  test "the first manager created is an admin, the next ones are managers" do
+    Manager.destroy_all
+
+    first = Manager.create!(name: "First", email: "first@example.com", password: "password123")
+    second = Manager.create!(name: "Second", email: "second@example.com", password: "password123")
+
+    assert first.reload.admin?
+    assert second.reload.manager?
+  end
+
+  test "nobody becomes admin after the admin is gone" do
+    Manager.destroy_all
+    admin = Manager.create!(name: "First", email: "first@example.com", password: "password123")
+    Manager.create!(name: "Second", email: "second@example.com", password: "password123")
+    admin.destroy
+    third = Manager.create!(name: "Third", email: "third@example.com", password: "password123")
+
+    assert third.manager?
+    assert_equal 0, Manager.admin.count
+  end
+
+  test "a manager created while others exist is a manager" do
+    assert Manager.create!(name: "New", email: "new@example.com", password: "password123").manager?
+  end
+
   test "requires a name" do
     manager = Manager.new(email: "c@example.com", password: "password123")
     assert_not manager.valid?

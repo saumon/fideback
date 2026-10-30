@@ -3,6 +3,18 @@ require "test_helper"
 class ManagerAuthTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
 
+  test "the first sign-up is an unconfirmed admin, the next one a manager" do
+    Manager.destroy_all
+
+    post manager_registration_path, params: { manager: { name: "Carol", email: "carol@example.com", password: "password123", password_confirmation: "password123" } }
+    post manager_registration_path, params: { manager: { name: "Dave", email: "dave@example.com", password: "password123", password_confirmation: "password123" } }
+
+    carol = Manager.find_by!(email: "carol@example.com")
+    assert carol.admin?
+    assert_not carol.confirmed?
+    assert Manager.find_by!(email: "dave@example.com").manager?
+  end
+
   test "sign up with valid data creates an inactive account, sends the activation email and does not sign in" do
     assert_difference "Manager.count", 1 do
       assert_emails 1 do
