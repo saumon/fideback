@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#show"
     resources :users, only: :index
+    resource :danger_zone, path: "danger-zone", controller: "danger_zone", only: %i[show update]
   end
 
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.

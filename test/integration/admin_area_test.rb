@@ -1,7 +1,7 @@
 require "test_helper"
 
 class AdminAreaTest < ActionDispatch::IntegrationTest
-  test "an admin sees the administration screen, with a Users button and no form" do
+  test "an admin sees the administration screen, with its two buttons and no form" do
     sign_in managers(:alice)
 
     get admin_root_path
@@ -10,6 +10,7 @@ class AdminAreaTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Administration"
     assert_select "main form, main button, main input", false
     assert_select "main a.btn[href=?]", admin_users_path, text: "Utilisateurs"
+    assert_select "main a.btn.btn-danger[href=?]", admin_danger_zone_path, text: "Danger zone"
   end
 
   test "a manager who is not an admin gets a 404" do

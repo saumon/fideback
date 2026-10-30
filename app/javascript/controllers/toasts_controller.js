@@ -6,6 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // Le minuteur d'une notice est l'animation de sa barre (voir le CSS) : sa fin ferme le toast ; une alerte n'en a pas.
 const ANNOUNCE_DELAY = 100
 const MAX_TOASTS = 3
+const WARNING_BONUS = 2000 // un avertissement reste plus longtemps qu'une notice de même texte
 const SWIPE_RATIO = 0.35
 const SWIPE_SPEED = 0.5 // px/ms
 
@@ -41,7 +42,7 @@ export default class extends Controller {
   show(toast) {
     if (!toast.classList.contains("flash-alert")) {
       const length = toast.querySelector("p").textContent.trim().length
-      const duration = Math.min(Math.max(3000 + 60 * length, 4000), 10000)
+      const duration = Math.min(Math.max(3000 + 60 * length, 4000), 10000) + (toast.classList.contains("flash-warning") ? WARNING_BONUS : 0)
       toast.style.setProperty("--toast-duration", `${duration}ms`)
       toast.classList.add("is-timed")
     }

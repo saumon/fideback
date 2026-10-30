@@ -4,4 +4,7 @@
   <h1>Administration</h1>
 </div>
 
-<p class="admin-welcome"><%= link_to "Utilisateurs", admin_users_path, class: "btn btn-primary" %></p>
+<p class="actions admin-welcome">
+  <%= link_to "Utilisateurs", admin_users_path, class: "btn btn-primary" %>
+  <%= link_to "Danger zone", admin_danger_zone_path, class: "btn btn-danger" %>
+</p>

@@ -1,0 +1,31 @@
+<% content_for :title, "Danger zone · Fideback" %>
+
+<div class="page-head">
+  <h1>Danger zone</h1>
+  <p class="campaign-meta"><%= link_to "← Administration", admin_root_path %></p>
+</div>
+
+<section class="danger-zone" aria-labelledby="registrations-title">
+  <span class="zone-label">Réservé à l'administrateur</span>
+  <h2 id="registrations-title">Inscriptions des utilisateurs</h2>
+
+  <div class="zone-state">
+    <span class="status <%= @registrations_open ? "status-open" : "status-closed" %>"><%= @registrations_open ? "Ouvertes" : "Fermées" %></span>
+    <p><%= @registrations_open ? "Tout visiteur peut créer un compte." : "Les visiteurs ne peuvent plus créer de compte." %></p>
+  </div>
+  <p class="zone-note">Tant qu'aucun manager n'existe, l'inscription reste possible, pour que le premier compte puisse devenir administrateur.</p>
+
+  <% if @confirming %>
+    <div class="zone-confirm" role="group" aria-label="Confirmation">
+      <p>Plus personne ne pourra créer de compte tant que vous ne les aurez pas réactivées. Les comptes existants ne changent pas.</p>
+      <div class="actions">
+        <%= button_to "Désactiver les inscriptions", admin_danger_zone_path, method: :patch, params: { registrations_open: false }, class: "btn btn-solid-danger" %>
+        <%= link_to "Annuler", admin_danger_zone_path, class: "btn" %>
+      </div>
+    </div>
+  <% elsif @registrations_open %>
+    <div class="actions"><%= link_to "Désactiver les inscriptions", admin_danger_zone_path(confirm: 1), class: "btn btn-danger" %></div>
+  <% else %>
+    <div class="actions"><%= button_to "Réactiver les inscriptions", admin_danger_zone_path, method: :patch, params: { registrations_open: true }, class: "btn" %></div>
+  <% end %>
+</section>

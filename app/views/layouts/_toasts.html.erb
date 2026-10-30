@@ -1,6 +1,6 @@
 <%# Messages consécutifs à une action : posés au premier plan, ils ne décalent rien.
     Devise peut aussi ranger dans le flash des valeurs non textuelles (timedout…) : elles ne s'affichent pas. %>
-<% messages = flash.to_hash.slice("notice", "alert").select { |_, message| message.is_a?(String) && message.present? } %>
+<% messages = flash.to_hash.slice("notice", "warning", "alert").select { |_, message| message.is_a?(String) && message.present? } %>
 <% if messages.any? %>
   <section class="toasts" aria-label="Notifications" aria-live="polite" data-controller="toasts" data-turbo-temporary>
     <% messages.each do |type, message| %>

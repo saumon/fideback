@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -92,6 +92,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_120000) do
     t.index ["campaign_id"], name: "index_respondents_on_campaign_id"
     t.index ["contact_id"], name: "index_respondents_on_contact_id"
     t.index ["token"], name: "index_respondents_on_token", unique: true
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_settings_on_key", unique: true
   end
 
   create_table "subjects", force: :cascade do |t|
