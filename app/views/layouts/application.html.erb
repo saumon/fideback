@@ -31,6 +31,7 @@
       <nav aria-label="Navigation principale">
         <% if manager_signed_in? %>
           <%= link_to "Mes campagnes", campaigns_path %>
+          <%= link_to "Mon équipe", team_path %>
           <%= link_to current_manager.name, edit_manager_registration_path %>
           <%= button_to "Se déconnecter", destroy_manager_session_path, method: :delete, class: "link", form: { class: "inline" } %>
         <% else %>

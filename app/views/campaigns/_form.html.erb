@@ -21,14 +21,12 @@
 
   <fieldset>
     <legend>Managés <span>(personnes sur lesquelles porte le feedback)</span></legend>
-    <%= render "nested_rows", f: f, association: :subjects, partial: "contact_fields",
-                              blank: Subject.new, add_label: "Ajouter un managé" %>
+    <%= render "contact_picker", campaign: campaign, list: :subjects, empty: "Aucun managé dans votre équipe pour l'instant." %>
   </fieldset>
 
   <fieldset>
     <legend>Sondés <span>(personnes interrogées)</span></legend>
-    <%= render "nested_rows", f: f, association: :respondents, partial: "contact_fields",
-                              blank: Respondent.new, add_label: "Ajouter un sondé" %>
+    <%= render "contact_picker", campaign: campaign, list: :respondents, empty: "Aucun sondable dans votre équipe pour l'instant." %>
   </fieldset>
 
   <fieldset>

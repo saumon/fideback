@@ -41,7 +41,7 @@ Redémarrez le serveur après toute modification. Les e-mails déjà intercepté
 
 ```bash
 bin/rails test            # modèles, services, vues, intégration, mailers
-bin/rails test:system     # parcours complet et toasts (Chrome headless)
+bin/rails test:system     # parcours complet, équipe et toasts (Chrome headless)
 bin/rubocop               # style
 bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
@@ -60,7 +60,8 @@ Le « F » du logotype de la barre du haut reprend ce style en CSS (`.brand-name
 ## Fonctionnement
 
 - Les **managers** s'inscrivent librement, puis activent leur compte avec le lien reçu par e-mail (valable 24 heures, renvoi possible depuis la page « Vous n'avez pas reçu l'email de confirmation ? », un e-mail par adresse toutes les 5 minutes) : tant que le compte n'est pas activé, la connexion est refusée. Ils gèrent ensuite leurs campagnes (brouillon → en cours → clôturée). Les comptes créés avant l'introduction de l'activation sont considérés comme activés.
-- Le formulaire de campagne (création et modification, tant qu'elle est en brouillon) est pré-rempli avec des **questions par défaut**. Les questions, les managés et les sondés s'y ajoutent et s'y suppriment directement avec les boutons *Ajouter* et *Supprimer*. Une fois la campagne lancée, ces listes ne sont plus modifiables.
+- Chaque manager tient son **équipe** dans l'écran *Mon équipe* (lien dans le menu) : nom, e-mail unique et rôle(s) *managé* et/ou *sondable*, avec un filtre par rôle. Une modification s'applique aussi aux campagnes en brouillon ; les campagnes lancées gardent leur copie. Au premier déploiement de cette fonctionnalité, une migration remplit l'équipe à partir des campagnes existantes.
+- Le formulaire de campagne (création et modification, tant qu'elle est en brouillon) est pré-rempli avec des **questions par défaut**, qui s'ajoutent et se suppriment avec les boutons *Ajouter* et *Supprimer*. Les managés et les sondés se cochent parmi les contacts de l'équipe (bouton *Tout cocher*), ou s'ajoutent avec *Nouveau contact*, qui les enregistre aussi dans l'équipe. Une fois la campagne lancée, ces listes ne sont plus modifiables.
 - Au lancement, chaque **sondé** reçoit un e-mail avec un lien personnel (`/repondre/<jeton>`). Il note (1 à 5) et/ou commente chaque managé, enregistre sa progression, puis soumet définitivement. Il est informé que ses réponses sont **nominatives**.
 - Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
 - Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.

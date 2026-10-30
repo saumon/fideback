@@ -1,5 +1,6 @@
 class Respondent < ApplicationRecord
   belongs_to :campaign
+  belongs_to :contact, optional: true
   has_many :answers, dependent: :destroy
 
   has_secure_token :token, length: 36

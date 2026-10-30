@@ -4,6 +4,9 @@ Rails.application.routes.draw do
     confirmations: "managers/confirmations"
   }
 
+  # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
+  resource :team, only: %i[show update]
+
   resources :campaigns do
     member do
       post :launch

@@ -37,22 +37,31 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
     assert_selector "input[placeholder='Question']", count: 4
     all("input[placeholder='Question']").last.set("Ambiance générale")
 
-    click_on "Ajouter un sondé"
-    click_on "Ajouter un sondé"
-    fields = all("input[placeholder='Nom']")
-    emails = all("input[placeholder='E-mail']")
-    assert_equal 4, fields.size # 1 managé + 3 sondés
-    fields[0].set("Gaspard Managé"); emails[0].set("gaspard@example.com")
-    fields[1].set("Rita Sondée");    emails[1].set("rita@example.com")
-    fields[2].set("Tom Sondé");      emails[2].set("tom@example.com")
-    within(:fieldset, "Sondés (personnes interrogées)") { all("button", text: "Supprimer").last.click } # ligne laissée vide
-    assert_equal 3, all("input[placeholder='Nom']").size
+    # Annuaire vide : les personnes sont ajoutées depuis la campagne et rejoignent l'équipe
+    managers_section = find(:fieldset, "Managés (personnes sur lesquelles porte le feedback)")
+    respondents_section = find(:fieldset, "Sondés (personnes interrogées)")
+    assert_text "Aucun managé dans votre équipe"
+    within(managers_section) do
+      click_on "Nouveau contact"
+      find("input[placeholder='Nom']").set("Gaspard Managé")
+      find("input[placeholder='E-mail']").set("gaspard@example.com")
+    end
+    within(respondents_section) do
+      3.times { click_on "Nouveau contact" }
+      names = all("input[placeholder='Nom']")
+      emails = all("input[placeholder='E-mail']")
+      names[0].set("Rita Sondée"); emails[0].set("rita@example.com")
+      names[1].set("Tom Sondé");   emails[1].set("tom@example.com")
+      all("button", text: "Supprimer").last.click # ligne laissée vide
+      assert_equal 2, all("input[placeholder='Nom']").size
+    end
     click_on "Créer la campagne"
     assert_text "Campagne créée."
     created = Campaign.find_by!(name: "Entretiens de fin d'année")
     assert_equal Campaign::DEFAULT_QUESTIONS.first(3).map { |q| q[:prompt] } + [ "Ambiance générale" ], created.questions.map(&:prompt)
     assert_equal 2, created.respondents.count
     assert_text "Gaspard Managé"
+    assert_equal [ "Gaspard Managé", "Rita Sondée", "Tom Sondé" ], Manager.find_by!(email: "claire@example.com").contacts.map(&:name)
 
     # Lancement
     perform_enqueued_jobs do

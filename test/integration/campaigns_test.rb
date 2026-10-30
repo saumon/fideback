@@ -19,46 +19,69 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "input[value='#{Campaign::DEFAULT_QUESTIONS.first[:prompt]}']"
   end
 
-  test "new form has one blank subject row and one blank respondent row, plus a template for each list" do
+  def checked_ids(list)
+    css_select("input[type=checkbox][name='campaign[#{list}_contact_ids][]'][checked]").map { |box| box["value"].to_i }
+  end
+
+  test "new form lists my contacts by role, all unchecked, with a template per list" do
     get new_campaign_path
-    assert_select "[data-nested-form-target=container] input[name$='[name]'][placeholder=Nom]", count: 2
-    assert_select "template[data-nested-form-target=template]", count: 3
+    assert_response :success
+    assert_select "input[name='campaign[subject_contact_ids][]'][type=checkbox]", count: 2 # Dana, Eli
+    assert_select "input[name='campaign[respondent_contact_ids][]'][type=checkbox]", count: 3 # Dana, Rose, Sam
+    assert_select "input[type=checkbox][value='#{contacts(:fred).id}']", count: 0
+    assert_empty checked_ids(:subject) + checked_ids(:respondent)
+    assert_select "input[type=hidden][name='campaign[subject_contact_ids][]'][value='']"
+    assert_select "button[data-action='check-all#check']", text: "Tout cocher", count: 2
+    assert_select "[data-nested-form-target=container] .contact", count: 0
+    assert_select "template input[name='campaign[new_subject_contacts][NEW_RECORD][name]']"
     assert_select "template input[name='campaign[questions_attributes][NEW_RECORD][prompt]']"
-    assert_select "button[data-action='nested-form#add']", count: 3
+    assert_select "button[data-action='nested-form#add']", text: "Nouveau contact", count: 2
   end
 
-  test "edit form shows existing items, a delete button on each and one blank contact row" do
-    campaign = campaigns(:draft_campaign)
-    get edit_campaign_path(campaign)
-    assert_select "[data-nested-form-target=container] .question", count: campaign.questions.count
-    assert_select "[data-nested-form-target=container] .contact[data-new-record=false]", count: campaign.subjects.count + campaign.respondents.count
-    assert_select "[data-nested-form-target=container] .contact[data-new-record=true]", count: 2
-    assert_select "[data-nested-form-target=container] button", text: "Supprimer", minimum: campaign.questions.count
+  test "edit form checks the contacts already in the campaign" do
+    get edit_campaign_path(campaigns(:draft_campaign))
+    assert_equal [ contacts(:dana).id ], checked_ids(:subject)
+    assert_equal [ contacts(:rose).id ], checked_ids(:respondent)
+    assert_select "[data-nested-form-target=container] .question", count: campaigns(:draft_campaign).questions.count
   end
 
-  test "create with added items, a default question left out and blank rows ignored" do
+  test "an empty directory points to the team screen" do
+    sign_out :manager
+    sign_in managers(:bob)
+    get new_campaign_path
+    assert_select ".picker-empty", text: /Aucun sondable/ do
+      assert_select "a[href='#{team_path}']"
+    end
+    assert_select "input[name='campaign[subject_contact_ids][]'][type=checkbox]", count: 1 # Fred
+  end
+
+  test "create with selected contacts, a new contact, a default question left out and blank rows ignored" do
     post campaigns_path, params: { campaign: {
       name: "Dynamique", deadline_on: 20.days.from_now.to_date,
-      subjects_attributes: { "1700000000001" => { name: "Gina", email: "gina@example.com", _destroy: "0" },
-                             "1700000000002" => { name: "Ivan", email: "ivan@example.com", _destroy: "0" },
-                             "1700000000003" => { name: "", email: "", _destroy: "0" } },
-      respondents_attributes: { "0" => { name: "Hugo", email: "hugo@example.com", _destroy: "0" } },
+      subject_contact_ids: [ "", contacts(:dana).id, contacts(:eli).id ],
+      respondent_contact_ids: [ "", contacts(:rose).id ],
+      new_respondent_contacts: { "1700000000001" => { name: "Hugo", email: "hugo@example.com" },
+                                 "1700000000002" => { name: "", email: "" } },
       questions_attributes: { "1" => { prompt: "Première", rating: "1", comment: "0", _destroy: "0" },
                               "2" => { prompt: "Seconde", rating: "0", comment: "1", _destroy: "0" } }
     } }
     campaign = Campaign.order(:id).last
     assert_redirected_to campaign_path(campaign)
-    assert_equal %w[Gina Ivan], campaign.subjects.order(:id).map(&:name)
+    assert_equal [ "Dana Managée", "Eli Managé" ], campaign.subjects.order(:name).map(&:name)
+    assert_equal [ "Hugo", "Rose Sondée" ], campaign.respondents.order(:name).map(&:name)
+    hugo = managers(:alice).contacts.find_by!(email: "hugo@example.com")
+    assert hugo.surveyable?
     assert_equal [ [ "Première", 0 ], [ "Seconde", 1 ] ], campaign.questions.map { |q| [ q.prompt, q.position ] }
   end
 
-  test "update adds a question and removes a persisted one" do
+  test "update adds a question, removes a persisted one and unchecks a subject" do
     campaign = campaigns(:draft_campaign)
     existing = campaign.questions.first
     patch campaign_path(campaign), params: { campaign: {
       questions_attributes: { "0" => { id: existing.id, prompt: existing.prompt, rating: "1", comment: "1", _destroy: "1" },
                               "1700000000001" => { prompt: "Ajoutée", rating: "1", comment: "0", _destroy: "0" } },
-      subjects_attributes: { "0" => { id: campaign.subjects.first.id, _destroy: "1" } }
+      subject_contact_ids: [ "" ],
+      respondent_contact_ids: [ "", contacts(:rose).id ]
     } }
     assert_redirected_to campaign_path(campaign)
     campaign.reload
@@ -66,39 +89,65 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_equal "Ajoutée", campaign.questions.last.prompt
     assert_equal (0...campaign.questions.size).to_a, campaign.questions.map(&:position)
     assert_equal 0, campaign.subjects.count
+    assert Contact.exists?(contacts(:dana).id)
+    assert_equal [ respondents(:draft_rose).id ], campaign.respondents.ids
   end
 
-  test "a failed create keeps added rows, drops removed ones and does not pile up blank rows" do
+  test "a failed create keeps the checked boxes, the new contacts and the questions" do
     post campaigns_path, params: { campaign: {
       name: "", deadline_on: 20.days.from_now.to_date,
-      subjects_attributes: { "5" => { name: "Gina", email: "gina@example.com", _destroy: "0" } },
+      subject_contact_ids: [ "", contacts(:eli).id ],
+      new_subject_contacts: { "5" => { name: "Gina", email: "gina@example.com" } },
       questions_attributes: { "7" => { prompt: "Seule question", rating: "1", comment: "0", _destroy: "0" } }
     } }
     assert_response :unprocessable_entity
+    assert_equal [ contacts(:eli).id ], checked_ids(:subject)
+    assert_empty checked_ids(:respondent)
     assert_select "[data-nested-form-target=container] input[value='Gina']", count: 1
+    assert_select "[data-nested-form-target=container] .contact", count: 1
     assert_select "[data-nested-form-target=container] .question", count: 1
     assert_select "[data-nested-form-target=container] input[value='Seule question']"
-    assert_select "[data-nested-form-target=container] .contact[data-new-record=true]", count: 2 # Gina + une ligne vide de sondé
+    assert_not Contact.exists?(email: "gina@example.com")
   end
 
-  test "a failed update re-renders a persisted item marked for deletion as hidden" do
+  test "a failed update keeps an unchecked contact unchecked and changes nothing" do
     campaign = campaigns(:draft_campaign)
-    subject = campaign.subjects.first
-    patch campaign_path(campaign), params: { campaign: {
-      name: "",
-      subjects_attributes: { "0" => { id: subject.id, name: subject.name, email: subject.email, _destroy: "1" } }
-    } }
+    patch campaign_path(campaign), params: { campaign: { name: "", subject_contact_ids: [ "" ] } }
     assert_response :unprocessable_entity
-    assert_select ".contact[hidden] input[name$='[_destroy]'][value='1']"
-    assert_equal subject, subject.reload
+    assert_empty checked_ids(:subject)
+    assert_equal [ contacts(:rose).id ], checked_ids(:respondent)
+    assert_equal [ subjects(:draft_dana) ], campaign.reload.subjects.to_a
+  end
+
+  test "an invalid new contact is shown on its row and nothing is saved" do
+    campaign = campaigns(:draft_campaign)
+    assert_no_difference [ "Contact.count", "Respondent.count" ] do
+      patch campaign_path(campaign), params: { campaign: {
+        respondent_contact_ids: [ "", contacts(:rose).id, contacts(:sam).id ],
+        new_respondent_contacts: { "1" => { name: "Zoé", email: "pas-un-email" } }
+      } }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".callout-alert li", /Nouveau contact « Zoé »/
+    assert_select ".contact.has-error input[value='pas-un-email']"
+    assert_equal [ contacts(:rose).id, contacts(:sam).id ].sort, checked_ids(:respondent).sort
+  end
+
+  test "a new contact with an email already in the directory checks the existing contact" do
+    patch campaign_path(campaigns(:draft_campaign)), params: { campaign: {
+      new_subject_contacts: { "1" => { name: "Sam encore", email: "SAM@example.com" } }
+    } }
+    assert_redirected_to campaign_path(campaigns(:draft_campaign))
+    assert contacts(:sam).reload.managed?
+    assert_includes campaigns(:draft_campaign).subjects.map(&:contact_id), contacts(:sam).id
   end
 
   test "create a valid campaign" do
     assert_difference "Campaign.count", 1 do
       post campaigns_path, params: { campaign: {
         name: "Fin d'année", deadline_on: 20.days.from_now.to_date,
-        subjects_attributes: { "0" => { name: "Gina", email: "gina@example.com" }, "1" => { name: "", email: "" } },
-        respondents_attributes: { "0" => { name: "Hugo", email: "hugo@example.com" } },
+        subject_contact_ids: [ "", contacts(:eli).id ],
+        respondent_contact_ids: [ "", contacts(:sam).id ],
         questions_attributes: { "0" => { prompt: "Note globale", rating: "1", comment: "0", position: 0 } }
       } }
     end

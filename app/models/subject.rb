@@ -1,5 +1,6 @@
 class Subject < ApplicationRecord
   belongs_to :campaign
+  belongs_to :contact, optional: true
   has_many :answers, dependent: :destroy
 
   normalizes :email, with: ->(email) { email.strip.downcase }

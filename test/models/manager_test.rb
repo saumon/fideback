@@ -33,4 +33,23 @@ class ManagerTest < ActiveSupport::TestCase
     assert_nil Manager.confirm_by_token(first_token).confirmed_at
     assert Manager.confirm_by_token(second_token).confirmed?
   end
+
+  test "two new contacts with the same email in one submission are refused, the second one flagged" do
+    manager = managers(:alice)
+    saved = manager.update(contacts_attributes: {
+      "1" => { name: "Nina", email: "nina@example.com", managed: "1" },
+      "2" => { name: "Nina bis", email: "NINA@example.com", surveyable: "1" }
+    })
+    assert_not saved
+    first, second = manager.contacts.select(&:new_record?)
+    assert_empty first.errors[:email]
+    assert second.errors.of_kind?(:email, :taken)
+    assert_not Contact.exists?(email: "nina@example.com")
+  end
+
+  test "contact rows without name nor email are ignored" do
+    assert_no_difference "Contact.count" do
+      assert managers(:alice).update(contacts_attributes: { "1" => { name: "", email: "", managed: "1" } })
+    end
+  end
 end

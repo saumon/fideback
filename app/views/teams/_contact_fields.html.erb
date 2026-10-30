@@ -1,0 +1,15 @@
+<% contact = f.object %>
+<div class="team-row<%= " has-error" if contact.errors.any? %>" data-nested-form-target="row" data-role-filter-target="row"
+     data-new-record="<%= contact.new_record? %>" <%= "hidden" if contact.marked_for_destruction? %>>
+  <%= f.text_field :name, placeholder: "Nom", aria: { label: "Nom" } %>
+  <%= f.email_field :email, placeholder: "E-mail", aria: { label: "E-mail" } %>
+  <span class="roles">
+    <label class="role role-managed"><%= f.check_box :managed, data: { role: "managed" } %> Managé</label>
+    <label class="role role-surveyable"><%= f.check_box :surveyable, data: { role: "surveyable" } %> Sondable</label>
+  </span>
+  <%= f.hidden_field :_destroy, value: contact.marked_for_destruction? ? "1" : "0" %>
+  <button type="button" class="link link-remove" data-action="nested-form#remove">Supprimer</button>
+  <% if contact.errors.any? %>
+    <p class="error row-error"><%= contact.errors.full_messages.to_sentence %></p>
+  <% end %>
+</div>

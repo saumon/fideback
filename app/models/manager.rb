@@ -6,8 +6,13 @@ class Manager < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :campaigns, dependent: :destroy
+  has_many :contacts, -> { order(:name, :id) }, dependent: :destroy, inverse_of: :manager
+
+  accepts_nested_attributes_for :contacts, allow_destroy: true,
+                                reject_if: ->(attrs) { attrs.values_at("name", "email").all?(&:blank?) }
 
   validates :name, presence: true
+  validate :contact_emails_unique_within_submission
 
   # Envoie un nouvel e-mail d'activation dont le lien remplace les précédents.
   # Jamais resend_confirmation_instructions seul : il renvoie le même jeton tant
@@ -17,5 +22,18 @@ class Manager < ApplicationRecord
     self.confirmation_token = nil
     @raw_confirmation_token = nil
     resend_confirmation_instructions
+  end
+
+  private
+
+  # La validation d'unicité de Contact ne lit que la base : deux lignes neuves
+  # du même envoi portant le même e-mail passeraient toutes les deux.
+  def contact_emails_unique_within_submission
+    contacts.target.reject(&:marked_for_destruction?).group_by(&:email).each do |email, same|
+      next if email.blank? || same.size < 2
+
+      same.drop(1).each { |contact| contact.errors.add(:email, :taken) }
+      errors.add(:base, "L'e-mail #{email} figure plusieurs fois dans l'annuaire")
+    end
   end
 end

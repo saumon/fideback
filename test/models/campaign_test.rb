@@ -75,9 +75,60 @@ class CampaignTest < ActiveSupport::TestCase
     assert_not campaign.accepting_answers?
   end
 
+  test "selecting contacts copies them into the campaign, unselecting removes the copy" do
+    campaign = campaigns(:draft_campaign)
+    assert campaign.update(subject_contact_ids: [ contacts(:eli).id.to_s ], respondent_contact_ids: [ "", contacts(:rose).id, contacts(:sam).id ])
+    campaign.reload
+    assert_equal [ [ "Eli Managé", "eli@example.com", contacts(:eli).id ] ], campaign.subjects.map { |s| [ s.name, s.email, s.contact_id ] }
+    assert_equal [ respondents(:draft_rose).id ], campaign.respondents.where(contact: contacts(:rose)).ids # copie existante gardée
+    assert_equal 2, campaign.respondents.count
+    assert contacts(:dana).reload.persisted?
+  end
+
+  test "a contact without the list's role or from another manager is ignored" do
+    campaign = campaigns(:draft_campaign)
+    assert campaign.update(subject_contact_ids: [ contacts(:rose).id, contacts(:fred).id, contacts(:dana).id ])
+    assert_equal [ contacts(:dana).id ], campaign.reload.subjects.map(&:contact_id)
+  end
+
+  test "a new contact joins the directory with the list's role and is selected" do
+    campaign = managers(:alice).campaigns.build(name: "Nouvelle", deadline_on: 1.month.from_now.to_date)
+    campaign.new_respondent_contacts = { "1" => { name: "Nina", email: " NINA@example.com" }, "2" => { name: "", email: "" } }
+    assert_difference "Contact.count", 1 do
+      assert campaign.save
+    end
+    nina = managers(:alice).contacts.find_by!(email: "nina@example.com")
+    assert nina.surveyable?
+    assert_not nina.managed?
+    assert_equal [ nina.id ], campaign.respondents.map(&:contact_id)
+  end
+
+  test "a new contact whose email is already in the directory reuses it and gains the role" do
+    campaign = campaigns(:draft_campaign)
+    assert_no_difference "Contact.count" do
+      assert campaign.update(subject_contact_ids: [ contacts(:dana).id ],
+                             new_subject_contacts: [ { name: "Rose bis", email: "ROSE@example.com" } ])
+    end
+    rose = contacts(:rose).reload
+    assert rose.managed?
+    assert_equal "Rose Sondée", rose.name
+    assert_equal [ contacts(:dana).id, rose.id ].sort, campaign.reload.subjects.map(&:contact_id).sort
+  end
+
+  test "an invalid new contact saves neither the campaign nor the directory" do
+    campaign = campaigns(:draft_campaign)
+    assert_no_difference [ "Contact.count", "Subject.count" ] do
+      assert_not campaign.update(name: "Renommée", subject_contact_ids: [],
+                                 new_subject_contacts: [ { name: "Nina", email: "nina@example.com" }, { name: "", email: "pas-un-email" } ])
+    end
+    assert_match "Nouveau contact « pas-un-email »", campaign.errors.full_messages.to_sentence
+    assert_equal [ "nina@example.com", "pas-un-email" ], campaign.new_subject_contacts.map(&:email)
+    assert_equal "Entretiens 2026", campaign.reload.name
+  end
+
   test "content cannot be edited once launched" do
     campaign = campaigns(:running_campaign)
-    assert_not campaign.update(subjects_attributes: [ { name: "Nouveau", email: "nouveau@example.com" } ])
+    assert_not campaign.update(subject_contact_ids: [ contacts(:dana).id ])
     assert campaign.errors[:base].any?
     assert_not campaign.update(questions_attributes: [ { id: questions(:quality).id, prompt: "Autre" } ])
   end

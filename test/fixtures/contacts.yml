@@ -1,0 +1,30 @@
+dana:
+  manager: alice
+  name: Dana Managée
+  email: dana@example.com
+  managed: true
+  surveyable: true
+
+eli:
+  manager: alice
+  name: Eli Managé
+  email: eli@example.com
+  managed: true
+
+rose:
+  manager: alice
+  name: Rose Sondée
+  email: rose@example.com
+  surveyable: true
+
+sam:
+  manager: alice
+  name: Sam Sondé
+  email: sam@example.com
+  surveyable: true
+
+fred:
+  manager: bob
+  name: Fred Managé
+  email: fred@example.com
+  managed: true

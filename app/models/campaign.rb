@@ -6,13 +6,15 @@ class Campaign < ApplicationRecord
     { prompt: "Axes de progrès", rating: false, comment: true }
   ].freeze
 
+  # Liste de la campagne => rôle que le contact doit avoir dans l'annuaire.
+  CONTACT_LISTS = { subjects: :managed, respondents: :surveyable }.freeze
+
   belongs_to :manager
-  has_many :subjects, dependent: :destroy
-  has_many :respondents, dependent: :destroy
+  has_many :subjects, dependent: :destroy, autosave: true
+  has_many :respondents, dependent: :destroy, autosave: true
   has_many :questions, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :campaign
 
-  accepts_nested_attributes_for :subjects, :respondents, :questions, allow_destroy: true,
-                                reject_if: ->(attrs) { attrs.values_at("name", "email", "prompt").all?(&:blank?) }
+  accepts_nested_attributes_for :questions, allow_destroy: true, reject_if: ->(attrs) { attrs["prompt"].blank? }
 
   enum :status, { draft: 0, running: 1, closed: 2 }, default: :draft
 
@@ -21,11 +23,31 @@ class Campaign < ApplicationRecord
   validate :content_frozen_once_launched, on: :update
 
   before_validation :renumber_questions, if: :draft?
+  before_validation :assign_contacts
+  validate :new_contacts_valid
+  before_save :save_touched_contacts
 
   def build_default_questions
     DEFAULT_QUESTIONS.each_with_index do |attrs, index|
       questions.build(attrs.merge(position: index))
     end
+  end
+
+  # Sélection des managés et sondés parmi les contacts de l'annuaire (identifiants),
+  # et nouveaux contacts saisis depuis la campagne ([{ name:, email: }, ...]).
+  # Appliqués à la validation, quand le manager de la campagne est connu.
+  CONTACT_LISTS.each_key do |list|
+    singular = list.to_s.singularize
+
+    define_method(:"#{singular}_contact_ids") { selected_contact_ids(list) }
+    define_method(:"#{singular}_contact_ids=") { |ids| contact_selection[list] = ids }
+    define_method(:"new_#{singular}_contacts") { new_contacts[list].select(&:new_record?) }
+    define_method(:"new_#{singular}_contacts=") { |rows| new_contact_rows[list] = rows }
+  end
+
+  # Contacts de l'annuaire proposés pour une liste, dans l'état où le formulaire les a laissés.
+  def directory_for(list)
+    manager.contacts.select { |contact| contact.persisted? && contact.public_send(:"#{CONTACT_LISTS[list]}?") }
   end
 
   def launch!
@@ -60,6 +82,79 @@ class Campaign < ApplicationRecord
   end
 
   private
+
+  def contact_selection
+    @contact_selection ||= {}
+  end
+
+  def new_contact_rows
+    @new_contact_rows ||= {}
+  end
+
+  def new_contacts
+    @new_contacts ||= Hash.new { |hash, list| hash[list] = [] }
+  end
+
+  def touched_contacts
+    @touched_contacts ||= []
+  end
+
+  def selected_contact_ids(list)
+    contact_selection.fetch(list) { public_send(list).reject(&:marked_for_destruction?).filter_map(&:contact_id) }
+  end
+
+  def assign_contacts
+    CONTACT_LISTS.each_key do |list|
+      next unless contact_selection.key?(list) || new_contact_rows.key?(list)
+
+      ids = Array(contact_selection[list]).map(&:to_i)
+      ids |= add_new_contacts(list).filter_map(&:id)
+      contact_selection[list] = ids
+      wanted = directory_for(list).select { |contact| ids.include?(contact.id) } +
+               new_contacts[list].select { |contact| contact.new_record? && contact.valid? }
+      sync_list(list, wanted)
+    end
+  end
+
+  # Un e-mail déjà présent dans l'annuaire reprend ce contact, en lui ajoutant le rôle de la liste.
+  def add_new_contacts(list)
+    role = CONTACT_LISTS[list]
+    rows = new_contact_rows.fetch(list, [])
+    rows = rows.values if rows.respond_to?(:values)
+    new_contacts[list] = rows.filter_map do |row|
+      name, email = row.to_h.stringify_keys.values_at("name", "email").map { |value| value.to_s.strip }
+      next if name.empty? && email.empty?
+
+      contact = touched_contacts.find { |known| known.email == email.downcase } ||
+                manager.contacts.find { |known| known.email == email.downcase } ||
+                manager.contacts.build(name: name, email: email)
+      contact.public_send(:"#{role}=", true)
+      touched_contacts << contact unless touched_contacts.include?(contact)
+      contact
+    end
+  end
+
+  # Idempotent : la validation peut tourner plusieurs fois avant l'enregistrement.
+  def sync_list(list, wanted)
+    rows = public_send(list)
+    copy_of = ->(row, contact) { contact.persisted? ? row.contact_id == contact.id : row.association(:contact).target.equal?(contact) }
+    rows.each do |row|
+      row.mark_for_destruction unless wanted.any? { |contact| copy_of.(row, contact) }
+    end
+    wanted.each do |contact|
+      rows.build(contact: contact, name: contact.name, email: contact.email) unless rows.any? { |row| copy_of.(row, contact) }
+    end
+  end
+
+  def new_contacts_valid
+    touched_contacts.reject(&:valid?).each do |contact|
+      errors.add(:base, "Nouveau contact « #{contact.name.presence || contact.email} » : #{contact.errors.full_messages.to_sentence}")
+    end
+  end
+
+  def save_touched_contacts
+    touched_contacts.each(&:save!)
+  end
 
   def renumber_questions
     return unless questions.any?(&:changed_for_autosave?)

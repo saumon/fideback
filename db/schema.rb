@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_100100) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -33,6 +33,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_100000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["manager_id"], name: "index_campaigns_on_manager_id"
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.integer "manager_id", null: false
+    t.string "name", null: false
+    t.string "email", null: false
+    t.boolean "managed", default: false, null: false
+    t.boolean "surveyable", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["manager_id", "email"], name: "index_contacts_on_manager_id_and_email", unique: true
+    t.index ["manager_id"], name: "index_contacts_on_manager_id"
   end
 
   create_table "managers", force: :cascade do |t|
@@ -73,8 +85,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_100000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_invited_at"
+    t.integer "contact_id"
+    t.index ["campaign_id", "contact_id"], name: "index_respondents_on_campaign_id_and_contact_id", unique: true
     t.index ["campaign_id", "email"], name: "index_respondents_on_campaign_id_and_email", unique: true
     t.index ["campaign_id"], name: "index_respondents_on_campaign_id"
+    t.index ["contact_id"], name: "index_respondents_on_contact_id"
     t.index ["token"], name: "index_respondents_on_token", unique: true
   end
 
@@ -84,15 +99,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_100000) do
     t.string "email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "contact_id"
+    t.index ["campaign_id", "contact_id"], name: "index_subjects_on_campaign_id_and_contact_id", unique: true
     t.index ["campaign_id", "email"], name: "index_subjects_on_campaign_id_and_email", unique: true
     t.index ["campaign_id"], name: "index_subjects_on_campaign_id"
+    t.index ["contact_id"], name: "index_subjects_on_contact_id"
   end
 
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "respondents"
   add_foreign_key "answers", "subjects"
   add_foreign_key "campaigns", "managers"
+  add_foreign_key "contacts", "managers"
   add_foreign_key "questions", "campaigns"
   add_foreign_key "respondents", "campaigns"
+  add_foreign_key "respondents", "contacts", on_delete: :nullify
   add_foreign_key "subjects", "campaigns"
+  add_foreign_key "subjects", "contacts", on_delete: :nullify
 end

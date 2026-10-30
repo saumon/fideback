@@ -11,6 +11,11 @@ fr:
         password_confirmation: Confirmation du mot de passe
         current_password: Mot de passe actuel
         remember_me: Se souvenir de moi
+      contact:
+        name: Nom
+        email: E-mail
+        managed: Managé
+        surveyable: Sondable
       campaign:
         name: Nom
         deadline_on: Date limite de réponse

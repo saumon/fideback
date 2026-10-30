@@ -1,0 +1,39 @@
+<div class="page-head">
+  <h1>Mon équipe</h1>
+  <p class="campaign-meta">Les personnes que vous évaluez et celles que vous interrogez, à cocher ensuite dans chaque campagne. Un changement ici s'applique aussi à vos campagnes en brouillon.</p>
+</div>
+
+<%= form_with model: @manager, url: team_path, method: :patch, scope: :manager, class: "team-form", data: { controller: "role-filter" } do |f| %>
+  <% if @manager.errors.any? %>
+    <div class="callout callout-alert">
+      <p>L'équipe n'a pas été enregistrée : corrigez les lignes signalées.</p>
+      <% if (base = @manager.errors[:base]).any? %>
+        <ul><% base.each do |message| %><li><%= message %></li><% end %></ul>
+      <% end %>
+    </div>
+  <% end %>
+
+  <p class="role-filter" role="group" aria-label="Filtrer par rôle">
+    <button type="button" class="chip is-active" data-role-filter-target="choice" data-action="role-filter#choose" data-role="" aria-pressed="true">Tous</button>
+    <button type="button" class="chip chip-managed" data-role-filter-target="choice" data-action="role-filter#choose" data-role="managed" aria-pressed="false">Managés</button>
+    <button type="button" class="chip chip-surveyable" data-role-filter-target="choice" data-action="role-filter#choose" data-role="surveyable" aria-pressed="false">Sondables</button>
+  </p>
+
+  <div class="team-list" data-controller="nested-form">
+    <div data-nested-form-target="container">
+      <%= f.fields_for :contacts do |cf| %>
+        <%= render "contact_fields", f: cf %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= f.fields_for :contacts, Contact.new, child_index: "NEW_RECORD" do |cf| %>
+        <%= render "contact_fields", f: cf %>
+      <% end %>
+    </template>
+
+    <p><button type="button" class="btn btn-add" data-action="nested-form#add">Ajouter un contact</button></p>
+  </div>
+
+  <p class="actions"><%= f.submit "Enregistrer l'équipe" %></p>
+<% end %>

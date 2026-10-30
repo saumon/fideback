@@ -13,7 +13,6 @@ class CampaignsController < ApplicationController
   def new
     @campaign = current_manager.campaigns.build(deadline_on: 1.month.from_now.to_date)
     @campaign.build_default_questions
-    build_blank_rows
   end
 
   def create
@@ -21,21 +20,18 @@ class CampaignsController < ApplicationController
     if @campaign.save
       redirect_to @campaign, notice: "Campagne créée."
     else
-      build_blank_rows
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
     redirect_to @campaign, alert: "Une campagne lancée n'est plus modifiable." unless @campaign.draft?
-    build_blank_rows
   end
 
   def update
     if @campaign.update(campaign_params)
       redirect_to @campaign, notice: "Campagne mise à jour."
     else
-      build_blank_rows
       render :edit, status: :unprocessable_entity
     end
   end
@@ -65,17 +61,11 @@ class CampaignsController < ApplicationController
     @campaign = current_manager.campaigns.find(params[:id])
   end
 
-  def build_blank_rows
-    [ @campaign.subjects, @campaign.respondents ].each do |rows|
-      rows.build unless rows.any?(&:new_record?)
-    end
-  end
-
   def campaign_params
     params.expect(campaign: [
       :name, :deadline_on,
-      subjects_attributes: [ [ :id, :name, :email, :_destroy ] ],
-      respondents_attributes: [ [ :id, :name, :email, :_destroy ] ],
+      subject_contact_ids: [], respondent_contact_ids: [],
+      new_subject_contacts: [ [ :name, :email ] ], new_respondent_contacts: [ [ :name, :email ] ],
       questions_attributes: [ [ :id, :position, :prompt, :rating, :comment, :_destroy ] ]
     ])
   end

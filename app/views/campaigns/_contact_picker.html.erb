@@ -1,0 +1,37 @@
+<%# Contacts de l'annuaire à cocher pour une liste de la campagne, puis nouveaux contacts à y ajouter. %>
+<% singular = list.to_s.singularize %>
+<% contacts = campaign.directory_for(list) %>
+<% selected = campaign.public_send(:"#{singular}_contact_ids").map(&:to_i) %>
+<div class="contact-picker" data-controller="check-all">
+  <%= hidden_field_tag "campaign[#{singular}_contact_ids][]", "", id: nil %>
+  <% if contacts.any? %>
+    <p class="picker-head"><button type="button" class="link" data-action="check-all#check">Tout cocher</button></p>
+    <ul class="picker">
+      <% contacts.each do |contact| %>
+        <li>
+          <label class="pick">
+            <%= check_box_tag "campaign[#{singular}_contact_ids][]", contact.id, selected.include?(contact.id), id: nil, data: { check_all_target: "box" } %>
+            <span class="pick-name"><%= contact.name %></span>
+            <span class="pick-email"><%= contact.email %></span>
+          </label>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="picker-empty"><%= empty %> Ajoutez-en ci-dessous ou depuis <%= link_to "Mon équipe", team_path %>.</p>
+  <% end %>
+
+  <div data-controller="nested-form">
+    <div data-nested-form-target="container">
+      <% campaign.public_send(:"new_#{singular}_contacts").each_with_index do |contact, index| %>
+        <%= render "new_contact_fields", singular: singular, index: index, contact: contact %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= render "new_contact_fields", singular: singular, index: "NEW_RECORD", contact: Contact.new %>
+    </template>
+
+    <p><button type="button" class="btn btn-add" data-action="nested-form#add">Nouveau contact</button></p>
+  </div>
+</div>
