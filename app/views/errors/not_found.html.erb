@@ -1,0 +1,40 @@
+<% content_for :title, "Page introuvable (404) · Fideback" %>
+
+<section class="not-found">
+  <div class="not-found-hero">
+    <p class="not-found-code">Erreur 404</p>
+    <%# Les chiffres sont un décor : le titre porte le message, lu une seule fois. %>
+    <p class="not-found-digits" aria-hidden="true">
+      <span class="digit voice-0" style="--i: 0">4</span><span class="digit digit-lost voice-4" style="--i: 1">0</span><span class="digit voice-3" style="--i: 2">4</span>
+    </p>
+    <% title = "Cette page est introuvable." %>
+    <h1>
+      <span class="visually-hidden"><%= title %></span>
+      <span aria-hidden="true"><% title.split.each_with_index do |word, index| %><span class="word voice-<%= (index + 1) % 6 %>" style="--i: <%= index + 3 %>"><%= word %></span> <% end %></span>
+    </h1>
+    <p class="lead">Nous avons interrogé tout le monde : personne ne l'a vue.</p>
+    <p class="actions">
+      <% if manager_signed_in? %>
+        <%= link_to "Retour à mes campagnes", campaigns_path, class: "btn btn-primary" %>
+      <% else %>
+        <%= link_to "Retour à l'accueil", root_path, class: "btn btn-primary" %>
+      <% end %>
+    </p>
+  </div>
+
+  <figure class="home-scene not-found-scene" aria-label="Synthèse imaginaire : trois collègues donnent leur avis sur cette page introuvable">
+    <p class="scene-title">Synthèse : cette page</p>
+    <div class="track" aria-hidden="true">
+      <span class="track-avg" style="--pos: 0%">?</span>
+      <span class="avatar voice-0" style="--pos: 0%; --stack: 0; --i: 0">RM</span>
+      <span class="avatar voice-2" style="--pos: 0%; --stack: 1.7; --i: 1">TB</span>
+      <span class="avatar voice-3" style="--pos: 0%; --stack: 3.4; --i: 2">LN</span>
+      <ol class="track-scale"><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li></ol>
+    </div>
+    <ul class="comments">
+      <li class="voice-0" style="--i: 0"><span class="avatar voice-0" aria-hidden="true">RM</span><div><blockquote><p>Toujours disponible, sauf à cette adresse.</p></blockquote><cite>Rita Martin</cite></div></li>
+      <li class="voice-2" style="--i: 1"><span class="avatar voice-2" aria-hidden="true">TB</span><div><blockquote><p>Pourrait mieux communiquer son emplacement.</p></blockquote><cite>Tom Bernard</cite></div></li>
+      <li class="voice-3" style="--i: 2"><span class="avatar voice-3" aria-hidden="true">LN</span><div><blockquote><p>Le meilleur binôme pour une mise en production un vendredi… quand elle existe.</p></blockquote><cite>Léa Nguyen</cite></div></li>
+    </ul>
+  </figure>
+</section>

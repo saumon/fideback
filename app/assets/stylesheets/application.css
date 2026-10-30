@@ -1139,6 +1139,42 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
   40% { transform: translateY(-5px); }
 }
 
+/* Page introuvable : l'écran de synthèse, où personne n'a trouvé la page. */
+
+.not-found-hero { max-width: 36rem; margin-bottom: 3rem; }
+.not-found-code { margin: 0; font-size: 0.9375rem; font-weight: 700; color: var(--ink-soft); }
+.not-found-digits {
+  margin: 0 0 0.25rem;
+  font-size: clamp(6rem, 24vw, 10.5rem);
+  font-weight: 800;
+  font-stretch: 78%;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+/* L'ombre décalée reprend celle du « F » du logotype. */
+.not-found-digits .digit {
+  display: inline-block;
+  text-shadow: 0.05em 0.05em 0 var(--voice);
+  animation: word-in 640ms calc(var(--i, 0) * 120ms) var(--bounce) both;
+}
+/* Le zéro cherche partout : il tangue de gauche à droite une fois arrivé. */
+.not-found-digits .digit-lost {
+  animation: word-in 640ms calc(var(--i, 0) * 120ms) var(--bounce) both, wander 3.2s ease-in-out 1.4s infinite;
+}
+.not-found h1 { font-size: clamp(2.25rem, 6vw, 3.5rem); font-weight: 800; font-stretch: 78%; line-height: 1; margin-bottom: 1rem; }
+.not-found h1 .word { display: inline-block; animation: word-in 640ms calc(var(--i, 0) * 70ms) var(--bounce) both; }
+.not-found .actions { margin-top: 1.5rem; }
+.not-found-scene { box-shadow: 10px 10px 0 var(--pink); rotate: 1.5deg; margin-bottom: 1rem; }
+.not-found-scene .track-avg { animation-delay: 1000ms; }
+@keyframes wander {
+  25% { transform: translateX(-0.08em) rotate(-10deg); }
+  75% { transform: translateX(0.08em) rotate(10deg); }
+}
+@media (min-width: 64rem) {
+  .not-found { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4rem; align-items: center; }
+  .not-found-hero, .not-found-scene { margin-bottom: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;

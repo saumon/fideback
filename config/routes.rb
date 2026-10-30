@@ -33,6 +33,13 @@ Rails.application.routes.draw do
   # Boîte mail de développement : les emails interceptés par letter_opener_web.
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
+  # Aperçu de la page introuvable, que la page de débogage de Rails masque en développement.
+  get "/dev/404", to: "errors#not_found" if Rails.env.development?
+
+  # Page introuvable : Rails relance la requête sur /404 pour toute 404 (config.exceptions_app).
+  # Un GET direct sur /404 n'arrive jamais ici : public/404.html le masque.
+  match "/404", to: "errors#not_found", via: :all
+
   get "up" =>"rails/health#show", as: :rails_health_check
 
   root "pages#home"

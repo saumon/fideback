@@ -67,6 +67,7 @@ Le « F » du logotype de la barre du haut reprend ce style en CSS (`.brand-name
 - Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
 - Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.
 - Les réponses sont fermées à la clôture de la campagne ou à la date limite.
+- Toute adresse inconnue (et toute page à laquelle on n'a pas droit, comme `/admin` pour un manager qui n'est pas Admin) affiche une **page 404** dans le style du site, rendue par l'application (`ErrorsController`). En développement, Rails masque cette page derrière sa page de débogage : ouvrez `/dev/404` pour la voir et la retoucher. `public/404.html` reste la page de secours, servie si le rendu habillé échoue ; les autres erreurs (400, 422, 500…) gardent leurs pages statiques de `public/`.
 - Les messages qui suivent une action (connexion, clôture, renvoi…) s'affichent en toasts par-dessus la page, en bas à droite (en bas sur toute la largeur sur mobile), sans décaler l'interface : les notices disparaissent seules après quelques secondes, les alertes restent jusqu'à ce qu'on les ferme. Les messages d'état (campagne terminée, réponses déjà soumises, erreurs d'un formulaire) restent dans la page.
 
 ## Déploiement (Kamal)
