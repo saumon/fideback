@@ -132,6 +132,7 @@ class ManagerConfirmationTest < ActionDispatch::IntegrationTest
     get new_manager_confirmation_path
     assert_response :success
     assert_select "input[name='manager[email]']"
+    assert_select ".auth-links a[href='#{new_manager_session_path}']", text: "Retour à la connexion"
   end
 
   test "an inactive manager with the right password is told to activate" do

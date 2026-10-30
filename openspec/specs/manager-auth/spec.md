@@ -106,6 +106,10 @@ Le système SHALL permettre de demander un nouvel e-mail d'activation depuis une
 - **WHEN** un visiteur demande un e-mail d'activation, que l'adresse soit inconnue, active, inactive ou limitée par le délai de 5 minutes
 - **THEN** la page et le message affichés sont identiques dans tous les cas
 
+#### Scenario: Lien de retour à la connexion
+- **WHEN** un visiteur ouvre la page de demande d'un nouvel e-mail d'activation, sur ordinateur ou sur un écran de téléphone
+- **THEN** le lien « Retour à la connexion » mène à la page de connexion, et il est séparé de la carte du formulaire et écrit à la même taille que les liens de la page de mot de passe oublié
+
 ### Requirement: Comptes existants considérés comme activés
 Le système SHALL considérer comme activés tous les comptes manager créés avant l'introduction de l'activation par e-mail.
 
