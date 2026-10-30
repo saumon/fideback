@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+# Régénère les icônes binaires à partir de public/icon.svg, la seule source du dessin.
+# Chrome headless (le même que pour les tests système) dessine le SVG sur un canvas, aux tailles voulues :
+#   public/icon.png             512 px, fond transparent (manifeste, Safari)
+#   public/apple-touch-icon.png 180 px, fond clair plein : iOS remplirait la transparence en noir
+#   public/favicon.ico          PNG 16, 32 et 48 px dans un conteneur ICO
+# À relancer après toute modification de public/icon.svg : ruby script/icons
+
+require "bundler/setup"
+require "base64"
+require "selenium-webdriver"
+
+PUBLIC = File.expand_path("../public", __dir__)
+APP_BACKGROUND = "#F7F5FC"
+
+# Dessine le SVG sur un canvas de `size` px ; `scale` réduit le dessin, centré, sur un fond `background` facultatif.
+RENDER = <<~JS
+  const [svg, size, scale, background, done] = arguments
+  const image = new Image()
+  image.onload = () => {
+    const canvas = document.createElement("canvas")
+    canvas.width = canvas.height = size
+    const context = canvas.getContext("2d")
+    if (background) { context.fillStyle = background; context.fillRect(0, 0, size, size) }
+    const drawn = size * scale
+    context.drawImage(image, (size - drawn) / 2, (size - drawn) / 2, drawn, drawn)
+    done(canvas.toDataURL("image/png").split(",")[1])
+  }
+  image.onerror = () => done(null)
+  image.src = "data:image/svg+xml;base64," + svg
+JS
+
+def ico(pngs)
+  header = [ 0, 1, pngs.size ].pack("s<s<s<")
+  offset = header.bytesize + 16 * pngs.size
+  entries = pngs.map do |size, png|
+    entry = [ size % 256, size % 256, 0, 0, 1, 32, png.bytesize, offset ].pack("CCCCs<s<L<L<")
+    offset += png.bytesize
+    entry
+  end
+  header + entries.join + pngs.map(&:last).join
+end
+
+options = Selenium::WebDriver::Chrome::Options.new
+options.add_argument("--headless=new")
+options.add_argument("--no-sandbox")
+options.add_argument("--blink-settings=preferredColorScheme=1") # thème clair : le F reste encre
+driver = Selenium::WebDriver.for(:chrome, options: options)
+
+begin
+  svg = Base64.strict_encode64(File.read(File.join(PUBLIC, "icon.svg")))
+  render = lambda do |size, scale: 1, background: nil|
+    data = driver.execute_async_script(RENDER, svg, size, scale, background) or abort "Le rendu de icon.svg a échoué."
+    Base64.decode64(data)
+  end
+
+  File.binwrite(File.join(PUBLIC, "icon.png"), render.call(512))
+  File.binwrite(File.join(PUBLIC, "apple-touch-icon.png"), render.call(180, scale: 0.83, background: APP_BACKGROUND))
+  File.binwrite(File.join(PUBLIC, "favicon.ico"), ico([ 16, 32, 48 ].map { |size| [ size, render.call(size) ] }))
+  puts "icon.png, apple-touch-icon.png et favicon.ico régénérés dans public/."
+ensure
+  driver.quit
+end

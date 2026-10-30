@@ -8,7 +8,7 @@ Monolithe Ruby on Rails 8.1.4 (Hotwire, Propshaft, Solid Queue/Cache/Cable, SQLi
 
 - Ruby 3.4.6 (voir `.ruby-version`)
 - Bundler
-- Pour les tests système : Chrome (téléchargé automatiquement par Selenium Manager)
+- Pour les tests système et la régénération des icônes (`script/icons`) : Chrome (téléchargé automatiquement par Selenium Manager)
 
 ## Installation
 
@@ -45,6 +45,14 @@ bin/rails test:system     # parcours complet et toasts (Chrome headless)
 bin/rubocop               # style
 bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
+```
+
+## Icône
+
+Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `public/icon.svg`, qui passe le F en clair quand le système est en thème sombre. Après toute modification de ce fichier, régénérez les versions binaires commitées, `public/icon.png`, `public/apple-touch-icon.png` (fond clair pour iOS) et `public/favicon.ico` :
+
+```bash
+ruby script/icons         # utilise Chrome headless, comme les tests système
 ```
 
 ## Fonctionnement

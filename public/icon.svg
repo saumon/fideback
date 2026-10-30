@@ -1,3 +1,14 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Fideback : un F encre et son ombre rose, comme les boutons. En thème sombre, le F passe au clair pour rester visible. -->
+  <style>@media (prefers-color-scheme: dark) { .letter { fill: #F7F5FC } }</style>
+  <g fill="#FF5D8F" transform="translate(3 3)">
+    <rect x="6" y="2" width="7" height="24" rx="1.5"/>
+    <rect x="6" y="2" width="17" height="7" rx="1.5"/>
+    <rect x="6" y="12.5" width="14" height="6" rx="1.5"/>
+  </g>
+  <g class="letter" fill="#231942">
+    <rect x="6" y="2" width="7" height="24" rx="1.5"/>
+    <rect x="6" y="2" width="17" height="7" rx="1.5"/>
+    <rect x="6" y="12.5" width="14" height="6" rx="1.5"/>
+  </g>
 </svg>
