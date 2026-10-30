@@ -13,11 +13,10 @@
   <body class="respondent">
     <header class="site-header"><span class="brand"><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Fideback</span></header>
     <main>
-      <% flash.each do |type, message| %>
-        <p class="flash flash-<%= type %>"><%= message %></p>
-      <% end %>
       <%= yield %>
     </main>
+
+    <%= render "layouts/toasts" %>
 
     <%= render "layouts/dev_footer" %>
   </body>

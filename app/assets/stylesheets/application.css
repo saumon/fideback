@@ -248,9 +248,9 @@ button.link:hover { text-decoration-color: var(--azure); }
 button.link-remove { color: var(--ink-soft); font-size: 0.875rem; text-decoration-color: var(--line-strong); }
 button.link-remove:hover { color: var(--danger); text-decoration-color: var(--danger); }
 
-/* Messages */
+/* Messages d'état : ils décrivent la page et y restent. Les messages consécutifs à une action sont des toasts. */
 
-.flash,
+.callout,
 #error_explanation,
 #confirmation-outcome {
   margin: 0 0 1.75rem;
@@ -260,12 +260,111 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
   background: color-mix(in srgb, var(--jade) 12%, var(--surface));
   animation: flash-in 520ms var(--bounce) both;
 }
-.flash-alert,
+.callout-alert,
 #error_explanation { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, var(--surface)); }
-.flash ul,
+.callout ul,
 #error_explanation ul { margin: 0; padding-left: 1.25rem; }
 #error_explanation h2 { font-size: 1.0625rem; font-stretch: 100%; letter-spacing: 0; margin: 0 0 0.25rem; }
 #confirmation-outcome p:last-child { margin: 0; }
+
+/* Toasts : les messages consécutifs à une action, posés par-dessus la page sans rien décaler.
+   Le contrôleur toasts fait passer la colonne dans la couche supérieure (popover) ; sans lui, elle reste en position fixe.
+   En bas à droite, en bas sur toute la largeur sur petit écran ; seuls les toasts captent les clics, pas la colonne.
+   --toasts-lift la soulève au-dessus d'une barre d'actions collée en bas de l'écran. */
+
+.toasts {
+  position: fixed;
+  inset: auto max(1rem, env(safe-area-inset-right)) calc(max(1rem, env(safe-area-inset-bottom)) + var(--toasts-lift, 0px)) auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(24rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.toast {
+  --toast-color: var(--jade);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 0.5rem 0.85rem 1rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: 4px 4px 0 var(--toast-color);
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: pan-y;
+  animation: toast-in 520ms var(--bounce) both;
+  transition: translate 220ms var(--bounce), opacity 220ms;
+}
+.toast.flash-alert { --toast-color: var(--danger); }
+.toast.is-dragging { transition: none; }
+.toast.is-leaving { pointer-events: none; animation: toast-out 240ms ease-in forwards; }
+.toast p { flex: 1; margin: 0.15rem 0 0; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+
+.toast-dot {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.45rem;
+  border-radius: 50%;
+  background: var(--toast-color);
+  animation: pop 420ms 160ms var(--bounce) both;
+}
+
+.toast-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: -0.25rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 1.375rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.toast-close:hover { background: color-mix(in srgb, var(--toast-color) 16%, var(--surface)); color: var(--ink); }
+.toast-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* La barre d'une notice est son minuteur : sa fin ferme le toast. Elle s'arrête au survol, au focus, pendant un
+   balayage et onglet caché ; !important parce que la règle de mouvement réduit redéfinit toute l'animation. */
+.toast.is-timed::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 4px;
+  background: var(--toast-color);
+  transform-origin: left;
+  animation: toast-timer var(--toast-duration, 5s) linear forwards;
+}
+.toast.is-timed:hover::after,
+.toast.is-timed:focus-within::after,
+.toast.is-timed.is-dragging::after,
+.toasts.is-paused .toast.is-timed::after { animation-play-state: paused !important; }
+
+/* Avec JavaScript, les toasts restent masqués jusqu'à leur réinsertion par le contrôleur, pour ne pas apparaître deux fois. */
+@media (scripting: enabled) {
+  .toasts:not([data-ready]) .toast { visibility: hidden; }
+}
+
+@media (max-width: 40rem) {
+  .toasts { left: max(1rem, env(safe-area-inset-left)); width: auto; }
+}
 
 .error { color: var(--danger); font-style: normal; font-weight: 700; font-size: 0.9375rem; }
 
@@ -893,6 +992,19 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
   from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--jade) 60%, transparent); }
   to { box-shadow: 0 0 0 0.45rem transparent; }
 }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(1.25rem) scale(0.96); }
+}
+/* --toast-exit : sens du balayage qui a fermé le toast. */
+@keyframes toast-out {
+  to { opacity: 0; transform: translateX(var(--toast-exit, 0)) scale(0.94); }
+}
+@keyframes toast-fade {
+  from { opacity: 0; }
+}
+@keyframes toast-timer {
+  to { transform: scaleX(0); }
+}
 
 .brand:hover .brand-dots i { animation: hop 520ms var(--bounce); }
 .brand-dots i:nth-child(2) { animation-delay: 50ms; }
@@ -909,6 +1021,10 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
     animation: none !important;
     transition: none !important;
   }
+  /* Les toasts gardent un fondu, et la barre d'une notice, qui est son minuteur, continue de se vider. */
+  .toast { animation: toast-fade 200ms ease-out both !important; }
+  .toast.is-leaving { animation: toast-fade 200ms ease-in reverse forwards !important; }
+  .toast.is-timed::after { animation: toast-timer var(--toast-duration, 5s) linear forwards !important; }
 }
 
 /* Petits écrans */

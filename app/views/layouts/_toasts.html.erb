@@ -1,0 +1,14 @@
+<%# Messages consécutifs à une action : posés au premier plan, ils ne décalent rien.
+    Devise peut aussi ranger dans le flash des valeurs non textuelles (timedout…) : elles ne s'affichent pas. %>
+<% messages = flash.to_hash.slice("notice", "alert").select { |_, message| message.is_a?(String) && message.present? } %>
+<% if messages.any? %>
+  <section class="toasts" aria-label="Notifications" aria-live="polite" data-controller="toasts" data-turbo-temporary>
+    <% messages.each do |type, message| %>
+      <%= tag.div class: "toast flash flash-#{type}", role: ("alert" if type == "alert"), data: { toasts_target: "toast", action: "animationend->toasts#expire pointerdown->toasts#grab" } do %>
+        <span class="toast-dot" aria-hidden="true"></span>
+        <p><%= message %></p>
+        <button type="button" class="toast-close" aria-label="Fermer la notification" data-action="toasts#close">×</button>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>

@@ -91,7 +91,7 @@ class RespondentFormsTest < ActionDispatch::IntegrationTest
   test "closed campaign refuses writes and shows a message" do
     campaigns(:running_campaign).close!
     get form_path
-    assert_select ".flash-alert", /terminée/
+    assert_select ".callout-alert", /terminée/
     patch form_path, params: { answers: full_answers }
     assert_equal 0, Answer.count
     post submit_path, params: { answers: full_answers }

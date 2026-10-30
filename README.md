@@ -40,8 +40,8 @@ Redémarrez le serveur après toute modification. Les e-mails déjà intercepté
 ## Tests et qualité
 
 ```bash
-bin/rails test            # modèles, services, intégration, mailers
-bin/rails test:system     # parcours complet (Chrome headless)
+bin/rails test            # modèles, services, vues, intégration, mailers
+bin/rails test:system     # parcours complet et toasts (Chrome headless)
 bin/rubocop               # style
 bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
@@ -55,6 +55,7 @@ bin/ci                    # enchaîne l'ensemble (hors tests système)
 - Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
 - Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.
 - Les réponses sont fermées à la clôture de la campagne ou à la date limite.
+- Les messages qui suivent une action (connexion, clôture, renvoi…) s'affichent en toasts par-dessus la page, en bas à droite (en bas sur toute la largeur sur mobile), sans décaler l'interface : les notices disparaissent seules après quelques secondes, les alertes restent jusqu'à ce qu'on les ferme. Les messages d'état (campagne terminée, réponses déjà soumises, erreurs d'un formulaire) restent dans la page.
 
 ## Déploiement (Kamal)
 

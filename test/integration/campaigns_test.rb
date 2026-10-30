@@ -114,6 +114,8 @@ class CampaignsTest < ActionDispatch::IntegrationTest
       post campaigns_path, params: { campaign: { name: "", deadline_on: 20.days.from_now.to_date } }
     end
     assert_response :unprocessable_entity
+    assert_select "main form .callout-alert li"
+    assert_select ".toasts", count: 0
   end
 
   test "another manager's campaign behaves as if it did not exist" do

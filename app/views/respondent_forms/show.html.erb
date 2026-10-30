@@ -5,9 +5,9 @@
 </header>
 
 <% if @respondent.submitted? %>
-  <p class="flash flash-notice">Vous avez soumis vos réponses. Merci ! Elles ne sont plus modifiables.</p>
+  <p class="callout">Vous avez soumis vos réponses. Merci ! Elles ne sont plus modifiables.</p>
 <% elsif !@campaign.accepting_answers? %>
-  <p class="flash flash-alert">Cette campagne est terminée : les réponses ne sont plus acceptées.</p>
+  <p class="callout callout-alert">Cette campagne est terminée : les réponses ne sont plus acceptées.</p>
 <% end %>
 
 <% editable = @campaign.accepting_answers? && !@respondent.submitted? %>
@@ -48,7 +48,7 @@
   <% end %>
 
   <% if editable %>
-    <p class="actions answer-actions">
+    <p class="actions answer-actions" data-toasts-avoid>
       <%= f.submit "Enregistrer et continuer plus tard", class: "btn" %>
       <%= f.submit "Soumettre définitivement", class: "btn btn-primary", formaction: submit_respondent_form_path(token: @respondent.token), formmethod: :post,
             data: { turbo_confirm: "Après soumission, vous ne pourrez plus modifier vos réponses. Continuer ?" } %>

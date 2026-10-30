@@ -1,6 +1,6 @@
 <%= form_with model: campaign, class: "campaign-form" do |f| %>
   <% if campaign.errors.any? %>
-    <div class="flash flash-alert">
+    <div class="callout callout-alert">
       <ul>
         <% campaign.errors.full_messages.each do |message| %>
           <li><%= message %></li>
