@@ -55,6 +55,8 @@ Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `publi
 ruby script/icons         # utilise Chrome headless, comme les tests système
 ```
 
+Le « F » du logotype de la barre du haut reprend ce style en CSS (`.brand-name::first-letter` dans `app/assets/stylesheets/application.css`) : si les couleurs ou l'ombre de l'icône changent, ajustez-le aussi.
+
 ## Fonctionnement
 
 - Les **managers** s'inscrivent librement, puis activent leur compte avec le lien reçu par e-mail (valable 24 heures, renvoi possible depuis la page « Vous n'avez pas reçu l'email de confirmation ? », un e-mail par adresse toutes les 5 minutes) : tant que le compte n'est pas activé, la connexion est refusée. Ils gèrent ensuite leurs campagnes (brouillon → en cours → clôturée). Les comptes créés avant l'introduction de l'activation sont considérés comme activés.

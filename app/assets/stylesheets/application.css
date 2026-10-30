@@ -137,6 +137,11 @@ small { font-size: 0.875rem; }
 }
 a.brand:hover { color: var(--ink); }
 
+/* L'initiale reprend l'ombre rose du favicon. ::first-letter ne s'applique pas à un conteneur flex, d'où l'inline-block.
+   La marge empêche le « i » serré de recouvrir l'ombre. */
+.brand-name { display: inline-block; }
+.brand-name::first-letter { text-shadow: 0.05em 0.05em 0 var(--pink); margin-right: 0.06em; }
+
 .brand-dots { display: grid; grid-template-columns: repeat(3, 0.55rem); gap: 3px; }
 .brand-dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; }
 .brand-dots i:nth-child(1) { background: var(--pink); }
