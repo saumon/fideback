@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_150000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -45,6 +45,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
     t.datetime "updated_at", null: false
     t.index ["manager_id", "email"], name: "index_contacts_on_manager_id_and_email", unique: true
     t.index ["manager_id"], name: "index_contacts_on_manager_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "token", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "accepted_at"
+    t.integer "invited_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_invitations_on_email_unaccepted", unique: true, where: "accepted_at IS NULL"
+    t.index ["invited_by_id"], name: "index_invitations_on_invited_by_id"
+    t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
   create_table "managers", force: :cascade do |t|
@@ -120,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
   add_foreign_key "answers", "subjects"
   add_foreign_key "campaigns", "managers"
   add_foreign_key "contacts", "managers"
+  add_foreign_key "invitations", "managers", column: "invited_by_id", on_delete: :nullify
   add_foreign_key "questions", "campaigns"
   add_foreign_key "respondents", "campaigns"
   add_foreign_key "respondents", "contacts", on_delete: :nullify

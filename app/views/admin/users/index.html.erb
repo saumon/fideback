@@ -2,6 +2,7 @@
 
 <div class="page-head">
   <h1>Utilisateurs</h1>
+  <%= link_to "Inviter un manager", new_admin_invitation_path, class: "btn btn-primary" %>
   <p class="campaign-meta"><%= link_to "← Administration", admin_root_path %></p>
 </div>
 
@@ -23,3 +24,29 @@
     </tbody>
   </table>
 </div>
+
+<h2 id="invitations-title">Invitations en attente</h2>
+
+<% if @invitations.empty? %>
+  <div class="empty"><p>Aucune invitation en attente.</p></div>
+<% else %>
+  <div class="table-scroll" aria-labelledby="invitations-title">
+    <table>
+      <thead><tr><th>Nom</th><th>E-mail</th><th>État</th><th>Invitée le</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>
+        <% @invitations.each do |invitation| %>
+          <tr id="<%= dom_id(invitation) %>">
+            <td class="cell-person"><span class="avatar voice-<%= invitation.id % ApplicationHelper::VOICE_COUNT %>" aria-hidden="true"><%= initials(invitation.name) %></span><%= invitation.name %></td>
+            <td class="muted cell-email"><%= invitation.email %></td>
+            <td class="cell-status"><% if invitation.expired? %><span class="status status-expired">Expirée</span><% else %><span class="status status-pending">En attente</span><% end %></td>
+            <td class="muted cell-invited" data-label="Invitée le"><%= l(invitation.updated_at, format: :short) %></td>
+            <td class="cell-action">
+              <%= button_to "Renvoyer", resend_admin_invitation_path(invitation), class: "link", form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{invitation.name} ?" } } %>
+              <%= button_to "Annuler", admin_invitation_path(invitation), method: :delete, class: "link link-remove", form: { class: "inline", data: { turbo_confirm: "Annuler l'invitation de #{invitation.name} ?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

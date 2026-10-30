@@ -1,0 +1,35 @@
+<% content_for :title, "Bienvenue · Fideback" %>
+
+<h2>Bienvenue</h2>
+
+<p class="lead">Vous êtes invité(e) à rejoindre Fideback. Choisissez votre mot de passe pour créer votre compte.</p>
+
+<%= form_with model: @manager, scope: :manager, url: invitation_acceptance_path(token: @invitation.token), method: :patch, novalidate: true do |f| %>
+  <%= render "devise/shared/error_messages", resource: @manager %>
+
+  <div class="field">
+    <p><%= f.label :name %></p>
+    <p><%= f.text_field :name, autofocus: true, autocomplete: "name" %></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :email %></p>
+    <p><%= f.email_field :email, readonly: true, aria: { describedby: "invited-email-hint" } %></p>
+    <p><em id="invited-email-hint">L'adresse qui a reçu l'invitation, non modifiable.</em></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :password %></p>
+    <p><em>6 caractères minimum.</em></p>
+    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :password_confirmation %></p>
+    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Créer mon compte" %>
+  </div>
+<% end %>

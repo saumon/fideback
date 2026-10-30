@@ -148,7 +148,7 @@ Le système SHALL, lors de l'introduction des rôles, attribuer le rôle `admin`
 - **THEN** aucun Admin n'est créé et la prochaine inscription devient `admin`
 
 ### Requirement: Inscriptions fermées par l'Admin
-Lorsque l'Admin a fermé les inscriptions et qu'au moins un manager existe, le système SHALL refuser toute inscription : l'ouverture de la page d'inscription comme l'envoi de son formulaire ramènent le visiteur à l'accueil avec un toast d'avertissement « Les inscriptions sont fermées pour le moment. ». Aucun compte SHALL être créé et aucun e-mail envoyé. Les boutons « Créer un compte » SHALL rester affichés.
+Lorsque l'Admin a fermé les inscriptions et qu'au moins un manager existe, le système SHALL refuser toute inscription par la page d'inscription : son ouverture comme l'envoi de son formulaire ramènent le visiteur à l'accueil avec un toast d'avertissement « Les inscriptions sont fermées pour le moment. ». Aucun compte SHALL être créé et aucun e-mail envoyé. Les boutons « Créer un compte » SHALL rester affichés.
 
 #### Scenario: Ouverture de la page d'inscription
 - **WHEN** un visiteur ouvre la page d'inscription, directement ou par un bouton « Créer un compte », alors que les inscriptions sont fermées
@@ -169,3 +169,7 @@ Lorsque l'Admin a fermé les inscriptions et qu'au moins un manager existe, le s
 #### Scenario: Comptes existants
 - **WHEN** les inscriptions sont fermées
 - **THEN** l'activation d'un compte par lien, le renvoi de l'e-mail d'activation, la connexion et la réinitialisation du mot de passe continuent de fonctionner
+
+#### Scenario: Invitation acceptée
+- **WHEN** une personne invitée par l'Admin accepte son invitation alors que les inscriptions sont fermées
+- **THEN** son compte est créé normalement

@@ -63,11 +63,12 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_equal [ carol, managers(:bob), managers(:alice) ].map { |m| dom_id(m) }, ids
   end
 
-  test "the screen offers no action on accounts" do
+  test "the screen offers no action on the listed accounts, only on invitations" do
     sign_in managers(:alice)
 
     get admin_users_path
 
-    assert_select "main form, main button, main input", false
+    assert_select "table:first-of-type form, table:first-of-type button, table:first-of-type input", false
+    assert_select "main a.btn", text: "Inviter un manager"
   end
 end

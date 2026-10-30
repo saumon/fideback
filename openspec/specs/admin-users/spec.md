@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Donner à l'Admin du site une vue en lecture seule des managers inscrits, y compris ceux qui n'ont pas encore activé leur compte.
+Donner à l'Admin du site une vue des managers inscrits, y compris ceux qui n'ont pas encore activé leur compte, et le moyen d'inviter de nouveaux managers, sans jamais modifier les comptes existants.
 
 ## Requirements
 
@@ -51,11 +51,15 @@ Le système SHALL trier la liste des utilisateurs par date d'inscription décroi
 - **THEN** le plus récemment inscrit apparaît en premier et le plus ancien en dernier
 
 ### Requirement: Écran en lecture seule
-Le système SHALL présenter l'écran des utilisateurs sans aucune action sur les comptes (suppression, changement de rôle ou autre), et SHALL y offrir un lien de retour vers l'écran « Administration ».
+Le système SHALL présenter l'écran des utilisateurs sans aucune action sur les comptes existants (suppression, changement de rôle ou autre), ses seules actions portant sur les invitations, et SHALL y offrir un lien de retour vers l'écran « Administration ».
 
 #### Scenario: Aucune action sur les comptes
 - **WHEN** un Admin ouvre l'écran des utilisateurs
-- **THEN** l'écran ne contient ni formulaire ni bouton d'action sur les comptes
+- **THEN** l'écran ne propose aucune action de suppression ni de changement de rôle sur les comptes de la liste des managers
+
+#### Scenario: Actions sur les invitations
+- **WHEN** un Admin ouvre l'écran des utilisateurs
+- **THEN** l'écran propose le bouton « Inviter un manager » et, pour chaque invitation non acceptée, « Renvoyer » et « Annuler »
 
 #### Scenario: Retour à l'administration
 - **WHEN** un Admin suit le lien de retour de l'écran des utilisateurs

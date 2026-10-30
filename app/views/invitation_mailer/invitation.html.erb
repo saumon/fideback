@@ -1,0 +1,7 @@
+<p>Bonjour <%= @invitation.name %>,</p>
+
+<p><%= @inviter_name %> vous invite à rejoindre Fideback pour préparer des entretiens individuels à partir des feedbacks de votre équipe.</p>
+
+<p style="margin: 24px 0;"><%= link_to "Accepter l'invitation", @url, style: "display: inline-block; padding: 12px 24px; background: #231942; color: #FFFFFF; border-radius: 999px; box-shadow: 3px 3px 0 #FF5D8F; font-weight: bold; text-decoration: none;" %></p>
+
+<p>Cette invitation est valable jusqu'au <%= @valid_until %>. Ce lien est personnel, ne le transmettez pas.</p>

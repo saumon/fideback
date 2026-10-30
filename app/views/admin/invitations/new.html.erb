@@ -1,0 +1,27 @@
+<% content_for :title, "Inviter un manager · Fideback" %>
+
+<h2>Inviter un manager</h2>
+
+<p class="lead">La personne reçoit un e-mail avec un lien pour créer son compte, valable 7 jours. Cela fonctionne même quand les inscriptions sont fermées.</p>
+
+<%= form_with model: @invitation, url: admin_invitations_path, novalidate: true do |f| %>
+  <%= render "devise/shared/error_messages", resource: @invitation %>
+
+  <div class="field">
+    <p><%= f.label :name %></p>
+    <p><%= f.text_field :name, autofocus: true, autocomplete: "off" %></p>
+  </div>
+
+  <div class="field">
+    <p><%= f.label :email %></p>
+    <p><%= f.email_field :email, autocomplete: "off" %></p>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Envoyer l'invitation" %>
+  </div>
+<% end %>
+
+<div class="auth-links">
+  <p><%= link_to "← Utilisateurs", admin_users_path %></p>
+</div>

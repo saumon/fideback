@@ -410,7 +410,8 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 
 .callout,
 #error_explanation,
-#confirmation-outcome {
+#confirmation-outcome,
+#invitation-outcome {
   margin: 0 0 1.75rem;
   padding: 0.85rem 1.1rem;
   border: 2px solid var(--jade);
@@ -423,7 +424,10 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 .callout ul,
 #error_explanation ul { margin: 0; padding-left: 1.25rem; }
 #error_explanation h2 { font-size: 1.0625rem; font-stretch: 100%; letter-spacing: 0; margin: 0 0 0.25rem; }
-#confirmation-outcome p:last-child { margin: 0; }
+#confirmation-outcome p:last-child,
+#invitation-outcome p:last-child { margin: 0; }
+/* Une invitation invalide n'est pas un succès : même cadre que le résultat d'une confirmation, en safran. */
+#invitation-outcome { border-color: var(--saffron); background: color-mix(in srgb, var(--saffron) 14%, var(--surface)); }
 
 /* Toasts : les messages consécutifs à une action, posés par-dessus la page sans rien décaler.
    Le contrôleur toasts fait passer la colonne dans la couche supérieure (popover) ; sans lui, elle reste en position fixe.
@@ -622,6 +626,7 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 .status-unconfirmed { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
 .status + .status { margin-left: 0.35rem; }
 .status-pending { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+.status-expired { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
 .status-running::before {
   content: "";
   width: 0.5rem;
@@ -713,6 +718,7 @@ tbody tr:hover { background: #FAF8FF; }
 td.cell-person { font-weight: 600; white-space: nowrap; }
 td.cell-person .avatar { width: 1.85rem; height: 1.85rem; margin-right: 0.6rem; font-size: 0.6875rem; vertical-align: middle; }
 td.cell-action { text-align: right; }
+td.cell-action form + form { margin-left: 1rem; }
 
 /* Quand la place manque, chaque sondé devient une fiche : nom et statut, puis e-mail, date d'invitation et action. */
 @container (max-width: 36rem) {
@@ -977,21 +983,21 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 
 /* Écrans de compte (Devise) : le formulaire posé sur une fiche */
 
-:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations) main { max-width: 34rem; }
-:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations) main > h2:first-of-type {
+:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations, .page-invitations, .page-invitation_acceptances) main { max-width: 34rem; }
+:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations, .page-invitations, .page-invitation_acceptances) main > h2:first-of-type {
   font-size: 2.75rem;
   font-weight: 800;
   font-stretch: 78%;
   margin: 0 0 1.5rem;
 }
-:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations) main > form {
+:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations, .page-invitations, .page-invitation_acceptances) main > form {
   padding: 1.75rem;
   border: 2px solid var(--ink);
   border-radius: 1.5rem;
   background: var(--surface);
   box-shadow: 8px 8px 0 var(--orchid);
 }
-:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations) main > form input:not([type=checkbox]):not([type=submit]) { max-width: none; }
+:is(.page-sessions, .page-registrations, .page-passwords, .page-confirmations, .page-invitations, .page-invitation_acceptances) main > form input:not([type=checkbox]):not([type=submit]) { max-width: none; }
 .actions input[type=submit], .actions .btn { margin-top: 0.5rem; }
 .auth-links { margin-top: 2rem; font-size: 0.9375rem; }
 .auth-links p { margin: 0 0 0.45rem; }

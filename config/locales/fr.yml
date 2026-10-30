@@ -3,6 +3,7 @@ fr:
     models:
       manager: Manager
       campaign: Campagne
+      invitation: Invitation
     attributes:
       manager:
         name: Nom
@@ -11,6 +12,9 @@ fr:
         password_confirmation: Confirmation du mot de passe
         current_password: Mot de passe actuel
         remember_me: Se souvenir de moi
+      invitation:
+        name: Nom
+        email: E-mail
       contact:
         name: Nom
         email: E-mail

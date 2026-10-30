@@ -9,7 +9,14 @@ Rails.application.routes.draw do
     root "dashboard#show"
     resources :users, only: :index
     resource :danger_zone, path: "danger-zone", controller: "danger_zone", only: %i[show update]
+    resources :invitations, only: %i[new create destroy] do
+      post :resend, on: :member
+    end
   end
+
+  # Acceptation d'une invitation envoyée par l'Admin : lien à jeton, sans compte, ouvert même inscriptions fermées.
+  get "invitations/:token", to: "invitation_acceptances#show", as: :invitation_acceptance
+  patch "invitations/:token", to: "invitation_acceptances#update"
 
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
   resource :team, only: %i[show update]
