@@ -1,0 +1,25 @@
+<% content_for :title, "Utilisateurs · Fideback" %>
+
+<div class="page-head">
+  <h1>Utilisateurs</h1>
+  <p class="campaign-meta"><%= link_to "← Administration", admin_root_path %></p>
+</div>
+
+<div class="table-scroll">
+  <table>
+    <thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Inscrit le</th></tr></thead>
+    <tbody>
+      <% @managers.each do |manager| %>
+        <tr id="<%= dom_id(manager) %>">
+          <td class="cell-person"><span class="avatar voice-<%= manager.id % ApplicationHelper::VOICE_COUNT %>" aria-hidden="true"><%= initials(manager.name) %></span><%= manager.name %></td>
+          <td class="muted cell-email"><%= manager.email %></td>
+          <td class="cell-status">
+            <span class="status status-<%= manager.role %>"><%= manager.admin? ? "Admin" : "Manager" %></span>
+            <% unless manager.confirmed? %><span class="status status-unconfirmed">Non confirmé</span><% end %>
+          </td>
+          <td class="muted cell-invited" data-label="Inscrit le"><%= l(manager.created_at, format: :short) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

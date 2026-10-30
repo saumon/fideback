@@ -421,6 +421,9 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 .status-running, .status-submitted { background: color-mix(in srgb, var(--jade) 16%, var(--surface)); color: #0A6B4E; }
 .status-closed { background: var(--ink); color: var(--surface); }
 .status-in_progress { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
+.status-admin { background: color-mix(in srgb, var(--pink) 18%, var(--surface)); color: #A3154A; }
+.status-unconfirmed { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
+.status + .status { margin-left: 0.35rem; }
 .status-pending { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line-strong); }
 .status-running::before {
   content: "";

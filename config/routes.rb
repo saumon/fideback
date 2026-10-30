@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   # Espace réservé à l'Admin du site.
   namespace :admin do
     root "dashboard#show"
+    resources :users, only: :index
   end
 
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
