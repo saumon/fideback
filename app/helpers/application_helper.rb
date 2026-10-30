@@ -17,4 +17,22 @@ module ApplicationHelper
   def avatar(person, css_class: nil, **options)
     tag.span(initials(person.name), class: [ "avatar", voice_class(person), css_class ], aria: { hidden: true }, **options)
   end
+
+  # Section de la navigation principale à laquelle appartient l'écran ouvert, d'après son contrôleur
+  # plutôt que son adresse : le détail, l'édition et les synthèses d'une campagne sont dans « Mes campagnes ».
+  # Les écrans sans entrée de menu (accueil, page introuvable, espace d'un sondé) n'en ont pas.
+  def current_nav_section
+    case controller_path
+    when "campaigns", "summaries", "respondents" then :campaigns
+    when "teams" then :team
+    when %r{\Aadmin/} then :admin
+    when "managers/registrations" then :account
+    when "devise/sessions" then :sign_in
+    end
+  end
+
+  # Lien de la navigation principale ; l'entrée de la section courante est signalée comme page courante.
+  def nav_link(label, path, section)
+    link_to label, path, data: { label: label }, aria: { current: ("page" if section == current_nav_section) }
+  end
 end

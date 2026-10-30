@@ -30,13 +30,13 @@
       <%= link_to root_path, class: "brand" do %><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="brand-name">Fideback</span><% end %>
       <nav aria-label="Navigation principale">
         <% if manager_signed_in? %>
-          <%= link_to "Mes campagnes", campaigns_path %>
-          <%= link_to "Mon équipe", team_path %>
-          <%= link_to "Administration", admin_root_path if current_manager.admin? %>
-          <%= link_to current_manager.name, edit_manager_registration_path %>
+          <%= nav_link "Mes campagnes", campaigns_path, :campaigns %>
+          <%= nav_link "Mon équipe", team_path, :team %>
+          <%= nav_link "Administration", admin_root_path, :admin if current_manager.admin? %>
+          <%= nav_link current_manager.name, edit_manager_registration_path, :account %>
           <%= button_to "Se déconnecter", destroy_manager_session_path, method: :delete, class: "link", form: { class: "inline" } %>
         <% else %>
-          <%= link_to "Se connecter", new_manager_session_path %>
+          <%= nav_link "Se connecter", new_manager_session_path, :sign_in %>
           <%= link_to "Créer un compte", new_manager_registration_path, class: "btn btn-small" %>
         <% end %>
       </nav>
