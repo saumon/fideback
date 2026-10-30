@@ -46,6 +46,11 @@ class ManagerAuthTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_manager_session_path
   end
 
+  test "password reset page has a short submit label" do
+    get new_manager_password_path
+    assert_select "input[type=submit][value='Envoyez-moi les instructions']"
+  end
+
   test "password reset sends an email for a known address" do
     assert_emails 1 do
       post manager_password_path, params: { manager: { email: managers(:alice).email } }

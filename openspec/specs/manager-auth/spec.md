@@ -43,6 +43,10 @@ Le système SHALL permettre à un manager de réinitialiser son mot de passe via
 - **WHEN** un visiteur saisit un e-mail sans compte
 - **THEN** la réponse affichée est identique à celle d'un e-mail connu, sans révéler l'existence du compte
 
+#### Scenario: Bouton de demande lisible
+- **WHEN** un visiteur ouvre la page de mot de passe oublié, sur ordinateur ou sur un écran de téléphone de 360 px de large
+- **THEN** le bouton d'envoi s'intitule « Envoyez-moi les instructions » et tient entièrement dans la carte du formulaire, sans texte coupé
+
 ### Requirement: Accès réservé aux managers authentifiés
 Le système SHALL refuser l'accès aux pages de gestion de campagnes à tout visiteur non authentifié.
 
