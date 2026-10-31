@@ -1,8 +1,17 @@
 Rails.application.routes.draw do
   devise_for :managers, controllers: {
+    sessions: "managers/sessions",
     registrations: "managers/registrations",
     confirmations: "managers/confirmations"
   }
+
+  # Connexion par lien unique : attente du lien, renvoi, changement d'adresse, et le lien reçu par e-mail.
+  devise_scope :manager do
+    get "managers/sign_in/link", to: "managers/sessions#link", as: :manager_login_link_wait
+    post "managers/sign_in/link", to: "managers/sessions#resend_link"
+    delete "managers/sign_in/link", to: "managers/sessions#cancel_link"
+    get "managers/sign_in/link/:token", to: "managers/sessions#open_link", as: :manager_login_link
+  end
 
   # Espace réservé à l'Admin du site.
   namespace :admin do

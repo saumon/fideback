@@ -1,0 +1,7 @@
+<p>Bonjour <%= @name %>,</p>
+
+<p>Vous avez saisi votre mot de passe sur Fideback. Cliquez sur le bouton pour ouvrir votre session.</p>
+
+<p style="margin: 24px 0;"><%= link_to "Me connecter", @url, style: "display: inline-block; padding: 12px 24px; background: #231942; color: #FFFFFF; border-radius: 999px; box-shadow: 3px 3px 0 #FF5D8F; font-weight: bold; text-decoration: none;" %></p>
+
+<p>Ce lien est valable <%= @minutes %> minutes et ne sert qu'une fois. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : sans ce lien, personne ne peut ouvrir votre session.</p>

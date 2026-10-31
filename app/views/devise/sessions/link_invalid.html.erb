@@ -1,0 +1,12 @@
+<% content_for :title, "Lien de connexion invalide · Fideback" %>
+
+<h2>Lien de connexion invalide</h2>
+
+<div id="login-link-outcome" role="alert">
+  <p><strong>Ce lien n'est plus valable.</strong> Il a expiré, a déjà servi ou a été remplacé par un lien plus récent.</p>
+  <p>Recommencez la connexion pour en recevoir un nouveau.</p>
+</div>
+
+<div class="auth-links">
+  <p><%= link_to "Se reconnecter", new_manager_session_path %></p>
+</div>

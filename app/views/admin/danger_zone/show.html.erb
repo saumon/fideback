@@ -15,7 +15,7 @@
   </div>
   <p class="zone-note">Tant qu'aucun manager n'existe, l'inscription reste possible, pour que le premier compte puisse devenir administrateur.</p>
 
-  <% if @confirming %>
+  <% if @confirming_registrations %>
     <div class="zone-confirm" role="group" aria-label="Confirmation">
       <p>Plus personne ne pourra créer de compte tant que vous ne les aurez pas réactivées. Les comptes existants ne changent pas.</p>
       <div class="actions">
@@ -24,8 +24,38 @@
       </div>
     </div>
   <% elsif @registrations_open %>
-    <div class="actions"><%= link_to "Désactiver les inscriptions", admin_danger_zone_path(confirm: 1), class: "btn btn-danger" %></div>
+    <div class="actions"><%= link_to "Désactiver les inscriptions", admin_danger_zone_path(confirm: "registrations"), class: "btn btn-danger" %></div>
   <% else %>
     <div class="actions"><%= button_to "Réactiver les inscriptions", admin_danger_zone_path, method: :patch, params: { registrations_open: true }, class: "btn" %></div>
+  <% end %>
+</section>
+
+<section class="danger-zone" aria-labelledby="login-link-title">
+  <span class="zone-label">Réservé à l'administrateur</span>
+  <h2 id="login-link-title">Connexion par lien unique</h2>
+
+  <div class="zone-state">
+    <span class="status <%= @login_link_required ? "status-closed" : "status-open" %>"><%= @login_link_required ? "Activée" : "Désactivée" %></span>
+    <p><%= @login_link_required ? "Après son mot de passe, chaque manager doit cliquer sur un lien reçu par e-mail." : "Le mot de passe suffit pour se connecter." %></p>
+  </div>
+  <p class="zone-note">Le lien est valable <%= (LoginLink::VALIDITY / 1.minute).to_i %> minutes et ne sert qu'une fois.</p>
+
+  <% if @confirming_login_link %>
+    <div class="zone-confirm" role="group" aria-label="Confirmation">
+      <p><strong>Chaque connexion passera par un lien envoyé par e-mail.</strong></p>
+      <ul>
+        <li>Si l'envoi des e-mails tombe en panne, plus personne ne pourra se connecter, vous compris.</li>
+        <li>Les sessions déjà ouvertes restent valables.</li>
+        <li>« Se souvenir de moi » ne marche plus, et la réinitialisation d'un mot de passe ne connecte plus.</li>
+      </ul>
+      <div class="actions">
+        <%= button_to "Activer la connexion par lien", admin_danger_zone_path, method: :patch, params: { login_link_required: true }, class: "btn btn-solid-danger" %>
+        <%= link_to "Annuler", admin_danger_zone_path, class: "btn" %>
+      </div>
+    </div>
+  <% elsif @login_link_required %>
+    <div class="actions"><%= button_to "Désactiver la connexion par lien", admin_danger_zone_path, method: :patch, params: { login_link_required: false }, class: "btn" %></div>
+  <% else %>
+    <div class="actions"><%= link_to "Activer la connexion par lien", admin_danger_zone_path(confirm: "login_link"), class: "btn btn-danger" %></div>
   <% end %>
 </section>

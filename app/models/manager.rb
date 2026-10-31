@@ -13,6 +13,7 @@ class Manager < ApplicationRecord
   before_create { self.role = :admin if Manager.none? }
 
   has_many :campaigns, dependent: :destroy
+  has_many :login_links, dependent: :delete_all
   has_many :contacts, -> { order(:name, :id) }, dependent: :destroy, inverse_of: :manager
 
   accepts_nested_attributes_for :contacts, allow_destroy: true,
@@ -20,6 +21,17 @@ class Manager < ApplicationRecord
 
   validates :name, presence: true
   validate :contact_emails_unique_within_submission
+
+  # Les deux voies de Devise qui ouvrent une session sans repasser par le lien de connexion sont coupées tant que
+  # l'Admin exige la connexion par lien unique : le cookie « se souvenir de moi » et la connexion qui suit une
+  # réinitialisation du mot de passe.
+  def self.serialize_from_cookie(*)
+    super unless Setting.login_link_required?
+  end
+
+  def self.sign_in_after_reset_password
+    super && !Setting.login_link_required?
+  end
 
   # Envoie un nouvel e-mail d'activation dont le lien remplace les précédents.
   # Jamais resend_confirmation_instructions seul : il renvoie le même jeton tant

@@ -20,4 +20,18 @@ class SettingTest < ActiveSupport::TestCase
 
     assert_not Setting.new(key: "registrations_open", value: "false").valid?
   end
+
+  test "the login link is not required when the setting was never written" do
+    assert_not Setting.login_link_required?
+  end
+
+  test "the login link can be required then dropped, on a single row, apart from registrations" do
+    Setting.login_link_required = true
+    assert Setting.login_link_required?
+    assert Setting.registrations_open?
+
+    Setting.login_link_required = false
+    assert_not Setting.login_link_required?
+    assert_equal 1, Setting.where(key: "login_link_required").count
+  end
 end

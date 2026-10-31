@@ -27,7 +27,7 @@ module ApplicationHelper
     when "teams" then :team
     when %r{\Aadmin/} then :admin
     when "managers/registrations" then :account
-    when "devise/sessions" then :sign_in
+    when "managers/sessions" then :sign_in
     end
   end
 

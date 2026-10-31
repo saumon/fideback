@@ -28,6 +28,7 @@ class ManagerInvitationTest < ApplicationSystemTestCase
     assert_equal [ "pat@example.com" ], mail.to
     link = mail.html_part.body.to_s[/href="([^"]*\/invitations\/[^"]*)"/, 1]
     click_on "Se déconnecter"
+    assert_selector ".toast.flash-notice", text: "Déconnecté(e)."
 
     visit URI(CGI.unescapeHTML(link)).request_uri # le lien pointe vers l'hôte du mailer, pas vers le serveur de test
     assert_selector "h2", text: "Bienvenue"

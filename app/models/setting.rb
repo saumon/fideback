@@ -12,4 +12,14 @@ class Setting < ApplicationRecord
     setting = find_or_initialize_by(key: "registrations_open")
     setting.update!(value: open ? "true" : "false")
   end
+
+  # La connexion par lien unique est désactivée tant que l'Admin ne l'a pas activée.
+  def self.login_link_required?
+    find_by(key: "login_link_required")&.value == "true"
+  end
+
+  def self.login_link_required=(required)
+    setting = find_or_initialize_by(key: "login_link_required")
+    setting.update!(value: required ? "true" : "false")
+  end
 end

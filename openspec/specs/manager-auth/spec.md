@@ -32,6 +32,10 @@ Le système SHALL authentifier un manager par e-mail et mot de passe et lui perm
 - **WHEN** un manager connecté se déconnecte
 - **THEN** sa session est terminée et il est redirigé vers la page de connexion
 
+#### Scenario: Connexion par lien unique activée
+- **WHEN** un manager soumet un e-mail et un mot de passe corrects alors que la connexion par lien unique est activée
+- **THEN** il n'est pas connecté tant qu'il n'a pas suivi le lien reçu par e-mail
+
 ### Requirement: Réinitialisation du mot de passe
 Le système SHALL permettre à un manager de réinitialiser son mot de passe via un lien envoyé par e-mail.
 
@@ -46,6 +50,10 @@ Le système SHALL permettre à un manager de réinitialiser son mot de passe via
 #### Scenario: Bouton de demande lisible
 - **WHEN** un visiteur ouvre la page de mot de passe oublié, sur ordinateur ou sur un écran de téléphone de 360 px de large
 - **THEN** le bouton d'envoi s'intitule « Envoyez-moi les instructions » et tient entièrement dans la carte du formulaire, sans texte coupé
+
+#### Scenario: Nouveau mot de passe avec la connexion par lien activée
+- **WHEN** un manager choisit un nouveau mot de passe alors que la connexion par lien unique est activée
+- **THEN** le mot de passe est changé, aucune session n'est ouverte et il est renvoyé vers la page de connexion
 
 ### Requirement: Accès réservé aux managers authentifiés
 Le système SHALL refuser l'accès aux pages de gestion de campagnes à tout visiteur non authentifié.

@@ -429,6 +429,28 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 /* Une invitation invalide n'est pas un succès : même cadre que le résultat d'une confirmation, en safran. */
 #invitation-outcome { border-color: var(--saffron); background: color-mix(in srgb, var(--saffron) 14%, var(--surface)); }
 
+/* Connexion par lien unique : la page d'attente du lien et le lien refusé. */
+#login-link-outcome { margin: 0 0 1.75rem; padding: 0.85rem 1.1rem; border: 2px solid var(--saffron); border-radius: 1rem; background: color-mix(in srgb, var(--saffron) 14%, var(--surface)); animation: flash-in 520ms var(--bounce) both; }
+#login-link-outcome p { margin: 0 0 0.5rem; }
+#login-link-outcome p:last-child { margin: 0; }
+.wait-card { display: grid; gap: 1rem; padding: 1.75rem; border: 2px solid var(--ink); border-radius: 1.5rem; background: var(--surface); box-shadow: 8px 8px 0 var(--azure); }
+.wait-card h2 { margin: 0; font-size: 2.25rem; font-weight: 800; font-stretch: 78%; line-height: 1.1; text-wrap: balance; }
+.wait-card .lead { margin: 0; font-size: 1.0625rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.wait-card .facts { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; margin: 0; list-style: none; }
+.wait-card .facts li { padding: 0.2rem 0.7rem; border-radius: 999px; background: color-mix(in srgb, var(--azure) 14%, var(--surface)); font-size: 0.8125rem; font-weight: 700; }
+.wait-card .btn[disabled] { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--line); }
+.envelope { position: relative; width: 4.25rem; height: 3rem; border: 2px solid var(--ink); border-radius: 0.5rem; background: var(--bg); animation: envelope-bob 2.4s ease-in-out infinite; }
+.envelope::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ink) 50%, transparent calc(50% + 1px)) 0 0 / 50% 62% no-repeat,
+    linear-gradient(to bottom left, transparent calc(50% - 1px), var(--ink) 50%, transparent calc(50% + 1px)) 100% 0 / 50% 62% no-repeat;
+}
+.envelope::after { content: ""; position: absolute; right: -0.55rem; top: -0.55rem; width: 1.1rem; height: 1.1rem; border: 2px solid var(--ink); border-radius: 50%; background: var(--pink); animation: envelope-ping 1.6s ease-out infinite; }
+@keyframes envelope-bob { 50% { transform: translateY(-5px) rotate(-2deg); } }
+@keyframes envelope-ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pink) 60%, transparent); } 100% { box-shadow: 0 0 0 0.6rem transparent; } }
+@media (max-width: 34rem) { .wait-card { padding: 1.25rem; } .wait-card h2 { font-size: 1.875rem; } }
+
 /* Toasts : les messages consécutifs à une action, posés par-dessus la page sans rien décaler.
    Le contrôleur toasts fait passer la colonne dans la couche supérieure (popover) ; sans lui, elle reste en position fixe.
    En bas à droite, en bas sur toute la largeur sur petit écran ; seuls les toasts captent les clics, pas la colonne.
@@ -578,6 +600,7 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
   animation: pop 360ms var(--bounce) both;
 }
 .danger-zone .zone-confirm p { color: var(--ink); font-weight: 600; }
+.zone-confirm ul { display: grid; gap: 0.25rem; margin: 0; padding-left: 1.2rem; color: var(--ink); }
 .btn-solid-danger { background: var(--danger); border-color: var(--danger); color: #fff; box-shadow: 3px 3px 0 color-mix(in srgb, var(--danger) 30%, var(--surface)); }
 .btn-solid-danger:hover { color: #fff; box-shadow: 5px 5px 0 color-mix(in srgb, var(--danger) 30%, var(--surface)); }
 @keyframes zone-pulse {

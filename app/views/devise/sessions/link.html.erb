@@ -1,0 +1,16 @@
+<% content_for :title, "Consultez votre boîte mail · Fideback" %>
+
+<div class="wait-card" id="login-link-wait">
+  <div class="envelope" aria-hidden="true"></div>
+  <h2>Consultez votre boîte mail</h2>
+  <p class="lead">Nous avons envoyé un lien de connexion à <strong><%= @manager.email %></strong>. Cliquez dessus pour ouvrir votre session.</p>
+  <ul class="facts">
+    <li>Valable <%= (LoginLink::VALIDITY / 1.minute).to_i %> minutes</li>
+    <li>Un seul usage</li>
+  </ul>
+  <%# Le bouton est rendu désactivé avec les secondes restantes ; le contrôleur countdown les décompte et le réactive. %>
+  <div class="actions" <%= tag.attributes(data: { controller: "countdown", countdown_seconds_value: @cooldown, countdown_label_value: "Renvoyer le lien" }) if @cooldown.positive? %>>
+    <%= button_to (@cooldown.positive? ? "Renvoyer le lien dans #{@cooldown} s" : "Renvoyer le lien"), manager_login_link_wait_path, method: :post, disabled: @cooldown.positive?, class: "btn", form: { class: "inline" }, data: { countdown_target: "button" } %>
+    <%= button_to "Changer d'adresse", manager_login_link_wait_path, method: :delete, class: "link", form: { class: "inline" } %>
+  </div>
+</div>
