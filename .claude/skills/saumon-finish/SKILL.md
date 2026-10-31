@@ -1,6 +1,6 @@
 ---
 name: saumon-finish
-description: Termine une session de travail sur Fideback : vérifie si le README est à jour, lance les vérifications (tests, RuboCop), committe tous les fichiers modifiés en conventional commit en anglais après validation du message, puis propose le push. À invoquer explicitement avec /saumon-finish.
+description: Termine une session de travail sur Fideback : vérifie si le README est à jour, lance les vérifications (tests, RuboCop, tests système, bin/ci), committe tous les fichiers modifiés en conventional commit en anglais après validation du message, puis propose le push. À invoquer explicitement avec /saumon-finish.
 disable-model-invocation: true
 ---
 
@@ -34,11 +34,15 @@ Lance, dans cet ordre :
 ```bash
 bin/rails test
 bin/rubocop
+bin/rails test:system
+bin/ci
 ```
+
+Les tests système lancent Chrome headless et durent plus longtemps que les autres : laisse-leur le temps de finir (délai de la commande relevé) au lieu de les interrompre. `bin/ci` rejoue les tests et RuboCop, et ajoute les audits (gems, importmap), Brakeman et les seeds : ne saute aucune de ces quatre commandes parce qu'une précédente a déjà passé.
 
 Si `ruby` est introuvable dans le `PATH`, retrouve l'installation Ruby de la machine (version de `.ruby-version`) et ajuste le `PATH` pour la commande ; si tu n'y arrives pas, arrête-toi et explique.
 
-Si l'une des commandes échoue, **arrête-toi** : montre la sortie utile (échecs, offenses) et ne committe rien. Ne contourne pas l'échec, ne désactive aucun test ni aucune règle. L'utilisateur corrige, ou te demande de le faire, puis relance le skill.
+**Refus de committer.** Si l'une des quatre commandes échoue, y compris les tests système ou `bin/ci`, ou ne peut pas s'exécuter (Chrome absent, délai dépassé, commande interrompue), **arrête-toi** : montre la sortie utile (échecs, offenses, avertissements Brakeman, vulnérabilités) et refuse de passer aux étapes 4 à 7. Aucun fichier n'est stagé, aucun commit ni push n'est fait, même si l'utilisateur le demande en cours de route : seul un nouveau passage du skill avec les quatre commandes au vert permet de committer. Ne contourne pas l'échec, ne désactive aucun test ni aucune règle, ne relance pas en boucle un test instable pour obtenir un vert sans en parler. L'utilisateur corrige, ou te demande de le faire, puis relance le skill.
 
 ## 4. Fichiers à committer
 
@@ -99,4 +103,4 @@ Si l'utilisateur refuse, termine sans pousser. En cas d'échec du push (branche 
 
 ## 8. Résumé
 
-Termine par un résumé court : README (vérifié / modifié / ignoré), vérifications (passées), hash et titre du commit, push (fait / non fait).
+Termine par un résumé court : README (vérifié / modifié / ignoré), vérifications (tests, RuboCop, tests système et `bin/ci` passés), hash et titre du commit, push (fait / non fait).
