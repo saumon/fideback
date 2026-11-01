@@ -1,0 +1,15 @@
+<%# Marque de la barre du haut : deux bulles de dialogue, celle de devant « écrit ». Décorative : le lien reste nommé par « Fideback ».
+    Le cadre est rogné au dessin, trait compris, pour que le bas du SVG soit le bas visible de la queue de bulle.
+    Chaque groupe porte une seule animation : .arrive (arrivée), .sway (balancement au survol). Les couleurs et les points
+    ont les leurs. Séparés, ils ne se gênent pas et le survol ne relance pas l'arrivée. %>
+<svg class="brand-mark" viewBox="0.9 2.9 46.2 36.3" aria-hidden="true" focusable="false">
+  <g class="arrive arrive-back"><g class="sway sway-back">
+    <path class="bubble-back" d="M9 4 H21 A7 7 0 0 1 28 11 V15 A7 7 0 0 1 21 22 H14 L8 28 V22 H9 A7 7 0 0 1 2 15 V11 A7 7 0 0 1 9 4 Z"/>
+  </g></g>
+  <g class="arrive arrive-front"><g class="sway sway-front">
+    <path class="bubble-front" d="M27 14 H39 A7 7 0 0 1 46 21 V25 A7 7 0 0 1 39 32 H40 V38 L34 32 H27 A7 7 0 0 1 20 25 V21 A7 7 0 0 1 27 14 Z"/>
+    <circle class="typing" cx="27" cy="23" r="2"/>
+    <circle class="typing" cx="33" cy="23" r="2"/>
+    <circle class="typing" cx="39" cy="23" r="2"/>
+  </g></g>
+</svg>

@@ -15,7 +15,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="respondent">
-    <header class="site-header"><span class="brand"><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="brand-name">Fideback</span></span></header>
+    <header class="site-header"><span class="brand" id="brand" data-controller="brand-mark"><%= render "layouts/brand_mark" %><span class="brand-name">Fideback</span></span></header>
     <main>
       <%= yield %>
     </main>

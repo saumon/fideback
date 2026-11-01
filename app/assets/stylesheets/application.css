@@ -127,9 +127,10 @@ small { font-size: 0.875rem; }
 
 .brand {
   display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
+  align-items: baseline;
+  gap: 0.5em;
   font-size: 1.5rem;
+  line-height: 1.2;
   font-weight: 800;
   font-stretch: 80%;
   letter-spacing: -0.02em;
@@ -143,14 +144,17 @@ a.brand:hover { color: var(--ink); }
 .brand-name { display: inline-block; }
 .brand-name::first-letter { text-shadow: 0.05em 0.05em 0 var(--pink); margin-right: 0.06em; }
 
-.brand-dots { display: grid; grid-template-columns: repeat(3, 0.55rem); gap: 3px; }
-.brand-dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; }
-.brand-dots i:nth-child(1) { background: var(--pink); }
-.brand-dots i:nth-child(2) { background: var(--saffron); }
-.brand-dots i:nth-child(3) { background: var(--jade); }
-.brand-dots i:nth-child(4) { background: var(--azure); }
-.brand-dots i:nth-child(5) { background: var(--orchid); }
-.brand-dots i:nth-child(6) { background: var(--lime); }
+/* Marque : deux bulles de dialogue, celle de devant « écrit » (partiel layouts/_brand_mark). Le bas du SVG, rogné au dessin,
+   se pose sur la ligne de base du nom (align-items: baseline) : la marque dépasse au-dessus des lettres, jamais en dessous.
+   Au repos elle est complète et immobile ; les animations sont ajoutées en fin de fichier, hors mouvement réduit. */
+.brand-mark { flex: none; width: 1.59em; height: 1.25em; overflow: visible; }
+.brand-mark g { transform-box: fill-box; }
+.arrive-back, .sway-back { transform-origin: 20% 100%; }
+.arrive-front, .sway-front { transform-origin: 80% 100%; }
+.brand-mark path { stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
+.bubble-back { fill: var(--pink); }
+.bubble-front { fill: var(--saffron); }
+.typing { fill: var(--ink); transform-box: fill-box; transform-origin: center; }
 
 .site-header nav {
   display: flex;
@@ -306,9 +310,9 @@ a.brand:hover { color: var(--ink); }
     animation: nav-unroll 450ms var(--bounce) 380ms both, nav-flow 3s linear 830ms infinite;
   }
 }
-/* Très petits écrans : le logo cède ses points pour que « Créer un compte » et le bouton de menu tiennent sur une ligne. */
+/* Très petits écrans : la marque rétrécit pour que « Créer un compte » et le bouton de menu tiennent sur une ligne. */
 @media (max-width: 24rem) {
-  .site-header[data-nav-ready] .brand-dots { display: none; }
+  .site-header[data-nav-ready] .brand-mark { width: 1.27em; height: 1em; }
   .site-header[data-nav-ready] .header-end > .btn { padding-inline: 0.6rem; font-size: 0.8125rem; }
 }
 @keyframes nav-item-in { from { opacity: 0; transform: translateX(1.25rem); } }
@@ -1358,14 +1362,30 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
   to { transform: scaleX(0); }
 }
 
-.brand:hover .brand-dots i { animation: hop 520ms var(--bounce); }
-.brand-dots i:nth-child(2) { animation-delay: 50ms; }
-.brand-dots i:nth-child(3) { animation-delay: 100ms; }
-.brand-dots i:nth-child(4) { animation-delay: 150ms; }
-.brand-dots i:nth-child(5) { animation-delay: 200ms; }
-.brand-dots i:nth-child(6) { animation-delay: 250ms; }
-@keyframes hop {
-  40% { transform: translateY(-5px); }
+/* Marque du logo, une animation par élément : l'arrivée (.arrive, une seule fois par chargement complet, voir le contrôleur
+   brand-mark), le balancement au survol (.sway), le défilé de couleurs (la bulle de devant) et la pulsation des points. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-brand-arrived]) .arrive-back { animation: bubble-in 520ms var(--bounce) both; }
+  :root:not([data-brand-arrived]) .arrive-front { animation: bubble-in 520ms 260ms var(--bounce) both; }
+  .brand-mark .bubble-front { animation: voices 12s linear infinite; }
+  .brand-mark .typing { animation: typing 1.2s infinite; }
+  .brand-mark .typing:nth-of-type(1) { animation-delay: 700ms; }
+  .brand-mark .typing:nth-of-type(2) { animation-delay: 850ms; }
+  .brand-mark .typing:nth-of-type(3) { animation-delay: 1000ms; }
+  .brand:is(:hover, :focus-visible) .sway-back { animation: sway 520ms var(--bounce); }
+  .brand:is(:hover, :focus-visible) .sway-front { animation: sway 520ms 90ms var(--bounce); }
+}
+@keyframes bubble-in { from { scale: 0; } }
+@keyframes typing { 30% { translate: 0 -2px; } 55% { opacity: 0.4; } }
+@keyframes sway { 30% { rotate: -6deg; } 65% { rotate: 4deg; } }
+/* Cinq voix du site, 12 s par tour : chaque couleur tient, le passage à la suivante est court pour éviter les teintes boueuses. */
+@keyframes voices {
+  0%, 17.5% { fill: var(--saffron); }
+  20%, 37.5% { fill: var(--jade); }
+  40%, 57.5% { fill: var(--azure); }
+  60%, 77.5% { fill: var(--orchid); }
+  80%, 97.5% { fill: var(--lime); }
+  100% { fill: var(--saffron); }
 }
 
 /* Page introuvable : l'écran de synthèse, où personne n'a trouvé la page. */

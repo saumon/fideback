@@ -27,7 +27,7 @@
 
   <body class="page-<%= controller_name %>">
     <header class="site-header" data-controller="nav-drawer">
-      <%= link_to root_path, class: "brand" do %><span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="brand-name">Fideback</span><% end %>
+      <%= link_to root_path, id: "brand", class: "brand", data: { controller: "brand-mark" } do %><%= render "layouts/brand_mark" %><span class="brand-name">Fideback</span><% end %>
       <div class="header-end">
         <nav id="site-nav" aria-label="Navigation principale" data-nav-drawer-target="panel">
           <% if manager_signed_in? %>

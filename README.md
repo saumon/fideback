@@ -176,7 +176,7 @@ test/                 tests unitaires, d'intégration et système
 
 ### Icône
 
-Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `public/icon.svg`, qui passe le F en clair en thème sombre. Après toute modification, régénérez `public/icon.png`, `public/apple-touch-icon.png` et `public/favicon.ico` avec `ruby script/icons` (Chrome headless). Le « F » du logotype (`.brand-name::first-letter` dans `app/assets/stylesheets/application.css`) reprend ce style : ajustez-le aussi si les couleurs changent.
+Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `public/icon.svg`, qui passe le F en clair en thème sombre. Après toute modification, régénérez `public/icon.png`, `public/apple-touch-icon.png` et `public/favicon.ico` avec `ruby script/icons` (Chrome headless). Le « F » du logotype (`.brand-name::first-letter` dans `app/assets/stylesheets/application.css`) reprend ce style : ajustez-le aussi si les couleurs changent. La barre du haut porte en plus une marque à deux bulles de dialogue, dessinée en SVG dans `app/views/layouts/_brand_mark.html.erb` et colorée par les variables CSS du site : elle suit donc un changement de palette sans autre retouche. Ses animations sont en CSS et coupées quand le système demande un mouvement réduit.
 
 ## Contribuer
 

@@ -12,6 +12,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     options.add_preference("profile.password_manager_leak_detection", false)
   end
 
+  # L'émulation de prefers-reduced-motion survit à un test : un test qui la demande la laisserait aux suivants, qui ne verraient
+  # plus d'animation. On la remet à « aucune préférence » avant chaque test (ce qui rend aussi les tests indépendants du réglage du
+  # poste) et après.
+  MOTION_PREFERENCE = ->(value) { [ { name: "prefers-reduced-motion", value: value } ] }
+
+  setup { page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: MOTION_PREFERENCE.("no-preference")) }
+  teardown { page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: MOTION_PREFERENCE.("no-preference")) }
+
   DIALOG = "dialog.confirm[open]".freeze
 
   # Attend la boîte de confirmation ouverte et son animation d'entrée terminée : un clic pendant le rebond rate sa cible.
