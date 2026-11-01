@@ -4,7 +4,6 @@
 
 **Préparez vos entretiens individuels de fin d'année avec les retours de ceux qui travaillent avec vos équipes.**
 
-[![CI](https://github.com/saumon/fideback/actions/workflows/ci.yml/badge.svg)](https://github.com/saumon/fideback/actions/workflows/ci.yml)
 [![Spec-Driven Development: OpenSpec](https://img.shields.io/badge/SDD-OpenSpec-6f42c1)](https://github.com/Fission-AI/OpenSpec)
 [![Ruby 3.4](https://img.shields.io/badge/Ruby-3.4-CC342D?logo=ruby&logoColor=white)](.ruby-version)
 [![Rails 8.1](https://img.shields.io/badge/Rails-8.1-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org)
@@ -145,7 +144,7 @@ bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
 ```
 
-L'intégration continue ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) exécute les audits de sécurité (Brakeman, gems, importmap), RuboCop, les tests et les tests système. [Dependabot](.github/dependabot.yml) tient les dépendances à jour.
+Le projet n'a pas d'intégration continue sur GitHub : les vérifications se lancent en local, et `/saumon-finish` les enchaîne (tests, RuboCop, tests système, `bin/ci`) avant chaque commit. `bin/ci` couvre aussi les audits de sécurité (Brakeman, gems, importmap). [Dependabot](.github/dependabot.yml) propose chaque semaine la mise à jour des dépendances.
 
 ## Déploiement
 
