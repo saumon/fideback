@@ -6,6 +6,10 @@
   </p>
 </div>
 
+<% if @campaign.closed? && @campaign.all_submitted? %>
+  <p class="callout">Clôturée : tous les sondés ont répondu.</p>
+<% end %>
+
 <% if @campaign.draft? %>
   <p class="actions">
     <%= link_to "Modifier", edit_campaign_path(@campaign), class: "btn" %>

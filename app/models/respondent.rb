@@ -84,5 +84,7 @@ class Respondent < ApplicationRecord
     return false if missing_ratings.any?
 
     update!(submitted_at: Time.current)
+    campaign.close_when_complete!
+    true
   end
 end

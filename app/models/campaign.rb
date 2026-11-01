@@ -72,6 +72,24 @@ class Campaign < ApplicationRecord
     running? && deadline_on >= Date.current
   end
 
+  # Évalué en base : l'association peut être chargée avant la dernière soumission.
+  def all_submitted?
+    !respondents.where(submitted_at: nil).exists?
+  end
+
+  # Clôture une campagne en cours dont tous les sondés ont soumis. La mise à jour est conditionnelle : si deux
+  # soumissions arrivent ensemble, une seule clôture réussit et envoie l'e-mail au manager : celle-là rend true.
+  def close_when_complete!
+    return false unless running? && all_submitted?
+
+    closed_now = self.class.running.where(id: id).update_all(status: self.class.statuses[:closed], updated_at: Time.current) == 1
+    return false unless closed_now
+
+    reload
+    CampaignMailer.completed(self).deliver_later
+    true
+  end
+
   def launchable?
     errors.clear
     errors.add(:base, "La campagne a déjà été lancée") unless draft?

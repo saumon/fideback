@@ -136,4 +136,75 @@ class CampaignTest < ActiveSupport::TestCase
   test "name can still be edited once launched" do
     assert campaigns(:running_campaign).update(name: "Renommée")
   end
+
+  test "all_submitted? is false while a respondent has not submitted" do
+    campaign = campaigns(:running_campaign)
+    assert_not campaign.all_submitted?
+
+    campaign.respondents.each { |respondent| respondent.update!(submitted_at: Time.current) }
+    assert campaign.all_submitted?
+  end
+
+  test "all_submitted? reads the database, not a loaded association" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.load
+    campaign.respondents.update_all(submitted_at: Time.current)
+
+    assert campaign.all_submitted?
+  end
+
+  test "close_when_complete! closes a running campaign once everyone submitted" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.update_all(submitted_at: Time.current)
+
+    assert campaign.close_when_complete!
+    assert campaign.closed?
+    assert campaigns(:running_campaign).reload.closed?
+    assert_not campaign.accepting_answers?
+  end
+
+  test "close_when_complete! leaves the campaign running while a respondent is missing" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+
+    assert_not campaign.close_when_complete!
+    assert campaign.reload.running?
+  end
+
+  test "saved answers without a final submission do not count" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+    answer_fully(respondents(:sam))
+
+    assert_not campaign.close_when_complete!
+    assert campaign.reload.running?
+  end
+
+  test "a campaign with one respondent closes on that submission" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:rose).id).destroy_all
+    campaign.respondents.reload.update_all(submitted_at: Time.current)
+
+    assert campaign.close_when_complete!
+  end
+
+  test "close_when_complete! does nothing on a draft or an already closed campaign" do
+    assert_not campaigns(:draft_campaign).close_when_complete!
+
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.update_all(submitted_at: Time.current)
+    assert campaign.close_when_complete!
+    assert_not campaign.close_when_complete!
+  end
+
+  test "only one of two competing closings succeeds" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.update_all(submitted_at: Time.current)
+    other = Campaign.find(campaign.id)
+
+    results = [ campaign.close_when_complete!, other.close_when_complete! ]
+
+    assert_equal [ true, false ], results
+    assert campaign.reload.closed?
+  end
 end

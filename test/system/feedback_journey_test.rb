@@ -87,9 +87,17 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
       end
     end
 
+    # La soumission du dernier sondé a clôturé la campagne et prévenu le manager
+    assert campaign.reload.closed?
+    perform_enqueued_jobs
+    completed = ActionMailer::Base.deliveries.last
+    assert_equal [ "claire@example.com" ], completed.to
+    assert_equal "Tous vos sondés ont répondu : campagne clôturée", completed.subject
+
     # Le manager consulte la synthèse nominative
     visit campaign_path(campaign)
     assert_text "2 / 2 réponses soumises"
+    assert_text "Clôturée : tous les sondés ont répondu."
     click_on "Synthèse"
     assert_text "Synthèse : Gaspard Managé"
     assert_text "Moyenne : 4,0 / 5"

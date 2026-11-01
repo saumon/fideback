@@ -40,4 +40,41 @@ class RespondentTest < ActiveSupport::TestCase
       freeze_time { respondent.invite!; assert_equal Time.current, respondent.reload.last_invited_at }
     end
   end
+
+  test "the last submission closes the campaign" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+
+    submit_fully(respondents(:sam))
+
+    assert campaign.reload.closed?
+    assert respondents(:sam).reload.submitted?
+  end
+
+  test "a submission with respondents left keeps the campaign running" do
+    submit_fully(respondents(:rose))
+
+    assert campaigns(:running_campaign).reload.running?
+  end
+
+  test "a submission refused for missing ratings does not close the campaign" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+
+    assert_not respondents(:sam).submit!
+
+    assert campaign.reload.running?
+    assert_not respondents(:sam).reload.submitted?
+  end
+
+  test "a submission after the deadline is refused and does not close the campaign" do
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+    answer_fully(respondents(:sam))
+    campaign.update_columns(deadline_on: Date.yesterday)
+
+    assert_not respondents(:sam).reload.submit!
+
+    assert campaign.reload.running?
+  end
 end

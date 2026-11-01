@@ -81,6 +81,23 @@ class ConfirmDialogTest < ApplicationSystemTestCase
     assert_not Campaign.exists?(@draft.id)
   end
 
+  # L'événement close d'une fermeture arrive après le code qui suit : rouvrir la boîte dans la même tâche le rejoue.
+  test "reopening the dialog before the close event of the previous one still confirms the new one" do
+    visit campaign_path(@draft)
+    click_on "Supprimer"
+    wait_for_confirm_dialog
+
+    execute_script(<<~JS)
+      document.querySelector("#{DIALOG} button[value=cancel]").click()
+      document.querySelector("form[action='#{campaign_path(@draft)}'] button").click()
+    JS
+    wait_for_confirm_dialog
+    find("#{DIALOG} button[value=ok]").click
+
+    assert_selector ".toast", text: /supprimée/i
+    assert_not Campaign.exists?(@draft.id)
+  end
+
   test "a common action starts on the confirmation button, which is not red" do
     visit campaign_path(@draft)
     click_on "Lancer la campagne"
