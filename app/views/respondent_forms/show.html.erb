@@ -51,7 +51,7 @@
     <p class="actions answer-actions" data-toasts-avoid>
       <%= f.submit "Enregistrer et continuer plus tard", class: "btn" %>
       <%= f.submit "Soumettre définitivement", class: "btn btn-primary", formaction: submit_respondent_form_path(token: @respondent.token), formmethod: :post,
-            data: { turbo_confirm: "Après soumission, vous ne pourrez plus modifier vos réponses. Continuer ?" } %>
+            data: { turbo_confirm: "Soumettre vos réponses ?", turbo_confirm_detail: "Après soumission, vous ne pourrez plus modifier vos réponses. Elles sont nominatives.", turbo_confirm_icon: "check" } %>
     </p>
   <% end %>
 <% end %>

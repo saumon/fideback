@@ -65,7 +65,8 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
 
     # Lancement
     perform_enqueued_jobs do
-      accept_confirm { click_on "Lancer la campagne" }
+      click_on "Lancer la campagne"
+      accept_confirm_dialog
       assert_text "Campagne lancée"
     end
     assert_equal 2, ActionMailer::Base.deliveries.size
@@ -80,7 +81,8 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
         assert_text "nominativement"
         all("input[type=number]").each { |input| input.set(rating) }
         all("textarea").each { |area| area.set(comment) }
-        accept_confirm { click_on "Soumettre définitivement" }
+        click_on "Soumettre définitivement"
+        accept_confirm_dialog
         assert_text "Vos réponses ont été soumises"
       end
     end

@@ -1,0 +1,19 @@
+<%# Boîte de confirmation commune. Le contrôleur confirm-dialog la remplit à chaque ouverture et remplace l'alerte du navigateur. %>
+<dialog class="confirm" data-controller="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-detail">
+  <form method="dialog" data-turbo="false">
+    <div class="confirm-badge" aria-hidden="true" data-confirm-dialog-target="badge"></div>
+    <h2 id="confirm-title" data-confirm-dialog-target="title"></h2>
+    <p id="confirm-detail" class="confirm-detail" data-confirm-dialog-target="detail" hidden></p>
+    <div class="confirm-actions">
+      <button type="submit" value="cancel" class="btn" data-confirm-dialog-target="cancel">Non, revenir</button>
+      <button type="submit" value="ok" class="btn btn-primary" data-confirm-dialog-target="confirm"></button>
+    </div>
+  </form>
+
+  <%# Pictogrammes copiés dans la pastille selon data-turbo-confirm-icon. %>
+  <template data-confirm-dialog-target="icon" data-name="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg></template>
+  <template data-confirm-dialog-target="icon" data-name="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></template>
+  <template data-confirm-dialog-target="icon" data-name="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></template>
+  <template data-confirm-dialog-target="icon" data-name="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg></template>
+  <template data-confirm-dialog-target="icon" data-name="warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg></template>
+</dialog>

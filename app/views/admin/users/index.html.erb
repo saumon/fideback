@@ -41,8 +41,8 @@
             <td class="cell-status"><% if invitation.expired? %><span class="status status-expired">Expirée</span><% else %><span class="status status-pending">En attente</span><% end %></td>
             <td class="muted cell-invited" data-label="Invitée le"><%= l(invitation.updated_at, format: :short) %></td>
             <td class="cell-action">
-              <%= button_to "Renvoyer", resend_admin_invitation_path(invitation), class: "link", form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{invitation.name} ?" } } %>
-              <%= button_to "Annuler", admin_invitation_path(invitation), method: :delete, class: "link link-remove", form: { class: "inline", data: { turbo_confirm: "Annuler l'invitation de #{invitation.name} ?" } } %>
+              <%= button_to "Renvoyer", resend_admin_invitation_path(invitation), class: "link", form: { class: "inline", data: { turbo_confirm: "Renvoyer l'invitation à #{invitation.name} ?", turbo_confirm_detail: "Un nouveau lien est envoyé et la validité repart de zéro.", turbo_confirm_icon: "send" } } %>
+              <%= button_to "Annuler", admin_invitation_path(invitation), method: :delete, class: "link link-remove", form: { class: "inline", data: { turbo_confirm: "Annuler l'invitation de #{invitation.name} ?", turbo_confirm_detail: "Son lien cessera de fonctionner.", turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" } } %>
             </td>
           </tr>
         <% end %>

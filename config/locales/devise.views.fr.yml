@@ -108,7 +108,8 @@ fr:
     registrations:
       destroyed: Au revoir ! Votre compte a bien été supprimé. Nous espérons vous revoir bientôt.
       edit:
-        are_you_sure: "Êtes-vous sûr ?"
+        are_you_sure: "Supprimer votre compte ?"
+        are_you_sure_detail: "Vos campagnes, vos contacts et toutes les réponses recueillies seront supprimés. Cette action est définitive."
         cancel_my_account: Supprimer mon compte
         currently_waiting_confirmation_for_email: 'Confirmation en attente pour: %{email}'
         leave_blank_if_you_don_t_want_to_change_it: laissez ce champ vide pour le laisser inchangé

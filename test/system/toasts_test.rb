@@ -19,7 +19,8 @@ class ToastsTest < ApplicationSystemTestCase
     campaign = campaigns(:running_campaign)
     visit campaign_path(campaign)
     respondents(:rose).update!(submitted_at: Time.current) # refusé entre l'affichage du bouton et le clic
-    accept_confirm { within("tr", text: "Rose Sondée") { click_on "Renvoyer" } }
+    within("tr", text: "Rose Sondée") { click_on "Renvoyer" }
+    accept_confirm_dialog
 
     assert_selector ".toast.flash-alert[role=alert]", text: "Rose Sondée"
     sleep 11 # au-delà de la durée maximale d'une notice
@@ -30,7 +31,8 @@ class ToastsTest < ApplicationSystemTestCase
 
   test "a toast is not shown again when coming back through history" do
     visit campaign_path(campaigns(:running_campaign))
-    accept_confirm { click_on "Clôturer la campagne" }
+    click_on "Clôturer la campagne"
+    accept_confirm_dialog
     assert_selector ".toast", text: "Campagne clôturée."
     click_on "Mes campagnes", match: :first
     assert_selector "h1", text: "Mes campagnes"

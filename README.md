@@ -86,7 +86,7 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 - *Danger zone* : fermer les inscriptions, exiger une **connexion par lien unique** envoyé par e-mail (second facteur).
 
 **Expérience**
-- Menu surligné selon l'écran, tiroir de navigation accessible sur mobile, toasts, page 404 sur mesure, e-mails au style du site.
+- Menu surligné selon l'écran, tiroir de navigation accessible sur mobile, toasts, boîtes de confirmation au style du site, page 404 sur mesure, e-mails au style du site.
 - Respect de `prefers-reduced-motion` et de l'accessibilité clavier.
 
 ## Pile technique

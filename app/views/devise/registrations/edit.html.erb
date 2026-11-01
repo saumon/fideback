@@ -43,7 +43,7 @@
 <section class="danger-zone">
 <h3><%= t('.cancel_my_account') %></h3>
 
-<div><%= t('.unhappy') %> <%= button_to t('.cancel_my_account'), registration_path(resource_name), class: "btn btn-danger", data: { confirm: t('.are_you_sure'), turbo_confirm: t('.are_you_sure') }, method: :delete %></div>
+<div><%= t('.unhappy') %> <%= button_to t('.cancel_my_account'), registration_path(resource_name), class: "btn btn-danger", data: { turbo_confirm: t('.are_you_sure'), turbo_confirm_detail: t('.are_you_sure_detail'), turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" }, method: :delete %></div>
 </section>
 
 <p class="back"><%= link_to t('devise.shared.links.back'), :back %></p>

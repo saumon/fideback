@@ -1404,6 +1404,76 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
   .not-found-hero, .not-found-scene { margin-bottom: 0; }
 }
 
+/* Boîte de confirmation : remplace l'alerte du navigateur (contrôleur confirm-dialog, partiel layouts/_confirm_dialog).
+   <dialog> passe dans la couche supérieure : pas de z-index, et la page derrière est inerte. --tone colore l'ombre et la
+   pastille (safran, ou rouge pour une action destructive). L'entrée et la sortie sont des transitions (@starting-style,
+   allow-discrete) ; la règle prefers-reduced-motion en bas du fichier les coupe. Sous 40rem, la boîte devient une feuille en bas. */
+
+dialog.confirm {
+  --tone: var(--saffron);
+  --tone-shadow: var(--pink);
+  width: min(26rem, calc(100vw - 2rem));
+  margin: auto;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 1.5rem;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 6px 6px 0 var(--tone-shadow);
+  overflow: visible;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.94);
+  transition: opacity 180ms var(--glide), transform 260ms var(--bounce), overlay 260ms allow-discrete, display 260ms allow-discrete;
+}
+dialog.confirm[open] { opacity: 1; transform: none; }
+@starting-style { dialog.confirm[open] { opacity: 0; transform: translateY(0.75rem) scale(0.94); } }
+dialog.confirm[data-tone="danger"] { --tone: var(--danger); --tone-shadow: color-mix(in srgb, var(--danger) 35%, var(--surface)); }
+
+dialog.confirm::backdrop {
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 200ms, overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+dialog.confirm[open]::backdrop { opacity: 1; }
+@starting-style { dialog.confirm[open]::backdrop { opacity: 0; } }
+
+.confirm form { display: grid; gap: 0.75rem; margin: 0; padding: 1.5rem 1.5rem 1.25rem; }
+.confirm-badge {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.25rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--tone);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.confirm[data-tone="danger"] .confirm-badge { color: #fff; }
+.confirm-badge svg { width: 1.5rem; height: 1.5rem; }
+.confirm h2 { margin: 0; font-size: 1.375rem; line-height: 1.2; text-wrap: balance; }
+.confirm-detail { margin: 0; color: var(--ink-soft); font-size: 0.9375rem; }
+.confirm-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
+
+@media (max-width: 40rem) {
+  dialog.confirm {
+    width: 100%;
+    max-width: none;
+    margin: auto 0 0;
+    border-bottom: 0;
+    border-radius: 1.5rem 1.5rem 0 0;
+    box-shadow: 0 -4px 0 var(--tone-shadow);
+    transform: translateY(100%);
+  }
+  dialog.confirm[open] { transform: none; }
+  @starting-style { dialog.confirm[open] { transform: translateY(100%); } }
+  .confirm form { padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); }
+  .confirm-actions { flex-direction: column-reverse; }
+  .confirm-actions .btn { width: 100%; padding-block: 0.8rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
