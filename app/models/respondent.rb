@@ -70,18 +70,26 @@ class Respondent < ApplicationRecord
     valid
   end
 
-  # Notes manquantes : [ [subject, question], ... ]
-  def missing_ratings
-    answered = answers.where.not(rating: nil).pluck(:subject_id, :question_id).to_set
-    rated_questions = campaign.questions.select(&:rating?)
-    subjects_to_rate.flat_map do |subject|
-      rated_questions.reject { |question| answered.include?([ subject.id, question.id ]) }.map { |question| [ subject, question ] }
+  # Champs manquants pour pouvoir soumettre : [ [managé, question, :rating | :body], ... ], dans l'ordre de la page
+  # (managés par nom, questions dans l'ordre de la campagne, la note avant le commentaire). Un commentaire compte dès qu'il a
+  # du texte : Answer retire les espaces et save_answers supprime une réponse vide, un commentaire blanc n'existe donc pas.
+  def missing_answers
+    given = answers.pluck(:subject_id, :question_id, :rating, :body).each_with_object(Set.new) do |(subject_id, question_id, rating, body), set|
+      set << [ subject_id, question_id, :rating ] unless rating.nil?
+      set << [ subject_id, question_id, :body ] if body.present?
+    end
+
+    subjects_to_rate.order(:name).flat_map do |subject|
+      campaign.questions.flat_map do |question|
+        expected = [ (:rating if question.rating?), (:body if question.comment?) ].compact
+        expected.reject { |field| given.include?([ subject.id, question.id, field ]) }.map { |field| [ subject, question, field ] }
+      end
     end
   end
 
   def submit!
     return false unless campaign.accepting_answers? && !submitted?
-    return false if missing_ratings.any?
+    return false if missing_answers.any?
 
     update!(submitted_at: Time.current)
     campaign.close_when_complete!

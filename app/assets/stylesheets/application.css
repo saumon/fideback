@@ -1291,6 +1291,17 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 .rating-pick:disabled { cursor: default; opacity: 0.55; }
 .rating-pick[aria-pressed="true"]:disabled { opacity: 1; }
 
+/* Champs obligatoires : mention près du libellé, signalement d'un champ manquant, compteur dans la barre d'actions. */
+.field-head { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.6rem; }
+.answer .comment .field-head { display: flex; margin-bottom: 0.35rem; }
+.answer .comment .field-head label { margin-bottom: 0; }
+.required-hint { color: var(--ink-soft); font-size: 0.8125rem; font-weight: 600; }
+.answer .comment .error { display: block; margin-top: 0.35rem; }
+.answer-progress { margin-right: auto; align-self: center; font-size: 0.9375rem; font-weight: 700; color: var(--ink); }
+.answer-progress.is-done { color: #0b7a58; }
+/* La barre d'actions collée en bas ne doit pas cacher le champ qui reçoit le focus après un refus. */
+html:has(.answer-form) { scroll-padding-bottom: 7rem; }
+
 .answer.missing {
   margin-inline: -0.75rem;
   padding-inline: 0.75rem;

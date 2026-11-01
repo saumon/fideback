@@ -11,6 +11,8 @@ export default class extends Controller {
 
   pick({ params: { value } }) {
     this.inputTarget.value = value
+    // Un événement input, pour ce contrôleur comme pour ceux qui écoutent le formulaire (compteur de champs restants).
+    this.inputTarget.dispatchEvent(new Event("input", { bubbles: true }))
     this.sync()
   }
 

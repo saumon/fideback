@@ -77,7 +77,7 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 
 **Pour les sondés**
 - Lien personnel par e-mail, **sans compte**.
-- Note de 1 à 5 et commentaire par managé, enregistrement de la progression, soumission définitive.
+- Note de 1 à 5 et commentaire par managé, tous obligatoires pour soumettre, avec un compteur de champs restants ; enregistrement de la progression, soumission définitive.
 - Information claire : les réponses sont nominatives.
 
 **Pour l'administrateur** (premier compte créé)

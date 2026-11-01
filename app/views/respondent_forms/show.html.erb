@@ -11,18 +11,25 @@
 <% end %>
 
 <% editable = @campaign.accepting_answers? && !@respondent.submitted? %>
-<% missing = (@missing || []).map { |subject, question| [ subject.id, question.id ] } %>
+<%# Champs manquants après un refus : [ [managé, question, :rating | :body], ... ] ; le premier reçoit le focus (autofocus, appliqué par Turbo). %>
+<% missing = (@missing || []).map { |subject, question, field| [ subject.id, question.id, field ] } %>
+<% first_missing = missing.first %>
+<% remaining = editable ? @respondent.missing_answers.size : 0 %>
 
-<%= form_with url: respondent_form_path(token: @respondent.token), method: :patch, class: "answer-form" do |f| %>
+<%= form_with url: respondent_form_path(token: @respondent.token), method: :patch, class: "answer-form",
+      data: { controller: ("answer-progress" if editable), action: ("input->answer-progress#update" if editable) } do |f| %>
   <% @respondent.subjects_to_rate.order(:name).each do |subject| %>
     <fieldset class="subject <%= voice_class(subject) %>">
       <legend data-initials="<%= initials(subject.name) %>"><%= subject.name %></legend>
       <% @campaign.questions.each do |question| %>
-        <div class="field answer<%= " missing" if missing.include?([ subject.id, question.id ]) %>">
+        <div class="field answer<%= " missing" if missing.any? { |sid, qid, _| sid == subject.id && qid == question.id } %>">
           <p class="prompt"><strong><%= question.prompt %></strong></p>
           <% if question.rating? %>
             <p class="rating" data-controller="rating">
-              <%= label_tag "answers_#{subject.id}_#{question.id}_rating", "Note (1 à 5)" %>
+              <span class="field-head">
+                <%= label_tag "answers_#{subject.id}_#{question.id}_rating", "Note (1 à 5)" %>
+                <% if editable %><small class="required-hint">obligatoire pour soumettre</small><% end %>
+              </span>
               <span class="rating-picks">
                 <% 1.upto(5) do |value| %>
                   <button type="button" class="rating-pick" data-rating-target="pick" data-action="rating#pick" data-rating-value-param="<%= value %>"
@@ -31,15 +38,22 @@
               </span>
               <%= number_field_tag "answers[#{subject.id}][#{question.id}][rating]", input_value(subject, question, :rating),
                     min: 1, max: 5, step: 1, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_rating",
-                    data: { rating_target: "input", action: "input->rating#sync" } %>
-              <% if missing.include?([ subject.id, question.id ]) %><em class="error">Note manquante</em><% end %>
+                    autofocus: first_missing == [ subject.id, question.id, :rating ],
+                    data: { rating_target: "input", action: "input->rating#sync", answer_progress_target: "field" } %>
+              <% if missing.include?([ subject.id, question.id, :rating ]) %><em class="error">Note manquante</em><% end %>
             </p>
           <% end %>
           <% if question.comment? %>
             <p class="comment">
-              <%= label_tag "answers_#{subject.id}_#{question.id}_body", "Commentaire" %>
+              <span class="field-head">
+                <%= label_tag "answers_#{subject.id}_#{question.id}_body", "Commentaire" %>
+                <% if editable %><small class="required-hint">obligatoire pour soumettre</small><% end %>
+              </span>
               <%= text_area_tag "answers[#{subject.id}][#{question.id}][body]", input_value(subject, question, :body),
-                    rows: 3, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_body" %>
+                    rows: 3, disabled: !editable, id: "answers_#{subject.id}_#{question.id}_body",
+                    autofocus: first_missing == [ subject.id, question.id, :body ],
+                    data: { answer_progress_target: "field" } %>
+              <% if missing.include?([ subject.id, question.id, :body ]) %><em class="error">Commentaire manquant</em><% end %>
             </p>
           <% end %>
         </div>
@@ -49,6 +63,8 @@
 
   <% if editable %>
     <p class="actions answer-actions" data-toasts-avoid>
+      <%# État de départ rendu par le serveur ; le contrôleur answer-progress le tient à jour pendant la saisie. %>
+      <span class="answer-progress<%= " is-done" if remaining.zero? %>" role="status" aria-live="polite" data-answer-progress-target="status"><%= remaining_fields_text(remaining) %></span>
       <%= f.submit "Enregistrer et continuer plus tard", class: "btn" %>
       <%= f.submit "Soumettre définitivement", class: "btn btn-primary", formaction: submit_respondent_form_path(token: @respondent.token), formmethod: :post,
             data: { turbo_confirm: "Soumettre vos réponses ?", turbo_confirm_detail: "Après soumission, vous ne pourrez plus modifier vos réponses. Elles sont nominatives.", turbo_confirm_icon: "check" } %>

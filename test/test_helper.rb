@@ -12,11 +12,13 @@ module ActiveSupport
 
     # Add more helper methods to be used by all tests here...
 
-    # Renseigne toutes les notes attendues d'un sondé, pour que sa soumission soit acceptée.
+    # Renseigne toutes les notes et tous les commentaires attendus d'un sondé, pour que sa soumission soit acceptée.
     def answer_fully(respondent)
-      rated = respondent.campaign.questions.select(&:rating?)
       respondent.subjects_to_rate.each do |subject|
-        rated.each { |question| respondent.answers.create!(subject: subject, question: question, rating: 4) }
+        respondent.campaign.questions.each do |question|
+          respondent.answers.create!(subject: subject, question: question,
+                                     rating: (4 if question.rating?), body: ("Un commentaire" if question.comment?))
+        end
       end
       respondent
     end

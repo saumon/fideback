@@ -34,8 +34,8 @@ class RespondentFormsController < ApplicationController
       redirect_to respondent_form_path(token: @respondent.token), notice: "Merci ! Vos réponses ont été soumises.", status: :see_other
     else
       @input = answers_params
-      @missing = @respondent.missing_ratings
-      flash.now[:alert] = "Il manque des notes : complétez les champs signalés avant de soumettre."
+      @missing = @respondent.missing_answers
+      flash.now[:alert] = "Il manque #{@missing.size} #{"champ".pluralize(@missing.size)} : complétez #{@missing.size == 1 ? "celui" : "ceux"} qui #{@missing.size == 1 ? "est signalé" : "sont signalés"} avant de soumettre."
       render :show, status: :unprocessable_entity
     end
   end

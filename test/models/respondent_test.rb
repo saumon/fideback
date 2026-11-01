@@ -77,4 +77,61 @@ class RespondentTest < ActiveSupport::TestCase
 
     assert campaign.reload.running?
   end
+
+  def missing(respondent) = respondent.missing_answers.map { |subject, question, field| [ subject.name, question.prompt, field ] }
+
+  test "missing_answers lists every expected note and comment in page order" do
+    assert_equal [
+      [ "Dana Managée", "Qualité du travail", :rating ], [ "Dana Managée", "Qualité du travail", :body ], [ "Dana Managée", "Points forts", :body ],
+      [ "Eli Managé", "Qualité du travail", :rating ], [ "Eli Managé", "Qualité du travail", :body ], [ "Eli Managé", "Points forts", :body ]
+    ], missing(respondents(:rose))
+  end
+
+  test "a respondent who is also a subject is not asked about themself in missing_answers" do
+    assert_equal [ [ "Eli Managé", "Qualité du travail", :rating ], [ "Eli Managé", "Qualité du travail", :body ], [ "Eli Managé", "Points forts", :body ] ],
+                 missing(respondents(:dana_as_respondent))
+  end
+
+  test "a note without its comment leaves the comment missing" do
+    respondent = respondents(:rose)
+    respondent.answers.create!(subject: subjects(:dana), question: questions(:quality), rating: 5)
+
+    assert_includes missing(respondent), [ "Dana Managée", "Qualité du travail", :body ]
+    assert_not_includes missing(respondent), [ "Dana Managée", "Qualité du travail", :rating ]
+  end
+
+  test "a comment without its note leaves the note missing" do
+    respondent = respondents(:rose)
+    respondent.answers.create!(subject: subjects(:dana), question: questions(:quality), body: "Bien")
+
+    assert_includes missing(respondent), [ "Dana Managée", "Qualité du travail", :rating ]
+    assert_not_includes missing(respondent), [ "Dana Managée", "Qualité du travail", :body ]
+  end
+
+  test "a comment of one character counts and a blank one does not" do
+    respondent = respondents(:rose)
+    input = { subjects(:dana).id.to_s => { questions(:strengths).id.to_s => { "body" => "ok" } },
+              subjects(:eli).id.to_s => { questions(:strengths).id.to_s => { "body" => "   \n  " } } }
+    assert respondent.save_answers(input)
+
+    assert_not_includes missing(respondent), [ "Dana Managée", "Points forts", :body ]
+    assert_includes missing(respondent), [ "Eli Managé", "Points forts", :body ]
+  end
+
+  test "a comment-only question blocks the submission when its comment is empty" do
+    respondent = respondents(:sam)
+    answer_fully(respondent)
+    respondent.answers.where(question: questions(:strengths), subject: subjects(:dana)).destroy_all
+
+    assert_equal [ [ "Dana Managée", "Points forts", :body ] ], missing(respondent)
+    assert_not respondent.submit!
+    assert_not respondent.reload.submitted?
+  end
+
+  test "a respondent with nothing left to fill can submit" do
+    respondent = answer_fully(respondents(:sam))
+
+    assert_empty respondent.missing_answers
+    assert respondent.submit!
+  end
 end
