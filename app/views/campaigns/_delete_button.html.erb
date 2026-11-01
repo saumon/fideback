@@ -1,0 +1,4 @@
+<%# Suppression d'une campagne brouillon ou clôturée (jamais en cours). Le détail de la boîte dépend de l'état de la campagne. %>
+<%= button_to "Supprimer", campaign, method: :delete, class: "btn btn-danger",
+      form: { class: "inline", data: { turbo_confirm: "Supprimer cette campagne ?", turbo_confirm_detail: delete_campaign_detail(campaign, submitted, total),
+                                       turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" } } %>

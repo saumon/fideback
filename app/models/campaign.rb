@@ -90,6 +90,12 @@ class Campaign < ApplicationRecord
     true
   end
 
+  # Une campagne en cours ne se supprime pas : des sondés peuvent encore y répondre. C'est une règle d'action du manager, donc
+  # vérifiée par le contrôleur et non par un before_destroy, que traverse aussi la suppression d'un compte (dependent: :destroy).
+  def deletable?
+    !running?
+  end
+
   def launchable?
     errors.clear
     errors.add(:base, "La campagne a déjà été lancée") unless draft?

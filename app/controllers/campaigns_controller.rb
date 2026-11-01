@@ -37,6 +37,8 @@ class CampaignsController < ApplicationController
   end
 
   def destroy
+    return redirect_to @campaign, alert: "Cette campagne est en cours : clôturez-la avant de la supprimer.", status: :see_other unless @campaign.deletable?
+
     @campaign.destroy
     redirect_to campaigns_path, notice: "Campagne supprimée.", status: :see_other
   end

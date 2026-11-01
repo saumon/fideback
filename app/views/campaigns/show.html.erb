@@ -10,18 +10,21 @@
   <p class="callout">Clôturée : tous les sondés ont répondu.</p>
 <% end %>
 
+<% submitted = @respondents.count(&:submitted?) %>
+
 <% if @campaign.draft? %>
   <p class="actions">
     <%= link_to "Modifier", edit_campaign_path(@campaign), class: "btn" %>
     <%= button_to "Lancer la campagne", launch_campaign_path(@campaign), class: "btn btn-primary", form: { class: "inline", data: { turbo_confirm: "Envoyer les invitations aux sondés ?", turbo_confirm_detail: "Chaque sondé reçoit son lien personnel par e-mail. Les listes ne seront plus modifiables.", turbo_confirm_icon: "send" } } %>
-    <%= button_to "Supprimer", @campaign, method: :delete, class: "btn btn-danger", form: { class: "inline", data: { turbo_confirm: "Supprimer cette campagne ?", turbo_confirm_detail: "Les réponses des sondés et la synthèse seront perdues. Cette action est définitive.", turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" } } %>
+    <%= render "delete_button", campaign: @campaign, submitted: submitted, total: @respondents.size %>
   </p>
 <% elsif @campaign.running? %>
   <p class="actions"><%= button_to "Clôturer la campagne", close_campaign_path(@campaign), class: "btn", form: { class: "inline", data: { turbo_confirm: "Clôturer la campagne ?", turbo_confirm_detail: "Les sondés ne pourront plus répondre. Les réponses déjà enregistrées restent consultables.", turbo_confirm_icon: "lock" } } %></p>
+<% elsif @campaign.closed? %>
+  <p class="actions"><%= render "delete_button", campaign: @campaign, submitted: submitted, total: @respondents.size %></p>
 <% end %>
 
 <h2>Sondés</h2>
-<% submitted = @respondents.count(&:submitted?) %>
 <p id="response-rate">
   <%= submitted %> / <%= @respondents.size %> réponses soumises
   (<%= @respondents.empty? ? 0 : (100.0 * submitted / @respondents.size).round %> %)

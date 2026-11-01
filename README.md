@@ -71,7 +71,7 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 
 **Pour les managers**
 - Inscription avec activation du compte par e-mail, connexion, réinitialisation du mot de passe.
-- Campagnes (brouillon → en cours → clôturée) avec questions par défaut modifiables.
+- Campagnes (brouillon → en cours → clôturée) avec questions par défaut modifiables, suppression d'une campagne brouillon ou clôturée.
 - Annuaire d'équipe réutilisable d'une campagne à l'autre, rôles *managé* et/ou *sondable*.
 - Suivi de l'avancement, relance des sondés, clôture automatique quand tous ont répondu (avec un e-mail au manager), synthèse nominative par managé.
 

@@ -86,7 +86,7 @@ class NavDrawerTest < ApplicationSystemTestCase
 
   test "going back after opening the drawer shows the screen with the drawer closed" do
     click_on "Nouvelle campagne", match: :first
-    assert_selector "h1"
+    assert_selector "h1", text: "Nouvelle campagne" # le titre de la page quittée est aussi un h1 : sans texte, le clic suivant peut partir avant le changement de page
     toggle.click
     assert_selector "button.nav-toggle[aria-expanded=true]"
     within("nav#site-nav") { click_on "Mon équipe" }
