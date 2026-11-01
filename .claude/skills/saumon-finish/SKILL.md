@@ -22,10 +22,33 @@ Demande : « Faut-il vérifier que le README est à jour ? » (oui / non).
 Si non, passe à l'étape 3.
 
 Si oui :
-1. Lis `README.md` et le diff (`git diff HEAD` et les fichiers non suivis).
-2. Vérifie chaque affirmation du README touchée par le diff, et cherche ce que le diff introduit sans que le README en parle (commandes, variables d'environnement, fonctionnement, prérequis, déploiement). Contrôle les faits dans le code (versions, routes, noms de fichiers) au lieu de supposer.
+1. Lis `README.md`, `docs/fonctionnement.md` et le diff (`git diff HEAD` et les fichiers non suivis).
+2. Vérifie chaque affirmation touchée par le diff, et cherche ce que le diff introduit sans que le README en parle. Contrôle les faits dans le code (versions, routes, noms de fichiers, variables) au lieu de supposer.
 3. Si tout est exact, dis-le brièvement.
-4. Sinon, liste les écarts et les modifications proposées, puis demande confirmation avant d'écrire. Applique uniquement ce qui est accepté. Le README modifié sera inclus dans le commit.
+4. Sinon, liste les écarts et les modifications proposées, puis demande confirmation avant d'écrire. Applique uniquement ce qui est accepté. Les fichiers modifiés seront inclus dans le commit.
+
+### Où écrire quoi
+
+Le README est la vitrine du projet sur GitHub : il reste court, professionnel et à jour. Le détail vit ailleurs.
+
+| Le diff introduit… | À mettre à jour |
+|---|---|
+| un comportement visible (écran, règle métier, réglage admin) | `docs/fonctionnement.md` : un paragraphe par fonctionnalité, dans le même style (gras sur les termes clés, routes et réglages en code). Dans le README, seule la liste *Fonctionnalités* change, en une ligne, si une capacité nouvelle apparaît pour un rôle |
+| une variable d'environnement ou un réglage SMTP | tableau de la section *Configuration* |
+| une commande, un prérequis, un changement de version (Ruby, Rails) | *Démarrage rapide*, *Pile technique*, les badges de version de l'en-tête et `.ruby-version` en cohérence |
+| une étape de vérification ou de CI | *Tests et qualité* |
+| un point de déploiement ou de reprise (migration, volume, secret) | *Déploiement* |
+| un nouveau dossier de premier niveau | *Structure du dépôt* |
+| un changement du workflow OpenSpec ou des skills | *Développé en SDD avec OpenSpec* et *Contribuer* |
+
+### Règles de rédaction
+
+- Français, ton neutre et factuel, vouvoiement. Pas de formulation promotionnelle.
+- Ne répète pas une information : le README renvoie vers `docs/fonctionnement.md` et vers `openspec/specs/` au lieu de les recopier. La source de vérité du comportement reste `openspec/specs/`.
+- Ne grave pas de chiffres qui vieillissent (nombre de tests, de spécifications, de changements archivés).
+- Garde la structure, l'ordre des sections et le sommaire. Si tu ajoutes ou renommes une section, mets le sommaire à jour.
+- Badges : n'en ajoute ni n'en retire sans que l'utilisateur le demande, sauf pour refléter un changement réel (version de Ruby ou de Rails). N'invente jamais un badge dont tu ne peux pas vérifier la source (licence absente, workflow inexistant).
+- Ne documente pas ce que le code dit déjà (noms de classes, détails d'implémentation) : seulement ce qu'un utilisateur, un administrateur ou un contributeur doit savoir.
 
 ## 3. Vérifications (bloquantes)
 

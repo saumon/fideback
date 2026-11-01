@@ -1,96 +1,196 @@
+<div align="center">
+
 # Fideback
 
-Aide les managers à préparer leurs entretiens individuels de fin d'année : un manager crée une **campagne de feedback** pour une liste finie de **managés**, interroge une liste finie de **sondés** (par lien personnel, sans compte), puis consulte une **synthèse nominative** par managé.
+**Préparez vos entretiens individuels de fin d'année avec les retours de ceux qui travaillent avec vos équipes.**
 
-Monolithe Ruby on Rails 8.1.4 (Hotwire, Propshaft, Solid Queue/Cache/Cable, SQLite), authentification des managers avec [devise](https://github.com/heartcombo/devise). Interface en français uniquement. Police Bricolage Grotesque auto-hébergée dans `app/assets/fonts/` (licence SIL OFL), sans CDN externe.
+[![CI](https://github.com/saumon/fideback/actions/workflows/ci.yml/badge.svg)](https://github.com/saumon/fideback/actions/workflows/ci.yml)
+[![Spec-Driven Development: OpenSpec](https://img.shields.io/badge/SDD-OpenSpec-6f42c1)](https://github.com/Fission-AI/OpenSpec)
+[![Ruby 3.4](https://img.shields.io/badge/Ruby-3.4-CC342D?logo=ruby&logoColor=white)](.ruby-version)
+[![Rails 8.1](https://img.shields.io/badge/Rails-8.1-D30001?logo=rubyonrails&logoColor=white)](https://rubyonrails.org)
+[![Hotwire](https://img.shields.io/badge/Hotwire-Turbo%20%2B%20Stimulus-1d1d1f)](https://hotwired.dev)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org)
+[![Déployé avec Kamal](https://img.shields.io/badge/d%C3%A9ploy%C3%A9%20avec-Kamal-2f6fed)](https://kamal-deploy.org)
+[![Style : RuboCop](https://img.shields.io/badge/style-rubocop--rails--omakase-red)](https://github.com/rails/rubocop-rails-omakase)
+[![Licence : MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
+[![Dependabot](https://img.shields.io/badge/Dependabot-activ%C3%A9-025e8c?logo=dependabot&logoColor=white)](.github/dependabot.yml)
 
-## Prérequis
+</div>
 
-- Ruby 3.4.6 (voir `.ruby-version`)
-- Bundler
-- Pour les tests système et la régénération des icônes (`script/icons`) : Chrome (téléchargé automatiquement par Selenium Manager)
+---
 
-## Installation
+## Sommaire
+
+- [Présentation](#présentation)
+- [Développé en SDD avec OpenSpec](#développé-en-sdd-avec-openspec)
+- [Fonctionnalités](#fonctionnalités)
+- [Pile technique](#pile-technique)
+- [Démarrage rapide](#démarrage-rapide)
+- [Configuration](#configuration)
+- [Tests et qualité](#tests-et-qualité)
+- [Déploiement](#déploiement)
+- [Structure du dépôt](#structure-du-dépôt)
+- [Contribuer](#contribuer)
+- [Licence](#licence)
+
+## Présentation
+
+Fideback aide les managers à préparer leurs entretiens individuels de fin d'année. Un manager crée une **campagne de feedback** pour une liste finie de **managés**, interroge une liste finie de **sondés** (par un lien personnel, sans compte à créer), puis consulte une **synthèse nominative** par managé : moyennes, commentaires, auteurs.
+
+```
+Manager ──crée──▶ Campagne ──lance──▶ Sondés reçoivent un lien personnel par e-mail
+                                           │
+                       note (1 à 5) et commente chaque managé
+                                           │
+Manager ◀── synthèse nominative par managé ◀┘
+```
+
+Interface en **français uniquement**, polices auto-hébergées (aucun CDN externe), pensée pour le mobile comme pour le bureau.
+
+## Développé en SDD avec OpenSpec
+
+Fideback a été **piloté en Spec-Driven Development (SDD)** avec [OpenSpec](https://github.com/Fission-AI/OpenSpec) : aucune fonctionnalité n'a été écrite sans spécification préalable, et le code est produit avec un assistant IA (Claude Code) qui travaille à partir de ces spécifications.
+
+Le principe : **la spécification précède le code et reste la source de vérité**. Chaque évolution suit le même cycle :
+
+| Étape | Commande | Résultat |
+|---|---|---|
+| 1. Explorer | `/opsx:explore` | l'idée est discutée et le code existant est lu, sans rien écrire |
+| 2. Proposer | `/opsx:propose` | un *change* contenant `proposal.md` (pourquoi), `specs/` (exigences et scénarios), `design.md` (comment) et `tasks.md` |
+| 3. Appliquer | `/opsx:apply` | l'assistant implémente les tâches une à une, avec des tests |
+| 4. Archiver | `/opsx:archive` | les exigences du change sont fusionnées dans les spécifications de référence |
+
+Ce que cela donne dans le dépôt :
+
+- [`openspec/specs/`](openspec/specs/) : les **spécifications de référence**, une par capacité (authentification, campagnes, synthèse, invitations, connexion par lien unique, navigation…). Chaque exigence est formulée en *doit* et accompagnée de scénarios *Étant donné / Quand / Alors* vérifiables.
+- [`openspec/changes/archive/`](openspec/changes/archive/) : l'**historique de toutes les évolutions**, chacune avec sa proposition, ses décisions de conception et ses tâches. Le dépôt se lit comme un journal de décisions.
+- [`.claude/`](.claude/) : les commandes et skills qui outillent le workflow, dont `saumon-finish` qui clôt un travail (vérifications, commit, push).
+
+Les spécifications se valident avec `openspec validate --all --strict`. Le [fonctionnement détaillé](docs/fonctionnement.md) en est la lecture rapide.
+
+## Fonctionnalités
+
+**Pour les managers**
+- Inscription avec activation du compte par e-mail, connexion, réinitialisation du mot de passe.
+- Campagnes (brouillon → en cours → clôturée) avec questions par défaut modifiables.
+- Annuaire d'équipe réutilisable d'une campagne à l'autre, rôles *managé* et/ou *sondable*.
+- Suivi de l'avancement, relance des sondés, synthèse nominative par managé.
+
+**Pour les sondés**
+- Lien personnel par e-mail, **sans compte**.
+- Note de 1 à 5 et commentaire par managé, enregistrement de la progression, soumission définitive.
+- Information claire : les réponses sont nominatives.
+
+**Pour l'administrateur** (premier compte créé)
+- Liste des utilisateurs et invitation d'un manager par e-mail.
+- *Danger zone* : fermer les inscriptions, exiger une **connexion par lien unique** envoyé par e-mail (second facteur).
+
+**Expérience**
+- Menu surligné selon l'écran, tiroir de navigation accessible sur mobile, toasts, page 404 sur mesure, e-mails au style du site.
+- Respect de `prefers-reduced-motion` et de l'accessibilité clavier.
+
+## Pile technique
+
+| Domaine | Choix |
+|---|---|
+| Langage et framework | Ruby 3.4.6, Ruby on Rails 8.1.4 (monolithe) |
+| Front | Hotwire (Turbo, Stimulus), importmap, Propshaft, CSS sans framework |
+| Données | SQLite, avec Solid Queue, Solid Cache et Solid Cable (aucun Redis) |
+| Authentification | [Devise](https://github.com/heartcombo/devise) (confirmable, recoverable, rememberable) |
+| Tests | Minitest, Capybara et Selenium (Chrome headless) |
+| Qualité | RuboCop (rails-omakase), Brakeman, bundler-audit, importmap audit |
+| Déploiement | Docker et [Kamal](https://kamal-deploy.org) |
+| Spécification | [OpenSpec](https://github.com/Fission-AI/OpenSpec) |
+
+## Démarrage rapide
+
+**Prérequis** : Ruby 3.4.6 (voir [`.ruby-version`](.ruby-version)) et Bundler. Chrome n'est nécessaire que pour les tests système et la régénération des icônes (Selenium Manager le télécharge).
 
 ```bash
+git clone git@github.com:saumon/fideback.git
+cd fideback
 bin/setup --skip-server   # installe les gems et prépare la base
+bin/dev                   # http://localhost:3000
 ```
 
-## Lancer l'application
+`bin/dev` écoute sur le réseau local ; `BINDING=127.0.0.1 bin/dev` restreint à la machine. **Le premier compte créé devient administrateur.**
 
-```bash
-bin/dev                   # http://localhost:3000, joignable sur le réseau local (BINDING=127.0.0.1 pour restreindre)
-```
+### E-mails en développement
 
-## E-mails en développement
+Sans configuration SMTP, aucun e-mail ne part : ils sont interceptés par [letter_opener_web](https://github.com/fgrehm/letter_opener_web) et consultables sur [`/letter_opener`](http://localhost:3000/letter_opener) (lien « Dev : boîte mail » en bas de chaque page, **en développement uniquement**). C'est là que se trouvent le lien d'activation et les liens de connexion.
 
-En développement, sauf configuration SMTP complète dans `.env` (voir *Déploiement*), aucun e-mail (activation de compte, invitations, réinitialisation de mot de passe) n'est envoyé : ils sont tous interceptés par [letter_opener_web](https://github.com/fgrehm/letter_opener_web) et consultables dans le navigateur sur `/letter_opener` (par exemple http://localhost:3000/letter_opener). La boîte est servie par l'application elle-même, ce qui fonctionne aussi quand le développement se fait sur une machine distante.
+## Configuration
 
-Un lien « Dev : boîte mail (letter_opener) » est affiché tout en bas de chaque page, côté manager comme côté sondé, **uniquement en développement**. La route et le lien n'existent ni en test ni en production.
+Les variables se placent dans un fichier `.env` à la racine (ignoré par git, chargé par `dotenv-rails`) en développement, et dans `config/deploy.yml` et `.kamal/secrets` en production.
 
-Les liens contenus dans les e-mails utilisent l'hôte et le port définis par `APP_HOST` et `APP_PORT` (par défaut `localhost` et `3000` ; dès qu'`APP_HOST` est défini, seul `APP_PORT` fixe le port). Si vous accédez à l'application par une autre adresse, par exemple depuis le réseau local, créez un fichier `.env` à la racine (ignoré par git, chargé par `dotenv-rails`) :
+| Variable | Rôle |
+|---|---|
+| `APP_HOST`, `APP_PORT`, `APP_PROTOCOL` | adresse publique utilisée dans les liens des e-mails (défaut : `localhost`, `3000`). Dès qu'`APP_HOST` est défini, seul `APP_PORT` fixe le port |
+| `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | **obligatoires** pour envoyer des e-mails : s'il en manque une, SMTP est considéré comme non configuré |
+| `SMTP_DOMAIN`, `SMTP_AUTHENTICATION` (`plain`), `SMTP_ENABLE_STARTTLS_AUTO` (`true`), `SMTP_OPENSSL_VERIFY_MODE` | facultatives |
+| `SMTP_SENDER` (ou `MAILER_SENDER`) | adresse d'expéditeur de tous les e-mails |
+| `SMTP_ENABLED=false` | n'envoie rien même si la configuration est complète |
 
-```bash
-APP_HOST=192.168.1.23
-APP_PORT=3000
-```
+À défaut de variables, les clés `smtp` des credentials sont utilisées (`bin/rails credentials:edit`). En développement, une configuration SMTP complète dans `.env` fait envoyer les e-mails pour de vrai au lieu de les intercepter. Redémarrez le serveur après toute modification ; les e-mails déjà interceptés gardent l'ancien lien.
 
-Redémarrez le serveur après toute modification. Les e-mails déjà interceptés conservent l'ancien lien : videz la boîte avec « Clear » ou renvoyez-les (bouton *Renvoyer* sur la page de la campagne).
+Sans configuration SMTP exploitable, l'application démarre mais écrit un avertissement `[mail]` dans le journal : les managers ne pourraient plus activer leur compte.
 
 ## Tests et qualité
 
 ```bash
 bin/rails test            # modèles, services, vues, intégration, mailers
-bin/rails test:system     # parcours complet, équipe, toasts, tiroir du menu mobile, inscriptions fermées, invitations et connexion par lien (Chrome headless)
+bin/rails test:system     # parcours complets dans Chrome headless
 bin/rubocop               # style
 bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
 ```
 
-## Icône
+L'intégration continue ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) exécute les audits de sécurité (Brakeman, gems, importmap), RuboCop, les tests et les tests système. [Dependabot](.github/dependabot.yml) tient les dépendances à jour.
 
-Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `public/icon.svg`, qui passe le F en clair quand le système est en thème sombre. Après toute modification de ce fichier, régénérez les versions binaires commitées, `public/icon.png`, `public/apple-touch-icon.png` (fond clair pour iOS) et `public/favicon.ico` :
+## Déploiement
 
-```bash
-ruby script/icons         # utilise Chrome headless, comme les tests système
-```
-
-Le « F » du logotype de la barre du haut reprend ce style en CSS (`.brand-name::first-letter` dans `app/assets/stylesheets/application.css`) : si les couleurs ou l'ombre de l'icône changent, ajustez-le aussi.
-
-## Fonctionnement
-
-- Les **managers** s'inscrivent librement (tant que l'Admin n'a pas fermé les inscriptions, voir plus bas), puis activent leur compte avec le lien reçu par e-mail (valable 24 heures, renvoi possible depuis la page « Vous n'avez pas reçu l'email de confirmation ? », un e-mail par adresse toutes les 5 minutes) : tant que le compte n'est pas activé, la connexion est refusée. Ils gèrent ensuite leurs campagnes (brouillon → en cours → clôturée). Les comptes créés avant l'introduction de l'activation sont considérés comme activés.
-- Chaque manager tient son **équipe** dans l'écran *Mon équipe* (lien dans le menu) : nom, e-mail unique et rôle(s) *managé* et/ou *sondable*, avec un filtre par rôle. Une modification s'applique aussi aux campagnes en brouillon ; les campagnes lancées gardent leur copie. Au premier déploiement de cette fonctionnalité, une migration remplit l'équipe à partir des campagnes existantes.
-- Le **premier compte créé** sur le site reçoit le rôle *Admin* dès l'inscription, activé ou non ; les suivants sont de simples managers, et personne ne reprend le rôle si l'Admin supprime son compte alors que d'autres comptes existent. Seul l'Admin voit le lien *Administration* du menu, qui mène à `/admin` (bouton *Utilisateurs* vers `/admin/users`, la liste des managers inscrits, sans action sur ces comptes, avec le badge *Non confirmé* pour les comptes non activés et le suivi des invitations, voir plus bas) ; un autre manager y reçoit une page introuvable (404). À la mise en production, une migration promeut le manager existant le plus ancien.
-- L'Admin peut **fermer les inscriptions** depuis l'écran *Danger zone* (`/admin/danger-zone`, bouton de `/admin`) : le réglage `registrations_open` est conservé dans la table `settings` et ouvert par défaut. Fermées, les inscriptions sont refusées (page et envoi du formulaire) : les boutons *Créer un compte* restent affichés, mais mènent à l'accueil avec un toast d'avertissement safran. Tant qu'aucun manager n'existe, l'inscription reste possible pour que le premier compte devienne Admin. Les comptes existants ne changent pas (activation, connexion, réinitialisation du mot de passe).
-- L'Admin peut **inviter un manager**, inscriptions ouvertes ou fermées, avec le bouton *Inviter un manager* de l'écran `/admin/users` : il saisit un nom et une adresse e-mail, et la personne reçoit un e-mail avec un lien personnel `/invitations/<jeton>`, valable 7 jours. Le lien ouvre une page où elle choisit son mot de passe ; son compte est créé déjà activé (rôle *manager*, aucun e-mail d'activation), puis elle est renvoyée vers la connexion. Une adresse déjà inscrite ne peut pas être invitée, et réinviter une adresse remplace l'invitation précédente. Le bloc *Invitations en attente* de `/admin/users` liste les invitations non acceptées (en attente ou expirées) et permet de les renvoyer (nouveau lien, validité repartie de zéro) ou de les annuler. Un lien invalide, expiré, annulé ou déjà utilisé affiche une page explicative.
-- L'Admin peut **exiger la connexion par lien unique** depuis l'écran *Danger zone* (second bloc, activation après confirmation, désactivation immédiate) : le réglage `login_link_required` est conservé dans la table `settings` et désactivé par défaut. Activé, un mot de passe correct n'ouvre aucune session : un lien `/managers/sign_in/link/<jeton>` est envoyé par e-mail, valable 10 minutes et à usage unique (un nouvel envoi invalide les précédents, un lien par minute et par compte au plus), et c'est le clic qui ouvre la session, sur n'importe quel appareil. Un écran « Consultez votre boîte mail » permet de renvoyer le lien (bouton désactivé pendant la minute d'attente, avec un décompte) ou de changer d'adresse. Un lien expiré, utilisé, remplacé ou inconnu affiche une page explicative. Tant que l'option est active, *Se souvenir de moi* est masqué et son cookie ignoré, et un nouveau mot de passe choisi après réinitialisation ne connecte plus ; les sessions déjà ouvertes restent valables. Ce second facteur protège d'un mot de passe volé, pas d'une boîte mail compromise (le lien de réinitialisation arrive dans la même boîte). Si l'envoi des e-mails tombe en panne, plus personne ne peut se connecter : le retour arrière se fait dans la console, `bin/rails runner 'Setting.login_link_required = false'`.
-- Le **menu principal** surligne l'entrée de l'écran ouvert (gras et barre multicolore qui se déroule puis défile en boucle, fixe si le mouvement réduit est demandé). L'entrée est déduite du contrôleur (`current_nav_section`, `ApplicationHelper`) : tout l'espace d'une campagne surligne *Mes campagnes*, `/admin/users` surligne *Administration*. Un écran sans entrée de menu (accueil, 404, espace sondé) n'en surligne aucune. Sous 40rem de large, la navigation devient un tiroir latéral (contrôleur Stimulus `nav_drawer`) : l'en-tête se réduit au logo et à un bouton menu, « Créer un compte » reste visible pour un visiteur, et le tiroir est accessible (Échap, focus piégé, page inerte). Sans JavaScript, la navigation reste empilée.
-- Le formulaire de campagne (création et modification, tant qu'elle est en brouillon) est pré-rempli avec des **questions par défaut**, qui s'ajoutent et se suppriment avec les boutons *Ajouter* et *Supprimer*. Les managés et les sondés se cochent parmi les contacts de l'équipe (bouton *Tout cocher*), ou s'ajoutent avec *Nouveau contact*, qui les enregistre aussi dans l'équipe. Une fois la campagne lancée, ces listes ne sont plus modifiables.
-- Au lancement, chaque **sondé** reçoit un e-mail avec un lien personnel (`/repondre/<jeton>`). Il note (1 à 5) et/ou commente chaque managé, enregistre sa progression, puis soumet définitivement. Il est informé que ses réponses sont **nominatives**.
-- Tant que la campagne est en cours, le manager peut renvoyer l'invitation (même lien) à un sondé qui n'a pas encore soumis, via le bouton *Renvoyer* ; la date de dernière invitation s'affiche dans le tableau des sondés.
-- Le manager suit l'avancement et lit, par managé, les moyennes et les commentaires attribués à leur auteur.
-- Les réponses sont fermées à la clôture de la campagne ou à la date limite.
-- Toute adresse inconnue (et toute page à laquelle on n'a pas droit, comme `/admin` pour un manager qui n'est pas Admin) affiche une **page 404** dans le style du site, rendue par l'application (`ErrorsController`). En développement, Rails masque cette page derrière sa page de débogage : ouvrez `/dev/404` pour la voir et la retoucher. `public/404.html` reste la page de secours, servie si le rendu habillé échoue ; les autres erreurs (400, 422, 500…) gardent leurs pages statiques de `public/`.
-- Les messages qui suivent une action (connexion, clôture, renvoi…) s'affichent en toasts par-dessus la page, en bas à droite (en bas sur toute la largeur sur mobile), sans décaler l'interface : les notices disparaissent seules après quelques secondes, les alertes restent jusqu'à ce qu'on les ferme. Les messages d'état (campagne terminée, réponses déjà soumises, erreurs d'un formulaire) restent dans la page.
-
-## Déploiement (Kamal)
-
-Le déploiement est configuré dans `config/deploy.yml` (voir la [documentation Kamal](https://kamal-deploy.org)). À renseigner avant le premier déploiement : serveur, registre d'images, domaine, et la variable `APP_HOST` (hôte utilisé dans les liens des e-mails ; en développement, la même variable se règle dans `.env`, voir plus haut). Les e-mails de production partent par un serveur SMTP configuré par variables d'environnement (ou, à défaut, par les clés `smtp` des credentials, `bin/rails credentials:edit`) :
-
-| Variable | Rôle |
-|---|---|
-| `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | obligatoires : s'il en manque une, SMTP est considéré comme non configuré |
-| `SMTP_DOMAIN`, `SMTP_AUTHENTICATION` (`plain`), `SMTP_ENABLE_STARTTLS_AUTO` (`true`), `SMTP_OPENSSL_VERIFY_MODE` | facultatives |
-| `SMTP_SENDER` (ou `MAILER_SENDER`) | adresse d'expéditeur de tous les e-mails |
-| `SMTP_ENABLED=false` | n'envoie rien même si la configuration est complète |
-| `APP_HOST`, `APP_PORT`, `APP_PROTOCOL` | adresse publique utilisée dans les liens des e-mails |
-
-Sans configuration SMTP exploitable, l'application démarre mais écrit un avertissement `[mail]` dans le journal : les managers ne pourraient plus activer leur compte. `SMTP_PASSWORD` est un secret Kamal, lu dans l'environnement du poste de déploiement (`.kamal/secrets`). En développement, ces mêmes variables, placées dans `.env`, font envoyer les e-mails pour de vrai au lieu de les intercepter.
+Le déploiement utilise [Kamal](https://kamal-deploy.org) et la configuration `config/deploy.yml`. À renseigner avant le premier déploiement : serveur, registre d'images, domaine (`proxy`), `APP_HOST` et les variables `SMTP_*`. `SMTP_PASSWORD` et `RAILS_MASTER_KEY` sont des secrets lus par `.kamal/secrets` dans l'environnement du poste de déploiement.
 
 ```bash
 bin/kamal setup           # premier déploiement
 bin/kamal deploy          # déploiements suivants
+bin/kamal console         # console Rails en production
 ```
 
-La base SQLite et le stockage vivent dans le volume persistant `fideback_storage` : pensez à le sauvegarder.
+Les migrations s'exécutent au démarrage du conteneur. Les bases SQLite et le stockage vivent dans le volume persistant `fideback_storage` : **pensez à le sauvegarder**.
+
+**Reprise en cas de problème d'e-mails** : si la connexion par lien unique est activée et que l'envoi des e-mails tombe en panne, plus personne ne peut se connecter. Le retour arrière se fait dans la console : `bin/rails runner 'Setting.login_link_required = false'`.
+
+## Structure du dépôt
+
+```
+app/                  modèles, contrôleurs, vues, contrôleurs Stimulus, CSS
+config/               configuration Rails, routes, déploiement Kamal
+db/                   migrations et schémas (principal, cache, queue, cable)
+docs/                 fonctionnement détaillé écran par écran
+openspec/specs/       spécifications de référence (source de vérité)
+openspec/changes/     évolutions en cours, et archive/ pour l'historique
+script/icons          génération des icônes binaires à partir de public/icon.svg
+test/                 tests unitaires, d'intégration et système
+.claude/              commandes et skills du workflow SDD
+```
+
+### Icône
+
+Le dessin de l'icône (un F encre et son ombre rose) a une seule source : `public/icon.svg`, qui passe le F en clair en thème sombre. Après toute modification, régénérez `public/icon.png`, `public/apple-touch-icon.png` et `public/favicon.ico` avec `ruby script/icons` (Chrome headless). Le « F » du logotype (`.brand-name::first-letter` dans `app/assets/stylesheets/application.css`) reprend ce style : ajustez-le aussi si les couleurs changent.
+
+## Contribuer
+
+Le projet suit le Spec-Driven Development, donc **on ne code pas avant d'avoir spécifié**.
+
+1. Installez [OpenSpec](https://github.com/Fission-AI/OpenSpec) puis décrivez l'évolution avec `/opsx:explore`, puis `/opsx:propose`.
+2. Relisez la proposition, les exigences (*Étant donné / Quand / Alors*) et les tâches.
+3. Implémentez avec `/opsx:apply`, puis archivez avec `/opsx:archive`.
+4. Vérifiez que tout passe : `bin/rails test`, `bin/rubocop`, `bin/rails test:system` et `bin/ci`.
+5. Les commits suivent la convention [Conventional Commits](https://www.conventionalcommits.org) (`feat:`, `fix:`, `docs:`, `chore:`…), en anglais.
+
+L'interface est exclusivement en français.
+
+## Licence
+
+Fideback est distribué sous [licence MIT](LICENSE).
