@@ -34,6 +34,7 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action='check-all#check']", text: "Tout cocher", count: 2
     assert_select "[data-nested-form-target=container] .contact", count: 0
     assert_select "template input[name='campaign[new_subject_contacts][NEW_RECORD][name]']"
+    assert_select "template .contact input[type=checkbox][checked]:not([name])", count: 2
     assert_select "template input[name='campaign[questions_attributes][NEW_RECORD][prompt]']"
     assert_select "button[data-action='nested-form#add']", text: "Nouveau contact", count: 2
   end
@@ -130,6 +131,7 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select ".callout-alert li", /Nouveau contact « Zoé »/
     assert_select ".contact.has-error input[value='pas-un-email']"
+    assert_select ".contact.has-error input[type=checkbox][checked]:not([name])", count: 1
     assert_equal [ contacts(:rose).id, contacts(:sam).id ].sort, checked_ids(:respondent).sort
   end
 

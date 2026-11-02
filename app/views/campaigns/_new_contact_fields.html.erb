@@ -1,4 +1,5 @@
 <div class="field contact<%= " has-error" if contact.errors.any? %>" data-nested-form-target="row" data-new-record="true">
+  <input type="checkbox" checked tabindex="-1" aria-hidden="true">
   <%= text_field_tag "campaign[new_#{singular}_contacts][#{index}][name]", contact.name, id: nil, placeholder: "Nom", aria: { label: "Nom" } %>
   <%= email_field_tag "campaign[new_#{singular}_contacts][#{index}][email]", contact.email, id: nil, placeholder: "E-mail", aria: { label: "E-mail" } %>
   <button type="button" class="link link-remove" data-action="nested-form#remove">Supprimer</button>

@@ -875,12 +875,13 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 
 .contact {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.3fr) auto;
   gap: 0.5rem 0.75rem;
   align-items: center;
   margin-bottom: 0.6rem;
 }
 .contact input { max-width: none; }
+.contact input[type=checkbox] { max-width: none; margin: 0; pointer-events: none; }
 
 .question {
   display: grid;
@@ -924,11 +925,17 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 .pick input { grid-area: box; }
 .pick-name { grid-area: name; font-weight: 700; overflow-wrap: anywhere; }
 .pick-email { grid-area: email; font-size: 0.8125rem; color: var(--ink-soft); overflow-wrap: anywhere; }
-.pick:has(:checked) {
+.pick:has(:checked),
+.contact {
   border-color: var(--ink);
   background: color-mix(in srgb, var(--pick) 22%, var(--surface));
   box-shadow: 3px 3px 0 var(--pick);
   transform: translate(-1px, -1px);
+}
+.contact {
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
 }
 .pick:has(:focus-visible) { outline: 3px solid var(--azure); outline-offset: 2px; }
 .picker-empty { padding: 0.85rem 1rem; border: 2px dashed var(--line-strong); border-radius: 1rem; color: var(--ink-soft); }
@@ -1537,9 +1544,11 @@ dialog.confirm[open]::backdrop { opacity: 1; }
   .home-scene { padding: 1.25rem 1.1rem; rotate: 0deg; box-shadow: 6px 6px 0 var(--azure); }
   .track { margin-inline: 1rem; }
 
-  .contact { grid-template-columns: minmax(0, 1fr) auto; }
-  .contact input[type=email] { grid-row: 2; }
-  .contact .link-remove { grid-row: 1 / span 2; }
+  .contact { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .contact input[type=checkbox] { grid-area: 1 / 1 / span 2; }
+  .contact input[type=text] { grid-area: 1 / 2; }
+  .contact input[type=email] { grid-area: 2 / 2; }
+  .contact .link-remove { grid-area: 1 / 3 / span 2; }
   .page-head .btn { width: 100%; }
   .answer-actions { padding-inline: 0.75rem; }
   .answer-actions input { flex: 1 1 100%; min-width: 0; padding-inline: 0.8rem; font-size: 0.875rem; white-space: normal; }
