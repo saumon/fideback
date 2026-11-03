@@ -14,6 +14,7 @@ user-invocable: false
 - Ton voulu : original, **coloré**, animé, typographie ludique. Un rendu sobre ou monochrome a déjà été rejeté (« trop sobre et terne »).
 - Plusieurs couleurs saturées qui portent du sens, des animations visibles, mais toujours avec `prefers-reduced-motion` respecté.
 - Police Bricolage Grotesque auto-hébergée dans `app/assets/fonts/` : aucun CDN externe.
+- La landing page statique `docs/` (GitHub Pages) a sa propre copie du CSS de l'accueil, `docs/landing.css`, non synchronisée : un changement de style de l'accueil se reporte à la main.
 - L'icône a une seule source, `public/icon.svg` ; les versions binaires se régénèrent avec `ruby script/icons`.
 
 ## Exécuter les commandes

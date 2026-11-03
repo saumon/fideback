@@ -160,13 +160,17 @@ Les migrations s'exécutent au démarrage du conteneur. Les bases SQLite et le s
 
 **Reprise en cas de problème d'e-mails** : si la connexion par lien unique est activée et que l'envoi des e-mails tombe en panne, plus personne ne peut se connecter. Le retour arrière se fait dans la console : `bin/rails runner 'Setting.login_link_required = false'`.
 
+### Landing page (GitHub Pages)
+
+`docs/index.html` est une page de présentation statique, sans JavaScript ni ressource externe, publiée à <https://saumon.github.io/fideback/> par GitHub Pages. Dans les paramètres du dépôt, **Pages** doit être réglé sur *Deploy from a branch*, branche `master`, dossier `/docs` : la page n'est en ligne qu'après la fusion de `dev` dans `master`. Elle reprend le style de l'accueil de l'application, mais `docs/landing.css` en est une **copie réduite, non synchronisée** : quand le style de l'accueil change (couleurs, boutons, logo, scène, animations), reportez le changement dans `docs/landing.css`. `docs/og.png` est l'image de prévisualisation des liens partagés (1200x630). `docs/fonctionnement.md` est aussi servi par Pages, en texte brut.
+
 ## Structure du dépôt
 
 ```
 app/                  modèles, contrôleurs, vues, contrôleurs Stimulus, CSS
 config/               configuration Rails, routes, déploiement Kamal
 db/                   migrations et schémas (principal, cache, queue, cable)
-docs/                 fonctionnement détaillé écran par écran
+docs/                 landing page statique (GitHub Pages) et fonctionnement détaillé écran par écran
 openspec/specs/       spécifications de référence (source de vérité)
 openspec/changes/     évolutions en cours, et archive/ pour l'historique
 script/icons          génération des icônes binaires à partir de public/icon.svg
