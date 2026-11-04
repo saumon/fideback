@@ -1,6 +1,11 @@
 <div align="center">
 
-# Fideback
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo/fideback-logo-dark.png">
+    <img src="docs/logo/fideback-logo.png" alt="Fideback" width="380">
+  </picture>
+</h1>
 
 **Préparez vos entretiens individuels de fin d'année avec les retours de ceux qui travaillent avec vos équipes.**
 

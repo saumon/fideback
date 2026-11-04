@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Fideback">
+<title>Fideback</title>
+<rect width="1024" height="1024" fill="#F7F5FC"/>
+<rect x="56" y="56" width="912" height="912" rx="200" fill="#FFFFFF" stroke="#231942" stroke-width="16"/>
+<svg x="172" y="262" width="680" height="534" viewBox="0.9 2.9 46.2 36.3" overflow="visible" stroke="#231942" stroke-width="2.2" stroke-linejoin="round"><path d="M9 4 H21 A7 7 0 0 1 28 11 V15 A7 7 0 0 1 21 22 H14 L9 28 V22 A7 7 0 0 1 2 15 V11 A7 7 0 0 1 9 4 Z" fill="#FF5D8F"/>
+<path d="M27 14 H39 A7 7 0 0 1 46 21 V25 A7 7 0 0 1 39 32 V38 L34 32 H27 A7 7 0 0 1 20 25 V21 A7 7 0 0 1 27 14 Z" fill="#FFB627"/>
+<circle cx="27" cy="23" r="2" fill="#231942" stroke="none"/><circle cx="33" cy="23" r="2" fill="#231942" stroke="none"/><circle cx="39" cy="23" r="2" fill="#231942" stroke="none"/></svg>
+</svg>
