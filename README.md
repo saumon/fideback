@@ -68,7 +68,7 @@ Ce que cela donne dans le dépôt :
 
 - [`openspec/specs/`](openspec/specs/) : les **spécifications de référence**, une par capacité (authentification, campagnes, synthèse, invitations, connexion par lien unique, navigation…). Chaque exigence est formulée en *doit* et accompagnée de scénarios *Étant donné / Quand / Alors* vérifiables.
 - [`openspec/changes/archive/`](openspec/changes/archive/) : l'**historique de toutes les évolutions**, chacune avec sa proposition, ses décisions de conception et ses tâches. Le dépôt se lit comme un journal de décisions.
-- [`.claude/`](.claude/) : les commandes et skills qui outillent le workflow, dont `saumon-finish` qui clôt un travail (vérifications, commit, push).
+- [`.claude/`](.claude/) : les commandes et skills qui outillent le workflow, dont `saumon-finish`, qui clôt un travail (vérifications, commit, push), et `saumon-dependabot`, qui intègre une branche Dependabot dans `dev`.
 
 Les spécifications se valident avec `openspec validate --all --strict`. Le [fonctionnement détaillé](docs/fonctionnement.md) en est la lecture rapide.
 
@@ -149,7 +149,7 @@ bin/brakeman              # analyse de sécurité
 bin/ci                    # enchaîne l'ensemble (hors tests système)
 ```
 
-Le projet n'a pas d'intégration continue sur GitHub : les vérifications se lancent en local, et `/saumon-finish` les enchaîne (tests, RuboCop, tests système, `bin/ci`) avant chaque commit. `bin/ci` couvre aussi les audits de sécurité (Brakeman, gems, importmap). [Dependabot](.github/dependabot.yml) propose chaque semaine la mise à jour des dépendances.
+Le projet n'a pas d'intégration continue sur GitHub : les vérifications se lancent en local, et `/saumon-finish` les enchaîne (tests, RuboCop, tests système, `bin/ci`) avant chaque commit. `bin/ci` couvre aussi les audits de sécurité (Brakeman, gems, importmap). [Dependabot](.github/dependabot.yml) propose chaque semaine la mise à jour des dépendances ; `/saumon-dependabot` intègre ces branches dans `dev` après vérification.
 
 ## Déploiement
 

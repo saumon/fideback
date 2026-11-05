@@ -28,3 +28,4 @@ user-invocable: false
 - Rails 8.1, Hotwire (Turbo + Stimulus), importmap, Propshaft, SQLite, Solid Queue/Cache/Cable, Devise.
 - En développement, les e-mails sont visibles sur `/letter_opener`.
 - Fin de session : `/saumon-finish` (README, vérifications, commit, push).
+- Mise à jour Dependabot : `/saumon-dependabot` (choix de la branche, rebase sur `dev`, vérifications, push forcé, merge `--no-ff`).
