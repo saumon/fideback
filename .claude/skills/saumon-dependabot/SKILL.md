@@ -54,7 +54,15 @@ git rebase origin/dev
 
 ## 4. Vérifications (bloquantes)
 
-Lance, dans cet ordre, sur la branche rebasée :
+Commence par installer les gems de la branche (une mise à jour de dépendance change le `Gemfile.lock`, et la gem peut manquer localement) :
+
+```bash
+bundle install
+```
+
+Si `bundle install` échoue, traite-le comme un échec de vérification (voir « Refus de continuer »). Il ne doit modifier aucun fichier suivi : vérifie avec `git status --short` ; sinon, arrête-toi et explique.
+
+Lance ensuite, dans cet ordre, sur la branche rebasée :
 
 ```bash
 bin/rails test
@@ -73,10 +81,12 @@ Les tests système lancent Chrome headless et durent plus longtemps : laisse-leu
 
 Saute cette étape si la branche était déjà à jour (étape 3).
 
-Avant de poser la question, lance `git log --oneline origin/dev..<branche>` pour connaître les commits de la branche. Demande : « Pousser la branche rebasée avec `git push --force-with-lease origin <branche>` ? » en listant ces commits. Cette information doit figurer dans la question elle-même.
+Dependabot rebase souvent sa branche après un merge dans `dev`. Juste avant de poser la question, lance `git fetch origin` puis compare `git rev-parse origin/<branche>` au commit de départ de l'étape 3 : si la branche distante a changé, arrête-toi (le lease échouerait) et propose de relancer le skill, avec le nettoyage de l'étape 4.
+
+Lance ensuite `git log --oneline origin/dev..<branche>` pour connaître les commits de la branche. Demande : « Pousser la branche rebasée avec `git push --force-with-lease origin <branche>` ? » en listant ces commits. Cette information doit figurer dans la question elle-même.
 
 - Si oui : `git push --force-with-lease origin <branche>`.
-- Si le push est rejeté (le lease a échoué : Dependabot a probablement réécrit la branche), affiche l'erreur, explique-le, ne réessaie pas, propose de relancer le skill (nouveau `fetch`). Nettoie comme à l'étape 4.
+- Si le push est rejeté (le lease a échoué : Dependabot a probablement réécrit la branche), **le skill s'arrête là** : affiche l'erreur, explique-le, ne réessaie pas, **ne pose pas la question de l'étape 6**, nettoie comme à l'étape 4 (`git switch dev`, `git branch -D <branche>`) et propose de relancer le skill (nouveau `fetch`).
 - Si non : nettoie (`git switch dev`, `git branch -D <branche>`) et termine par le résumé, sans merge.
 
 ## 6. Merge dans dev
@@ -93,8 +103,10 @@ Affiche ensuite `git log --oneline -3`.
 
 Une fois mergée, supprime la branche locale : `git branch -d <branche>`.
 
-Demande ensuite : « Supprimer la branche distante avec `git push origin --delete <branche>` ? ». Question séparée, son propre « oui ». Si non, laisse-la.
+Lance `git fetch --prune` : GitHub supprime parfois la branche tout seul quand il détecte la PR comme fusionnée. Si `origin/<branche>` n'existe plus, dis-le et ne pose pas la question.
+
+Sinon, demande : « Supprimer la branche distante avec `git push origin --delete <branche>` ? ». Question séparée, son propre « oui ». Si non, laisse-la. Si la suppression échoue avec « remote ref does not exist », GitHub l'a supprimée entre-temps : ce n'est pas une erreur, signale-le.
 
 ## 8. Résumé
 
-Termine par un résumé court : branche choisie, rebase (fait, conflit, ou déjà à jour), vérifications (tests, RuboCop, tests système et `bin/ci` passés), push forcé (fait, sauté ou refusé), merge et push de `dev` (hash et titre du commit de merge, fait ou non fait), branche distante (supprimée ou conservée).
+Termine par un résumé court : branche choisie, rebase (fait, conflit, ou déjà à jour), vérifications (`bundle install`, tests, RuboCop, tests système et `bin/ci` passés), push forcé (fait, sauté ou refusé), merge et push de `dev` (hash et titre du commit de merge, fait ou non fait), branche distante (supprimée ou conservée).
