@@ -37,6 +37,9 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
 
+  # Logs colorés dans « bin/kamal logs » : Rails ne colore pas hors d'un terminal.
+  config.colorize_logging = true
+
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
