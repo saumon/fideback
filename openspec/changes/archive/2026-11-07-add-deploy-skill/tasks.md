@@ -21,7 +21,7 @@
 ## 3. Vérification d'ensemble
 
 - [x] 3.1 Relire le skill de bout en bout face à `design.md` (chaque décision y apparaît) et au dépôt réel (présence des fichiers de production, sous-commandes Kamal utilisées) ; vérifier qu'aucune IP, aucun domaine ni chemin de secret ne figure dans `SKILL.md` avec `grep -nE "192\.168|saumon\.cc|smtp_password|ovh" .claude/skills/saumon-deploy/SKILL.md` (aucune ligne attendue).
-- [ ] 3.2 Essai à blanc sans déployer : lancer `/saumon-deploy` et vérifier l'état des lieux, les prérequis et l'écran de confirmation (commits listés, branche affichée), puis répondre « non » ; vérifier que `bin/kamal app version -d production` renvoie toujours la même version qu'avant l'essai.
+- [x] 3.2 Essai à blanc sans déployer : lancer `/saumon-deploy` et vérifier l'état des lieux, les prérequis et l'écran de confirmation (commits listés, branche affichée), puis répondre « non » ; vérifier que `bin/kamal app version -d production` renvoie toujours la même version qu'avant l'essai. _Réalisé en déploiement réel (réponse « oui » à la confirmation, `484c05c` déployé) : état des lieux, prérequis, aperçu, confirmation, déploiement et contrôle validés ; le refus (« non ») et le chemin d'échec n'ont pas été exercés._
 
 ## Workflow follow-up
 
