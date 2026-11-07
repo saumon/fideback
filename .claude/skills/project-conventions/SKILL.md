@@ -29,3 +29,4 @@ user-invocable: false
 - En développement, les e-mails sont visibles sur `/letter_opener`.
 - Fin de session : `/saumon-finish` (README, vérifications, commit, push).
 - Mise à jour Dependabot : `/saumon-dependabot` (choix de la branche, rebase sur `dev`, vérifications, push forcé, merge `--no-ff`).
+- Déploiement en production : `/saumon-deploy` (contrôles locaux, aperçu des commits qui partent, confirmation, `bin/kamal deploy -d production`, contrôle de santé). Les vérifications de code restent à `/saumon-finish`, à lancer avant.

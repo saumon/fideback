@@ -68,7 +68,7 @@ Ce que cela donne dans le dépôt :
 
 - [`openspec/specs/`](openspec/specs/) : les **spécifications de référence**, une par capacité (authentification, campagnes, synthèse, invitations, connexion par lien unique, navigation…). Chaque exigence est formulée en *doit* et accompagnée de scénarios *Étant donné / Quand / Alors* vérifiables.
 - [`openspec/changes/archive/`](openspec/changes/archive/) : l'**historique de toutes les évolutions**, chacune avec sa proposition, ses décisions de conception et ses tâches. Le dépôt se lit comme un journal de décisions.
-- [`.claude/`](.claude/) : les commandes et skills qui outillent le workflow, dont `saumon-finish`, qui clôt un travail (vérifications, commit, push), et `saumon-dependabot`, qui intègre une branche Dependabot dans `dev`.
+- [`.claude/`](.claude/) : les commandes et skills qui outillent le workflow, dont `saumon-finish`, qui clôt un travail (vérifications, commit, push), `saumon-dependabot`, qui intègre une branche Dependabot dans `dev`, et `saumon-deploy`, qui déploie en production après confirmation.
 
 Les spécifications se valident avec `openspec validate --all --strict`. Le [fonctionnement détaillé](docs/fonctionnement.md) en est la lecture rapide.
 
@@ -162,6 +162,8 @@ bin/kamal setup -d production     # premier déploiement
 bin/kamal deploy -d production    # déploiements suivants
 bin/kamal console -d production   # console Rails en production
 ```
+
+`/saumon-deploy` enchaîne les contrôles locaux, affiche les commits qui s'ajoutent à la version en production et, après confirmation, exécute `bin/kamal deploy -d production` puis vérifie que l'application répond. Les vérifications de code relèvent de `/saumon-finish`, à lancer avant.
 
 Les migrations s'exécutent au démarrage du conteneur. Les bases SQLite et le stockage vivent dans le volume persistant `fideback_storage` : **pensez à le sauvegarder**.
 
