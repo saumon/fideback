@@ -153,12 +153,14 @@ Le projet n'a pas d'intégration continue sur GitHub : les vérifications se lan
 
 ## Déploiement
 
-Le déploiement utilise [Kamal](https://kamal-deploy.org) et la configuration `config/deploy.yml`. À renseigner avant le premier déploiement : serveur, registre d'images, domaine (`proxy`), `APP_HOST` et les variables `SMTP_*`. `SMTP_PASSWORD` et `RAILS_MASTER_KEY` sont des secrets lus par `.kamal/secrets` dans l'environnement du poste de déploiement.
+Le déploiement utilise [Kamal](https://kamal-deploy.org). `config/deploy.yml` est un modèle avec des valeurs d'exemple ; les valeurs réelles (serveur, `APP_HOST`, variables `SMTP_*`) se placent dans `config/deploy.production.yml`, **ignoré par git**, que Kamal fusionne par-dessus avec `-d production`. `SMTP_PASSWORD` et `RAILS_MASTER_KEY` sont des secrets lus par `.kamal/secrets` dans l'environnement du poste de déploiement.
+
+L'application est prévue derrière un reverse proxy qui termine le HTTPS (Nginx Proxy Manager, par exemple) et transmet en HTTP au port 80 du serveur : `assume_ssl` et `force_ssl` sont activés en production, sans `proxy.ssl` dans Kamal. Le reverse proxy doit activer les websockets (Turbo, Action Cable). Pour terminer le HTTPS avec Kamal à la place, renseignez le bloc `proxy` de `deploy.yml`.
 
 ```bash
-bin/kamal setup           # premier déploiement
-bin/kamal deploy          # déploiements suivants
-bin/kamal console         # console Rails en production
+bin/kamal setup -d production     # premier déploiement
+bin/kamal deploy -d production    # déploiements suivants
+bin/kamal console -d production   # console Rails en production
 ```
 
 Les migrations s'exécutent au démarrage du conteneur. Les bases SQLite et le stockage vivent dans le volume persistant `fideback_storage` : **pensez à le sauvegarder**.

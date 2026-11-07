@@ -31,3 +31,8 @@
 # Ignore key files for decrypting credentials and more.
 /config/credentials/*.key
 
+
+# Configuration Kamal propre à la production (IP, domaine, SMTP) : jamais dans le dépôt public.
+/config/deploy.*.yml
+!/config/deploy.yml
+/.kamal/secrets.*

@@ -13,6 +13,14 @@ servers:
   #     - 192.168.0.1
   #   cmd: bin/jobs
 
+# Le HTTPS est terminé en amont par un reverse proxy (Nginx Proxy Manager) qui
+# transmet en HTTP au port 80 de ce serveur : pas de proxy.ssl ici, et
+# config.assume_ssl / config.force_ssl sont activés dans production.rb.
+#
+# Les valeurs réelles de production (IP, domaine, SMTP) ne sont pas dans le
+# dépôt : elles vivent dans config/deploy.production.yml (ignoré par git),
+# fusionné par-dessus ce fichier avec « bin/kamal <commande> -d production ».
+#
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 #
