@@ -86,7 +86,7 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 - Information claire : les réponses sont nominatives.
 
 **Pour l'administrateur** (premier compte créé)
-- Liste des utilisateurs et invitation d'un manager par e-mail.
+- Liste des utilisateurs, invitation d'un manager par e-mail et suppression d'un manager.
 - *Danger zone* : fermer les inscriptions, exiger une **connexion par lien unique** envoyé par e-mail (second facteur).
 
 **Expérience**

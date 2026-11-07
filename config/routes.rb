@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   # Espace réservé à l'Admin du site.
   namespace :admin do
     root "dashboard#show"
-    resources :users, only: :index
+    resources :users, only: %i[index destroy]
     resource :danger_zone, path: "danger-zone", controller: "danger_zone", only: %i[show update]
     resources :invitations, only: %i[new create destroy] do
       post :resend, on: :member

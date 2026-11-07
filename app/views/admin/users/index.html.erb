@@ -8,7 +8,7 @@
 
 <div class="table-scroll">
   <table>
-    <thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Inscrit le</th></tr></thead>
+    <thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Inscrit le</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
     <tbody>
       <% @managers.each do |manager| %>
         <tr id="<%= dom_id(manager) %>">
@@ -19,6 +19,11 @@
             <% unless manager.confirmed? %><span class="status status-unconfirmed">Non confirmé</span><% end %>
           </td>
           <td class="muted cell-invited" data-label="Inscrit le"><%= l(manager.created_at, format: :short) %></td>
+          <td class="cell-action">
+            <% unless manager == current_manager %>
+              <%= button_to "Supprimer", admin_user_path(manager), method: :delete, class: "link link-remove", form: { class: "inline", data: { turbo_confirm: "Supprimer #{manager.name} ?", turbo_confirm_detail: delete_manager_detail(@campaign_counts.fetch(manager.id, 0)), turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" } } %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>

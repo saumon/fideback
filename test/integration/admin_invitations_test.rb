@@ -183,11 +183,14 @@ class AdminInvitationsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "the screen has no action on existing accounts" do
+  test "the only action on existing accounts is deletion" do
     sign_in managers(:alice)
 
     get admin_users_path
 
-    assert_select "table:first-of-type form, table:first-of-type button", false
+    assert_select "table:first-of-type form", Manager.count - 1
+    assert_select "table:first-of-type form" do |forms|
+      forms.each { |form| assert_equal "delete", form.at_css("input[name=_method]")["value"] }
+    end
   end
 end
