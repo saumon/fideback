@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "support/fake_telegram"
 
 module ActiveSupport
   class TestCase
@@ -11,6 +12,22 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    # L'API Telegram de chaque test : aucune requête ne part vers le vrai service.
+    attr_reader :fake_telegram
+
+    setup do
+      @fake_telegram = FakeTelegram.new
+      Telegram::BotClient.transport = @fake_telegram
+    end
+
+    # Un token au format de ceux que donne BotFather, qui se termine par « 1234 ».
+    TELEGRAM_TOKEN = "123456789:AAHfakeTokenForTestsOnly_abcdefgh1234".freeze
+
+    def configure_telegram(manager, enabled: true, chat_id: "42")
+      manager.update!(telegram_bot_token: TELEGRAM_TOKEN, telegram_chat_id: chat_id, telegram_enabled: enabled)
+      manager
+    end
 
     # Renseigne toutes les notes et tous les commentaires attendus d'un sondé, pour que sa soumission soit acceptée.
     def answer_fully(respondent)

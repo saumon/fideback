@@ -39,6 +39,11 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
+  # Clés fixes : les tests ne dépendent ni de la clé maître ni des credentials.
+  config.active_record.encryption.primary_key = "test-primary-key-0123456789abcdef"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key-0123456789"
+  config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt-0123456789"
+
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 

@@ -12,6 +12,9 @@ fr:
         password_confirmation: Confirmation du mot de passe
         current_password: Mot de passe actuel
         remember_me: Se souvenir de moi
+        telegram_bot_token: Le token du bot
+        telegram_chat_id: L'identifiant de conversation
+        telegram_enabled: L'activation des notifications Telegram
       invitation:
         name: Nom
         email: E-mail

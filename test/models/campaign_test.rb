@@ -207,4 +207,16 @@ class CampaignTest < ActiveSupport::TestCase
     assert_equal [ true, false ], results
     assert campaign.reload.closed?
   end
+
+  test "two competing closings notify the manager once, on telegram too" do
+    configure_telegram(managers(:alice))
+    campaign = campaigns(:running_campaign)
+    campaign.respondents.update_all(submitted_at: Time.current)
+    other = Campaign.find(campaign.id)
+
+    assert_enqueued_jobs(1, only: TelegramMessageJob) do
+      campaign.close_when_complete!
+      other.close_when_complete!
+    end
+  end
 end

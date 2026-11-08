@@ -1,0 +1,76 @@
+<%# Section « Notifications Telegram » de la page du compte. manager porte la saisie et ses erreurs ; saved est le
+    manager tel qu'enregistré, qui dit si Telegram est configuré et montre le token masqué. %>
+<% configured = saved.telegram_configured? %>
+<% token_hint = saved.masked_telegram_bot_token %>
+<% errors = %i[telegram_bot_token telegram_chat_id telegram_enabled].flat_map { |attribute| manager.errors.full_messages_for(attribute) } %>
+<section id="telegram-settings" class="telegram-card" aria-labelledby="telegram-title">
+  <header class="telegram-head">
+    <span class="telegram-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 11.5 20.5 4.2c.8-.3 1.5.2 1.3 1.2l-3 14.1c-.2 1-.9 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.4-.9.4l.3-4.7 8.6-7.8c.4-.3-.1-.5-.6-.2L7.1 13.4 2.6 12c-1-.3-1-1 .4-1.5Z" fill="currentColor"/></svg>
+    </span>
+    <div>
+      <h3 id="telegram-title">Notifications Telegram</h3>
+      <p>Recevez vos notifications dans Telegram, en plus des e-mails, par un bot à vous.</p>
+    </div>
+    <% if saved.telegram_active? %>
+      <span class="telegram-state is-on">Activées</span>
+    <% elsif configured %>
+      <span class="telegram-state is-off">En pause</span>
+    <% else %>
+      <span class="telegram-state is-unset">À configurer</span>
+    <% end %>
+  </header>
+
+  <%= tag.details class: "telegram-guide", open: !configured do %>
+    <summary>Relier votre bot en 6 étapes</summary>
+    <ol>
+      <li>Dans Telegram, ouvrez <a href="https://telegram.me/BotFather" target="_blank" rel="noopener">@BotFather</a> et envoyez <code>/newbot</code>.</li>
+      <li>Choisissez un nom, puis un nom d'utilisateur qui se termine par « bot » (<code>fideback_alice_bot</code>, par exemple). Ce nom d'utilisateur ne pourra plus être changé.</li>
+      <li>Copiez le token que BotFather vous donne et collez-le ci-dessous.</li>
+      <li>Ouvrez la conversation avec votre nouveau bot et envoyez-lui <code>/start</code>.</li>
+      <li>Cliquez sur « Détecter », vérifiez que le nom affiché est bien le vôtre, puis enregistrez.</li>
+      <li>Activez les notifications et envoyez-vous un message de test.</li>
+    </ol>
+    <p class="telegram-guide-note">
+      <strong>Bot déjà utilisé par n8n ?</strong> S'il reçoit ses messages par un webhook (nœud Telegram Trigger), « Détecter » ne peut pas les lire :
+      écrivez à <a href="https://telegram.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>, qui vous donne votre identifiant, et saisissez-le à la main.
+    </p>
+  <% end %>
+
+  <%= form_with model: manager, scope: :manager, url: telegram_setting_path, method: :patch, id: "telegram-form", class: "telegram-form" do |f| %>
+    <% if errors.any? %>
+      <div class="callout callout-alert" role="alert">
+        <ul><% errors.each do |message| %><li><%= message %></li><% end %></ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <p><%= f.label :telegram_bot_token, "Token du bot" %></p>
+      <p><%= f.password_field :telegram_bot_token, value: nil, autocomplete: "off", spellcheck: false,
+                                                   placeholder: token_hint || "123456789:AAH…" %></p>
+      <% if token_hint %>
+        <p><i>Un token est enregistré (<span class="telegram-token-hint"><%= token_hint %></span>). Laissez vide pour le garder.</i></p>
+      <% else %>
+        <p><i>Celui que BotFather vous a donné.</i></p>
+      <% end %>
+    </div>
+
+    <%= render "telegram_settings/chat_field", chat_id: manager.telegram_chat_id %>
+
+    <div class="field telegram-switch">
+      <%= f.check_box :telegram_enabled, role: "switch" %>
+      <%= f.label :telegram_enabled, "Envoyer mes notifications sur Telegram" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Enregistrer" %>
+    </div>
+  <% end %>
+
+  <% if configured %>
+    <div class="telegram-test">
+      <%= button_to "Envoyer un message de test", test_message_telegram_setting_path, class: "btn btn-small", form_class: "inline" %>
+      <span>Même si les notifications sont en pause.</span>
+    </div>
+  <% end %>
+</section>

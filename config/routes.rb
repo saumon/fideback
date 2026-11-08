@@ -27,6 +27,13 @@ Rails.application.routes.draw do
   get "invitations/:token", to: "invitation_acceptances#show", as: :invitation_acceptance
   patch "invitations/:token", to: "invitation_acceptances#update"
 
+  # Notifications Telegram du manager, réglées depuis la page de son compte. Fideback ne reçoit rien de Telegram :
+  # aucune route ne sert de webhook. « Détecter » est un second bouton du formulaire, d'où la même méthode PATCH.
+  resource :telegram_setting, path: "telegram", only: :update do
+    patch :detect
+    post :test_message
+  end
+
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
   resource :team, only: %i[show update]
 

@@ -1,0 +1,18 @@
+<%# Le champ de l'identifiant de conversation, que « Détecter » remplace par un Turbo Stream sans rien enregistrer.
+    Rendu dans le formulaire de la section : le bouton soumet ce formulaire vers detect. %>
+<% detection = local_assigns[:detection] %>
+<div id="telegram-chat" class="field telegram-chat">
+  <p><%= label_tag "manager_telegram_chat_id", "Identifiant de conversation" %></p>
+  <div class="telegram-chat-row">
+    <%= text_field_tag "manager[telegram_chat_id]", chat_id, id: "manager_telegram_chat_id", inputmode: "numeric",
+                       autocomplete: "off", placeholder: "123456789" %>
+    <button type="submit" class="btn btn-small telegram-detect" formaction="<%= detect_telegram_setting_path %>" formnovalidate>
+      Détecter
+    </button>
+  </div>
+  <% if detection %>
+    <p class="telegram-detection <%= detection.found? ? "is-found" : "is-missed" %>" role="status"><%= detection.message %></p>
+  <% else %>
+    <p><i>Écrivez /start à votre bot, puis cliquez sur « Détecter ».</i></p>
+  <% end %>
+</div>

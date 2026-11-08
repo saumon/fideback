@@ -79,6 +79,7 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 - Campagnes (brouillon → en cours → clôturée) avec questions par défaut modifiables, suppression d'une campagne brouillon ou clôturée.
 - Annuaire d'équipe réutilisable d'une campagne à l'autre, rôles *managé* et/ou *sondable*.
 - Suivi de l'avancement, relance des sondés, clôture automatique quand tous ont répondu (avec un e-mail au manager), synthèse nominative par managé.
+- Notifications Telegram en plus des e-mails, par un bot créé par le manager et réglé dans « Mon compte » (envoi seul, sans webhook).
 
 **Pour les sondés**
 - Lien personnel par e-mail, **sans compte**.
@@ -134,10 +135,13 @@ Les variables se placent dans un fichier `.env` à la racine (ignoré par git, c
 | `SMTP_DOMAIN`, `SMTP_AUTHENTICATION` (`plain`), `SMTP_ENABLE_STARTTLS_AUTO` (`true`), `SMTP_OPENSSL_VERIFY_MODE` | facultatives |
 | `SMTP_SENDER` (ou `MAILER_SENDER`) | adresse d'expéditeur de tous les e-mails |
 | `SMTP_ENABLED=false` | n'envoie rien même si la configuration est complète |
+| `ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`, `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` | facultatives : clés de chiffrement des tokens Telegram, qui remplacent les clés `active_record_encryption` des credentials |
 
 À défaut de variables, les clés `smtp` des credentials sont utilisées (`bin/rails credentials:edit`). En développement, une configuration SMTP complète dans `.env` fait envoyer les e-mails pour de vrai au lieu de les intercepter. Redémarrez le serveur après toute modification ; les e-mails déjà interceptés gardent l'ancien lien.
 
 Sans configuration SMTP exploitable, l'application démarre mais écrit un avertissement `[mail]` dans le journal : les managers ne pourraient plus activer leur compte.
+
+Les tokens des bots Telegram sont chiffrés en base par Active Record. Les clés `active_record_encryption` sont déjà dans les credentials de développement et de production ; pour un nouvel environnement, générez-les avec `bin/rails db:encryption:init` et copiez le bloc affiché dans `bin/rails credentials:edit` (ajoutez `-e production` pour la production). **Ne changez pas ces clés** : les tokens déjà enregistrés deviendraient illisibles, et chaque manager concerné devrait ressaisir le sien.
 
 ## Tests et qualité
 
@@ -164,6 +168,8 @@ bin/kamal console -d production   # console Rails en production
 ```
 
 `/saumon-deploy` enchaîne les contrôles locaux, affiche les commits qui s'ajoutent à la version en production et, après confirmation, exécute `bin/kamal deploy -d production` puis vérifie que l'application répond. Les vérifications de code relèvent de `/saumon-finish`, à lancer avant.
+
+Pour les notifications Telegram, le serveur doit pouvoir joindre `api.telegram.org` en HTTPS sortant, et les clés `active_record_encryption` des credentials de production ne doivent pas changer d'un déploiement à l'autre (voir [Configuration](#configuration)).
 
 Les migrations s'exécutent au démarrage du conteneur. Les bases SQLite et le stockage vivent dans le volume persistant `fideback_storage` : **pensez à le sauvegarder**.
 

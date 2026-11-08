@@ -78,7 +78,8 @@ class Campaign < ApplicationRecord
   end
 
   # Clôture une campagne en cours dont tous les sondés ont soumis. La mise à jour est conditionnelle : si deux
-  # soumissions arrivent ensemble, une seule clôture réussit et envoie l'e-mail au manager : celle-là rend true.
+  # soumissions arrivent ensemble, une seule clôture réussit et prévient le manager (e-mail, et Telegram s'il l'a
+  # activé) : celle-là rend true.
   def close_when_complete!
     return false unless running? && all_submitted?
 
@@ -86,7 +87,7 @@ class Campaign < ApplicationRecord
     return false unless closed_now
 
     reload
-    CampaignMailer.completed(self).deliver_later
+    ManagerNotifier.campaign_completed(self)
     true
   end
 

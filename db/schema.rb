@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -86,6 +86,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_100000) do
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
     t.string "role", default: "manager", null: false
+    t.text "telegram_bot_token"
+    t.string "telegram_chat_id"
+    t.boolean "telegram_enabled", default: false, null: false
     t.index ["confirmation_token"], name: "index_managers_on_confirmation_token", unique: true
     t.index ["email"], name: "index_managers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_managers_on_reset_password_token", unique: true

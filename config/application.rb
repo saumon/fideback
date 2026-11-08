@@ -27,6 +27,17 @@ module Fideback
     config.i18n.default_locale = :fr
     config.i18n.available_locales = [ :fr ]
     config.time_zone = "Paris"
+
+    # Clés du chiffrement Active Record (token des bots Telegram des managers). Rails les lit déjà dans
+    # credentials.active_record_encryption ; une variable ACTIVE_RECORD_ENCRYPTION_* non vide passe devant,
+    # sur le modèle des réglages mail.
+    {
+      primary_key: "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY",
+      deterministic_key: "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY",
+      key_derivation_salt: "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"
+    }.each do |key, env|
+      config.active_record.encryption[key] = ENV[env] if ENV[env].present?
+    end
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
