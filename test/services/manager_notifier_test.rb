@@ -54,4 +54,39 @@ class ManagerNotifierTest < ActiveSupport::TestCase
 
     assert_includes fake_telegram.sent_messages.sole["text"], "Votre sondé a répondu"
   end
+
+  test "respondent submitted sends a telegram message only, with the respondent, the campaign and the link" do
+    configure_telegram(managers(:alice))
+    respondent = respondents(:rose)
+
+    assert_no_enqueued_emails do
+      assert_enqueued_jobs(1, only: TelegramMessageJob) { ManagerNotifier.respondent_submitted(respondent) }
+    end
+
+    perform_enqueued_jobs(only: TelegramMessageJob)
+    text = fake_telegram.sent_messages.sole["text"]
+    assert_includes text, "<b>#{respondent.name} a répondu</b>"
+    assert_includes text, "« Campagne en cours »"
+    assert_includes text, %(<a href="http://example.com/campaigns/#{campaign.id}">Voir la campagne</a>)
+  end
+
+  test "respondent submitted sends nothing when telegram is off or disabled" do
+    assert_no_enqueued_jobs(only: TelegramMessageJob) { ManagerNotifier.respondent_submitted(respondents(:rose)) }
+
+    configure_telegram(managers(:alice), enabled: false)
+    assert_no_enqueued_jobs(only: TelegramMessageJob) { ManagerNotifier.respondent_submitted(respondents(:rose)) }
+  end
+
+  test "respondent submitted escapes the respondent and campaign names" do
+    configure_telegram(managers(:alice))
+    campaign.update_columns(name: "Bilan <b>R&D</b>")
+    respondents(:rose).update_columns(name: "Rose <i>&</i>")
+
+    perform_enqueued_jobs(only: TelegramMessageJob) { ManagerNotifier.respondent_submitted(respondents(:rose).reload) }
+
+    text = fake_telegram.sent_messages.sole["text"]
+    assert_includes text, "Rose &lt;i&gt;&amp;&lt;/i&gt;"
+    assert_includes text, "« Bilan &lt;b&gt;R&amp;D&lt;/b&gt; »"
+    assert_not_includes text, "<i>&</i>"
+  end
 end

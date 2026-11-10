@@ -92,6 +92,8 @@ class Respondent < ApplicationRecord
     return false if missing_answers.any?
 
     update!(submitted_at: Time.current)
+    # Avant la clôture : le dernier sondé fait arriver « X a répondu » puis « campagne clôturée », dans cet ordre.
+    ManagerNotifier.respondent_submitted(self)
     campaign.close_when_complete!
     true
   end

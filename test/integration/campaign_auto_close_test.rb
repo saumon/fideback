@@ -2,6 +2,7 @@ require "test_helper"
 
 class CampaignAutoCloseTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
+  include ActiveJob::TestHelper
 
   # Dana est à la fois sondée et managée : elle ne se note pas elle-même.
   SUBJECTS = {
@@ -83,17 +84,20 @@ class CampaignAutoCloseTest < ActionDispatch::IntegrationTest
     assert_includes mail.html_part.body.to_s, "/campaigns/#{campaign.id}"
   end
 
-  test "the manager also gets one telegram message when telegram is on" do
-    configure_telegram(managers(:alice))
+  test "the manager also gets the closing telegram message, after the submission one, when telegram is on" do
     submit(:rose)
     submit(:sam)
+    configure_telegram(managers(:alice))
 
     assert_enqueued_emails 1 do
-      assert_enqueued_jobs(1, only: TelegramMessageJob) { submit(:dana_as_respondent) }
+      assert_enqueued_jobs(2, only: TelegramMessageJob) { submit(:dana_as_respondent) }
     end
 
     perform_enqueued_jobs
-    assert_includes fake_telegram.sent_messages.sole["text"], "« Campagne en cours »"
+    first, second = fake_telegram.sent_messages.map { |message| message["text"] }
+    assert_includes first, "a répondu"
+    assert_includes second, "Tous vos sondés ont répondu : campagne clôturée"
+    assert_includes second, "« Campagne en cours »"
   end
 
   test "no telegram message when the manager left telegram off" do
@@ -111,10 +115,10 @@ class CampaignAutoCloseTest < ActionDispatch::IntegrationTest
   end
 
   test "a failing telegram message leaves the campaign closed and the e-mail sent" do
-    configure_telegram(managers(:alice))
-    fake_telegram.respond("sendMessage", status: 403, description: "Forbidden: bot was blocked by the user")
     submit(:rose)
     submit(:sam)
+    configure_telegram(managers(:alice))
+    fake_telegram.respond("sendMessage", status: 403, description: "Forbidden: bot was blocked by the user")
     submit(:dana_as_respondent)
 
     perform_enqueued_jobs
@@ -122,7 +126,7 @@ class CampaignAutoCloseTest < ActionDispatch::IntegrationTest
     assert campaign.reload.closed?
     assert campaign.respondents.all?(&:submitted?)
     assert_equal [ "alice@example.com" ], ActionMailer::Base.deliveries.last.to
-    assert_equal 1, fake_telegram.requests_to("sendMessage").size
+    assert_equal 2, fake_telegram.requests_to("sendMessage").size
   end
 
   test "no e-mail is sent while respondents are missing" do
@@ -210,5 +214,12 @@ class CampaignAutoCloseTest < ActionDispatch::IntegrationTest
     campaign.respondents.update_all(submitted_at: Time.current)
 
     assert campaign.reload.running?
+  end
+
+  test "a submission through the form queues one telegram message for an active manager and none otherwise" do
+    assert_no_enqueued_jobs(only: TelegramMessageJob) { submit(:rose) }
+
+    configure_telegram(managers(:alice))
+    assert_enqueued_jobs(1, only: TelegramMessageJob) { submit(:sam) }
   end
 end

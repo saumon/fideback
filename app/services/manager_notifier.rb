@@ -19,6 +19,19 @@ module ManagerNotifier
     TEXT
   end
 
+  # Un sondé vient de soumettre ses réponses. Pas d'e-mail : le manager le sait par Telegram seulement, et voit le
+  # détail sur la page de la campagne.
+  def respondent_submitted(respondent)
+    campaign = respondent.campaign
+    telegram(campaign.manager, <<~TEXT.strip)
+      📝 <b>#{escape(respondent.name)} a répondu</b>
+
+      #{escape(respondent.name)} a soumis ses réponses à la campagne « #{escape(campaign.name)} ».
+
+      <a href="#{escape(url_helpers.campaign_url(campaign, **url_options))}">Voir la campagne</a>
+    TEXT
+  end
+
   def telegram(manager, text)
     TelegramMessageJob.perform_later(manager, text) if manager.telegram_active?
   end

@@ -2,6 +2,7 @@ require "test_helper"
 
 class RespondentTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
+  include ActiveJob::TestHelper
 
   test "email must be unique within a campaign" do
     respondent = campaigns(:running_campaign).respondents.build(name: "Doublon", email: "rose@example.com")
@@ -133,5 +134,44 @@ class RespondentTest < ActiveSupport::TestCase
 
     assert_empty respondent.missing_answers
     assert respondent.submit!
+  end
+
+  test "a submission notifies the manager on telegram" do
+    configure_telegram(managers(:alice))
+
+    assert_enqueued_jobs(1, only: TelegramMessageJob) { submit_fully(respondents(:rose)) }
+
+    perform_enqueued_jobs(only: TelegramMessageJob)
+    text = fake_telegram.sent_messages.sole["text"]
+    assert_includes text, "Rose"
+    assert_includes text, "Campagne en cours"
+  end
+
+  test "no telegram message when telegram is not active" do
+    assert_no_enqueued_jobs(only: TelegramMessageJob) { submit_fully(respondents(:rose)) }
+  end
+
+  test "a refused submission or a saved draft sends no telegram message" do
+    configure_telegram(managers(:alice))
+
+    assert_no_enqueued_jobs(only: TelegramMessageJob) do
+      assert_not respondents(:rose).submit!
+      answer_fully(respondents(:sam))
+      campaigns(:running_campaign).update_columns(deadline_on: Date.yesterday)
+      assert_not respondents(:sam).reload.submit!
+    end
+  end
+
+  test "the last respondent triggers the submission message then the closing message" do
+    configure_telegram(managers(:alice))
+    campaigns(:running_campaign).respondents.where.not(id: respondents(:sam).id).update_all(submitted_at: Time.current)
+
+    assert_enqueued_jobs(2, only: TelegramMessageJob) { submit_fully(respondents(:sam)) }
+
+    perform_enqueued_jobs(only: TelegramMessageJob)
+    first, second = fake_telegram.sent_messages.map { |message| message["text"] }
+    assert_includes first, "Sam"
+    assert_includes first, "a répondu"
+    assert_includes second, "campagne clôturée"
   end
 end
