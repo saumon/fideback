@@ -33,6 +33,7 @@
           <% if manager_signed_in? %>
             <%= nav_link "Mes campagnes", campaigns_path, :campaigns %>
             <%= nav_link "Mon équipe", team_path, :team %>
+            <%= nav_link "Mes modèles", question_templates_path, :templates %>
             <%= nav_link "Administration", admin_root_path, :admin if current_manager.admin? %>
             <div class="nav-account">
               <p class="nav-who">Connecté</p>

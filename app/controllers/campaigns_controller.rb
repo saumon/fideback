@@ -1,5 +1,6 @@
 class CampaignsController < ApplicationController
   before_action :set_campaign, only: %i[show edit update destroy launch close]
+  before_action :set_templates, only: %i[new create]
 
   def index
     @campaigns = current_manager.campaigns.order(created_at: :desc)
@@ -12,7 +13,7 @@ class CampaignsController < ApplicationController
 
   def new
     @campaign = current_manager.campaigns.build(deadline_on: 1.month.from_now.to_date)
-    @campaign.build_default_questions
+    @template.build_questions_for(@campaign)
   end
 
   def create
@@ -58,6 +59,13 @@ class CampaignsController < ApplicationController
   end
 
   private
+
+  # Les modèles proposés à la création, et celui qui est choisi : le modèle par défaut si aucun, ou si l'identifiant
+  # n'est pas celui d'un modèle du manager. Le choix est aussi renvoyé avec un formulaire refusé, qui garde ainsi le sélecteur.
+  def set_templates
+    @templates = QuestionTemplate.available_to(current_manager).includes(:items)
+    @template = @templates.find { |template| template.id.to_s == params[:template_id].to_s } || @templates.find(&:system?)
+  end
 
   def set_campaign
     @campaign = current_manager.campaigns.find(params[:id])

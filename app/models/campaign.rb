@@ -1,11 +1,4 @@
 class Campaign < ApplicationRecord
-  DEFAULT_QUESTIONS = [
-    { prompt: "Qualité du travail réalisé cette année", rating: true, comment: true },
-    { prompt: "Collaboration et esprit d'équipe", rating: true, comment: true },
-    { prompt: "Points forts à valoriser", rating: false, comment: true },
-    { prompt: "Axes de progrès", rating: false, comment: true }
-  ].freeze
-
   # Liste de la campagne => rôle que le contact doit avoir dans l'annuaire.
   CONTACT_LISTS = { subjects: :managed, respondents: :surveyable }.freeze
 
@@ -26,12 +19,6 @@ class Campaign < ApplicationRecord
   before_validation :assign_contacts
   validate :new_contacts_valid
   before_save :save_touched_contacts
-
-  def build_default_questions
-    DEFAULT_QUESTIONS.each_with_index do |attrs, index|
-      questions.build(attrs.merge(position: index))
-    end
-  end
 
   # Sélection des managés et sondés parmi les contacts de l'annuaire (identifiants),
   # et nouveaux contacts saisis depuis la campagne ([{ name:, email: }, ...]).

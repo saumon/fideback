@@ -1,0 +1,15 @@
+default:
+  name: Modèle par défaut
+  system: true
+
+alice_annual:
+  manager: alice
+  name: Bilan annuel
+
+alice_project:
+  manager: alice
+  name: Fin de projet
+
+bob_private:
+  manager: bob
+  name: Modèle de Bob

@@ -1,0 +1,24 @@
+<%= form_with model: template, class: "template-form" do |f| %>
+  <% if template.errors.any? %>
+    <div class="callout callout-alert">
+      <ul>
+        <% template.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <p><%= f.label :name %></p>
+    <p><%= f.text_field :name %></p>
+  </div>
+
+  <fieldset>
+    <legend>Questions</legend>
+    <%= render "campaigns/nested_rows", f: f, association: :items, partial: "campaigns/question_fields",
+                                        blank: QuestionTemplateItem.new(rating: true, comment: true), add_label: "Ajouter une question" %>
+  </fieldset>
+
+  <p class="actions"><%= f.submit(template.persisted? ? "Enregistrer" : "Créer le modèle") %></p>
+<% end %>

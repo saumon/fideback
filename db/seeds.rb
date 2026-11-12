@@ -7,3 +7,6 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Le modèle de questions fourni à tous les managers (la migration le crée sur une base existante).
+QuestionTemplate.ensure_default!

@@ -1,0 +1,20 @@
+<div class="page-head">
+  <h1><%= @template.name %></h1>
+  <% if @template.system? %><p class="campaign-meta"><span class="status status-system">Fourni par Fideback</span> Ce modèle est identique pour tous les managers : il ne se modifie pas.</p><% end %>
+</div>
+
+<% unless @template.system? %>
+  <p class="actions">
+    <%= link_to "Modifier", edit_question_template_path(@template), class: "btn" %>
+    <%= render "delete_button", template: @template %>
+  </p>
+<% end %>
+
+<h2>Questions</h2>
+<ol class="question-list">
+  <% @template.items.each do |item| %>
+    <li><%= item.prompt %> <small>(<%= [ ("note" if item.rating?), ("commentaire" if item.comment?) ].compact.join(" + ") %>)</small></li>
+  <% end %>
+</ol>
+
+<p class="back"><%= link_to "Retour aux modèles", question_templates_path %></p>

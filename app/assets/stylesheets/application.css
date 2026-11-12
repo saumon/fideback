@@ -649,6 +649,7 @@ button.link-remove:hover { color: var(--danger); text-decoration-color: var(--da
 .status-running, .status-submitted, .status-open { background: color-mix(in srgb, var(--jade) 16%, var(--surface)); color: #0A6B4E; }
 .status-closed { background: var(--ink); color: var(--surface); }
 .status-in_progress { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
+.status-system { background: color-mix(in srgb, var(--azure) 18%, var(--surface)); color: #0B4F8A; }
 .status-admin { background: color-mix(in srgb, var(--pink) 18%, var(--surface)); color: #A3154A; }
 .status-unconfirmed { background: color-mix(in srgb, var(--saffron) 25%, var(--surface)); color: #7A4F00; }
 .status + .status { margin-left: 0.35rem; }
@@ -795,6 +796,8 @@ td.cell-action form + form { margin-left: 1rem; }
 }
 .ledger-title { font-weight: 700; font-size: 1.0625rem; }
 .ledger-action { margin-left: auto; }
+.template-actions { display: inline-flex; align-items: center; gap: 1rem; }
+.template-actions form { margin: 0; }
 
 .question-list { padding: 0; list-style: none; counter-reset: q; }
 .question-list li {
@@ -847,6 +850,26 @@ input:focus, textarea:focus {
 }
 input:disabled, textarea:disabled { background: var(--bg); color: var(--ink-soft); border-style: dashed; }
 input::placeholder, textarea::placeholder { color: #9A93B3; }
+
+select {
+  width: 100%;
+  max-width: 28rem;
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+select:hover { border-color: var(--ink-soft); }
+select:focus {
+  outline: none;
+  border-color: var(--azure);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--azure) 22%, transparent);
+}
 
 input[type=checkbox] { width: 1.15rem; height: 1.15rem; margin: 0; accent-color: var(--ink); vertical-align: -0.2em; }
 .check { display: inline-flex; align-items: center; gap: 0.5rem; }

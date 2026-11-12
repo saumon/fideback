@@ -29,10 +29,16 @@
     <%= render "contact_picker", campaign: campaign, list: :respondents, empty: "Aucun sondable dans votre équipe pour l'instant." %>
   </fieldset>
 
-  <fieldset>
+  <fieldset data-controller="template-picker" data-template-picker-url-value="<%= new_campaign_path %>">
     <legend>Questions</legend>
-    <%= render "nested_rows", f: f, association: :questions, partial: "question_fields",
-                              blank: Question.new(rating: true, comment: true), add_label: "Ajouter une question" %>
+    <% if campaign.new_record? && @templates %>
+      <%= render "template_picker", templates: @templates, selected: @template %>
+    <% end %>
+    <%# Seul ce cadre est rechargé quand on change de modèle : le reste du formulaire garde ce qui a été saisi. %>
+    <%= turbo_frame_tag "questions", data: { template_picker_target: "frame" } do %>
+      <%= render "nested_rows", f: f, association: :questions, partial: "question_fields",
+                                blank: Question.new(rating: true, comment: true), add_label: "Ajouter une question" %>
+    <% end %>
   </fieldset>
 
   <p class="actions"><%= f.submit(campaign.persisted? ? "Enregistrer" : "Créer la campagne") %></p>

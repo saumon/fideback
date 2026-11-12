@@ -164,4 +164,12 @@ class ManagerTest < ActiveSupport::TestCase
     assert_nil manager.masked_telegram_bot_token
     assert manager.update(name: "Bob Renamed")
   end
+
+  test "destroying a manager destroys their templates but keeps the system one" do
+    assert_difference -> { QuestionTemplate.count }, -2 do
+      managers(:alice).destroy!
+    end
+    assert QuestionTemplate.exists?(system: true)
+    assert QuestionTemplate.exists?(question_templates(:bob_private).id)
+  end
 end

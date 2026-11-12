@@ -25,6 +25,7 @@ module ApplicationHelper
     case controller_path
     when "campaigns", "summaries", "respondents" then :campaigns
     when "teams" then :team
+    when "question_templates" then :templates
     when %r{\Aadmin/} then :admin
     when "managers/registrations" then :account
     when "managers/sessions" then :sign_in

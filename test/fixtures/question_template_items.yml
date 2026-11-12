@@ -1,0 +1,55 @@
+default_quality:
+  question_template: default
+  position: 0
+  prompt: Qualité du travail réalisé cette année
+  rating: true
+  comment: true
+
+default_collaboration:
+  question_template: default
+  position: 1
+  prompt: Collaboration et esprit d'équipe
+  rating: true
+  comment: true
+
+default_strengths:
+  question_template: default
+  position: 2
+  prompt: Points forts à valoriser
+  rating: false
+  comment: true
+
+default_progress:
+  question_template: default
+  position: 3
+  prompt: Axes de progrès
+  rating: false
+  comment: true
+
+annual_goals:
+  question_template: alice_annual
+  position: 0
+  prompt: Objectifs atteints
+  rating: true
+  comment: true
+
+annual_wishes:
+  question_template: alice_annual
+  position: 1
+  prompt: Souhaits d'évolution
+  rating: false
+  comment: true
+
+project_delivery:
+  question_template: alice_project
+  position: 0
+  prompt: Respect des délais
+  rating: true
+  comment: false
+
+bob_item:
+  question_template: bob_private
+  position: 0
+  prompt: Question privée de Bob
+  rating: false
+  comment: true

@@ -58,7 +58,7 @@ class FeedbackJourneyTest < ApplicationSystemTestCase
     click_on "Créer la campagne"
     assert_text "Campagne créée."
     created = Campaign.find_by!(name: "Entretiens de fin d'année")
-    assert_equal Campaign::DEFAULT_QUESTIONS.first(3).map { |q| q[:prompt] } + [ "Ambiance générale" ], created.questions.map(&:prompt)
+    assert_equal question_templates(:default).items.first(3).map(&:prompt) + [ "Ambiance générale" ], created.questions.map(&:prompt)
     assert_equal 2, created.respondents.count
     assert_text "Gaspard Managé"
     assert_equal [ "Gaspard Managé", "Rita Sondée", "Tom Sondé" ], Manager.find_by!(email: "claire@example.com").contacts.map(&:name)

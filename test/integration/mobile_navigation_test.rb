@@ -15,7 +15,7 @@ class MobileNavigationTest < ActionDispatch::IntegrationTest
 
     get campaigns_path
 
-    assert_select "nav#site-nav > a", %w[ Mes\ campagnes Mon\ équipe Administration ].size
+    assert_select "nav#site-nav > a", %w[ Mes\ campagnes Mon\ équipe Mes\ modèles Administration ].size
     assert_select "nav#site-nav .nav-account" do
       assert_select ".nav-who", "Connecté"
       assert_select "a[href=?]", edit_manager_registration_path, text: managers(:alice).name

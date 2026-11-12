@@ -1,0 +1,14 @@
+<%# Choix du modèle de questions à la création. Sans effet sur l'enregistrement : « template_id » n'est lu que pour afficher les
+    questions du modèle, et pour que le sélecteur garde son choix quand le formulaire est réaffiché. %>
+<div class="field template-picker">
+  <p><%= label_tag :template_id, "Partir d'un modèle" %></p>
+  <p>
+    <%= select_tag :template_id,
+          safe_join([
+            options_for_select(templates.select(&:system?).map { |template| [ template.name, template.id ] }, selected&.id),
+            (content_tag(:optgroup, options_for_select(templates.reject(&:system?).map { |template| [ template.name, template.id ] }, selected&.id), label: "Mes modèles") if templates.any? { |template| !template.system? })
+          ].compact),
+          data: { action: "template-picker#choose" } %>
+  </p>
+  <p><i>Choisir un modèle remplace les questions ci-dessous. <%= link_to "Gérer mes modèles", question_templates_path %></i></p>
+</div>

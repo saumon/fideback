@@ -14,6 +14,7 @@ class Manager < ApplicationRecord
 
   has_many :campaigns, dependent: :destroy
   has_many :login_links, dependent: :delete_all
+  has_many :question_templates, dependent: :destroy
   has_many :contacts, -> { order(:name, :id) }, dependent: :destroy, inverse_of: :manager
 
   accepts_nested_attributes_for :contacts, allow_destroy: true,

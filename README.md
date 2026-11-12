@@ -76,7 +76,8 @@ Les spécifications se valident avec `openspec validate --all --strict`. Le [fon
 
 **Pour les managers**
 - Inscription avec activation du compte par e-mail, connexion, réinitialisation du mot de passe.
-- Campagnes (brouillon → en cours → clôturée) avec questions par défaut modifiables, suppression d'une campagne brouillon ou clôturée.
+- Campagnes (brouillon → en cours → clôturée) avec questions modifiables, suppression d'une campagne brouillon ou clôturée.
+- Modèles de questions : un modèle par défaut fourni à tous, et les modèles de chaque manager (ajout, modification, suppression), à choisir comme point de départ à la création d'une campagne.
 - Annuaire d'équipe réutilisable d'une campagne à l'autre, rôles *managé* et/ou *sondable*.
 - Suivi de l'avancement, relance des sondés, clôture automatique quand tous ont répondu (avec un e-mail au manager), synthèse nominative par managé.
 - Notifications Telegram en plus des e-mails, par un bot créé par le manager et réglé dans « Mon compte » (envoi seul, sans webhook).

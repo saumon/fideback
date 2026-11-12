@@ -37,6 +37,9 @@ Rails.application.routes.draw do
   # Annuaire du manager : managés et sondables réutilisés d'une campagne à l'autre.
   resource :team, only: %i[show update]
 
+  # Modèles de questions : le modèle du système (lecture seule) et ceux du manager.
+  resources :question_templates, path: "modeles"
+
   resources :campaigns do
     member do
       post :launch

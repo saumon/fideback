@@ -1,0 +1,22 @@
+<div class="page-head">
+  <h1>Mes modèles</h1>
+  <p><%= link_to "Nouveau modèle", new_question_template_path, class: "btn btn-primary" %></p>
+</div>
+
+<p class="campaign-meta">Des jeux de questions à réutiliser. À la création d'une campagne, choisissez-en un comme point de départ : vous pouvez toujours en modifier les questions.</p>
+
+<ul class="ledger template-list">
+  <% @templates.each do |template| %>
+    <li id="<%= dom_id(template) %>">
+      <%= link_to template.name, template, class: "ledger-title" %>
+      <% if template.system? %><span class="status status-system">Fourni par Fideback</span><% end %>
+      <span class="muted"><%= template.items.size %> question<%= "s" if template.items.size > 1 %></span>
+      <% unless template.system? %>
+        <span class="ledger-action template-actions">
+          <%= link_to "Modifier", edit_question_template_path(template), class: "link" %>
+          <%= render "delete_button", template: template %>
+        </span>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

@@ -1,0 +1,4 @@
+<%# Supprimer un modèle ne touche pas aux campagnes déjà créées : elles ont leur propre copie des questions. %>
+<%= button_to "Supprimer", question_template_path(template), method: :delete, class: "link link-remove",
+      form: { class: "inline", data: { turbo_confirm: "Supprimer ce modèle ?", turbo_confirm_detail: "Les campagnes déjà créées avec ce modèle ne sont pas modifiées.",
+                                       turbo_confirm_tone: "danger", turbo_confirm_icon: "trash" } } %>

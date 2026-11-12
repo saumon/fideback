@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_100000) do
   create_table "answers", force: :cascade do |t|
     t.integer "respondent_id", null: false
     t.integer "subject_id", null: false
@@ -94,6 +94,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
     t.index ["reset_password_token"], name: "index_managers_on_reset_password_token", unique: true
   end
 
+  create_table "question_template_items", force: :cascade do |t|
+    t.integer "question_template_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "prompt", null: false
+    t.boolean "rating", default: false, null: false
+    t.boolean "comment", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_template_id"], name: "index_question_template_items_on_question_template_id"
+  end
+
+  create_table "question_templates", force: :cascade do |t|
+    t.integer "manager_id"
+    t.string "name", null: false
+    t.boolean "system", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["manager_id"], name: "index_question_templates_on_manager_id"
+  end
+
   create_table "questions", force: :cascade do |t|
     t.integer "campaign_id", null: false
     t.integer "position", default: 0, null: false
@@ -150,6 +170,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   add_foreign_key "contacts", "managers"
   add_foreign_key "invitations", "managers", column: "invited_by_id", on_delete: :nullify
   add_foreign_key "login_links", "managers", on_delete: :cascade
+  add_foreign_key "question_template_items", "question_templates", on_delete: :cascade
+  add_foreign_key "question_templates", "managers", on_delete: :cascade
   add_foreign_key "questions", "campaigns"
   add_foreign_key "respondents", "campaigns"
   add_foreign_key "respondents", "contacts", on_delete: :nullify

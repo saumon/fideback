@@ -4,7 +4,11 @@ fr:
       manager: Manager
       campaign: Campagne
       invitation: Invitation
+      question_template: Modèle
     attributes:
+      question_template:
+        name: Nom
+        items: Questions
       manager:
         name: Nom
         email: E-mail

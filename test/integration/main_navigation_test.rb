@@ -33,6 +33,29 @@ class MainNavigationTest < ActionDispatch::IntegrationTest
     assert_equal [ "Mon équipe" ], current_entries
   end
 
+  test "every template screen highlights Mes modèles, also after a refused creation" do
+    sign_in managers(:alice)
+    template = question_templates(:alice_annual)
+
+    [ question_templates_path, new_question_template_path, question_template_path(template), edit_question_template_path(template) ].each do |path|
+      get path
+      assert_equal [ "Mes modèles" ], current_entries, path
+    end
+
+    post question_templates_path, params: { question_template: { name: "" } }
+    assert_response :unprocessable_content
+    assert_equal [ "Mes modèles" ], current_entries
+  end
+
+  test "Mes modèles is offered to signed-in managers only" do
+    get new_manager_session_path
+    assert_select "header nav a", text: "Mes modèles", count: 0
+
+    sign_in managers(:alice)
+    get campaigns_path
+    assert_select "header nav a[href=?]", question_templates_path, text: "Mes modèles"
+  end
+
   test "the administration screens highlight Administration" do
     sign_in managers(:alice)
 

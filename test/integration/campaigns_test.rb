@@ -12,11 +12,86 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Campagne de Bob", count: 0
   end
 
-  test "new form is prefilled with default questions" do
+  test "new form is prefilled with the default template's questions, which is preselected" do
+    default = question_templates(:default)
     get new_campaign_path
     assert_response :success
-    assert_select "[data-nested-form-target=container] input[name$='[prompt]']", count: Campaign::DEFAULT_QUESTIONS.size
-    assert_select "input[value='#{Campaign::DEFAULT_QUESTIONS.first[:prompt]}']"
+    assert_select "[data-nested-form-target=container] input[name$='[prompt]']", count: default.items.size
+    assert_select "input[value='#{default.items.first.prompt}']"
+    assert_select "select#template_id option[selected]", text: default.name
+  end
+
+  test "the template picker lists the default template, then my templates under « Mes modèles »" do
+    get new_campaign_path
+    assert_select "label[for=template_id]", text: "Partir d'un modèle"
+    assert_select "select#template_id > option", count: 1
+    assert_select "select#template_id > option", text: "Modèle par défaut"
+    assert_select "select#template_id > optgroup[label='Mes modèles'] > option", count: 2
+    assert_equal [ "Bilan annuel", "Fin de projet" ], css_select("select#template_id optgroup option").map(&:text)
+    assert_select "select#template_id option", text: "Modèle de Bob", count: 0
+    assert_select "turbo-frame#questions [data-nested-form-target=container]"
+    assert_select "[data-controller=template-picker] select[data-action='template-picker#choose']"
+  end
+
+  test "without a template of my own the picker has no group" do
+    sign_out :manager
+    sign_in managers(:bob)
+    managers(:bob).question_templates.destroy_all
+    get new_campaign_path
+    assert_select "select#template_id > optgroup", count: 0
+  end
+
+  test "new form with a template of mine is prefilled with its questions" do
+    template = question_templates(:alice_annual)
+    get new_campaign_path(template_id: template.id)
+    assert_response :success
+    assert_equal template.items.map(&:prompt), css_select("turbo-frame#questions [data-nested-form-target=container] .question input[name$='[prompt]']").map { |input| input["value"] }
+    assert_select "select#template_id option[selected]", text: template.name
+  end
+
+  test "the frame request for a template renders without the page layout" do
+    get new_campaign_path(template_id: question_templates(:alice_project).id), headers: { "Turbo-Frame" => "questions" }
+    assert_response :success
+    assert_select "header.site-header", count: 0
+    assert_select "turbo-frame#questions input[value='Respect des délais']"
+  end
+
+  test "an unknown, foreign or malformed template falls back to the default" do
+    [ 0, question_templates(:bob_private).id, "abc", "" ].each do |id|
+      get new_campaign_path(template_id: id)
+      assert_response :success, id.inspect
+      assert_select "select#template_id option[selected]", text: "Modèle par défaut"
+      assert_select "input[value='Axes de progrès']"
+      assert_select "input[value='Question privée de Bob']", count: 0
+    end
+  end
+
+  test "a refused creation keeps the chosen template and the typed questions" do
+    template = question_templates(:alice_annual)
+    post campaigns_path, params: { template_id: template.id, campaign: { name: "", deadline_on: 1.month.from_now.to_date,
+      questions_attributes: { "0" => { prompt: "Ma question à moi", rating: "1", comment: "0" } } } }
+    assert_response :unprocessable_content
+    assert_select "select#template_id option[selected]", text: template.name
+    assert_select "input[value='Ma question à moi']"
+    assert_select "input[value='Objectifs atteints']", count: 0
+  end
+
+  test "the campaign keeps its own copy of the questions when the template changes afterwards" do
+    template = question_templates(:alice_annual)
+    post campaigns_path, params: { template_id: template.id, campaign: { name: "Copie", deadline_on: 1.month.from_now.to_date,
+      questions_attributes: { "0" => { prompt: "Objectifs atteints", rating: "1", comment: "1" }, "1" => { prompt: "Ajoutée à la main", rating: "0", comment: "1" } } } }
+    campaign = Campaign.find_by!(name: "Copie")
+    assert_equal [ "Objectifs atteints", "Ajoutée à la main" ], campaign.questions.map(&:prompt)
+
+    template.update!(items_attributes: [ { id: template.items.first.id, prompt: "Changé" } ])
+    template.destroy!
+    assert_equal [ "Objectifs atteints", "Ajoutée à la main" ], campaign.reload.questions.map(&:prompt)
+  end
+
+  test "the edit form of a draft has no template picker" do
+    get edit_campaign_path(campaigns(:draft_campaign))
+    assert_select "select#template_id", count: 0
+    assert_select "[data-nested-form-target=container] .question", count: campaigns(:draft_campaign).questions.count
   end
 
   def checked_ids(list)

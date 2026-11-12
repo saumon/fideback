@@ -14,13 +14,6 @@ class CampaignTest < ActiveSupport::TestCase
     assert campaign.errors.key?(:deadline_on)
   end
 
-  test "default questions are built with rating and/or comment" do
-    campaign = Campaign.new
-    campaign.build_default_questions
-    assert_equal Campaign::DEFAULT_QUESTIONS.size, campaign.questions.size
-    assert campaign.questions.all? { |q| q.rating? || q.comment? }
-  end
-
   test "questions are renumbered in form order, ignoring those marked for destruction" do
     campaign = campaigns(:draft_campaign)
     first, second = campaign.questions.to_a.first(2)
