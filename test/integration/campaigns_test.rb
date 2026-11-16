@@ -334,6 +334,38 @@ class CampaignsTest < ActionDispatch::IntegrationTest
     assert_select "##{ActionView::RecordIdentifier.dom_id(respondents(:dana_as_respondent))}", /Pas encore répondu/
   end
 
+  test "show displays the purpose under the header, before the action buttons, in every status" do
+    { draft_campaign: nil, running_campaign: nil, closed: :close! }.each do |name, transition|
+      campaign = campaigns(name == :closed ? :running_campaign : name)
+      campaign.close! if transition
+      campaign.update_columns(purpose: "Faire le point après le projet.")
+      get campaign_path(campaign)
+      assert_response :success
+      assert_select ".page-head + .campaign-purpose h2", text: "Pourquoi cette campagne ?"
+      assert_select ".campaign-purpose p", text: "Faire le point après le projet."
+      html = response.body
+      assert_operator html.index("campaign-purpose"), :<, html.index('class="actions"')
+    end
+  end
+
+  test "show has no purpose block without a purpose, even blank, and no reminder" do
+    [ nil, "", "  " ].each do |purpose|
+      campaigns(:draft_campaign).update_columns(purpose: purpose)
+      get campaign_path(campaigns(:draft_campaign))
+      assert_response :success
+      assert_select ".campaign-purpose", count: 0
+      assert_no_match(/Pourquoi cette campagne|Aucun motif/, response.body)
+    end
+  end
+
+  test "show displays the purpose as plain text with line breaks kept" do
+    campaigns(:draft_campaign).update_columns(purpose: "Avec <b>balises</b>.\nDeuxième ligne.")
+    get campaign_path(campaigns(:draft_campaign))
+    assert_select ".campaign-purpose b", count: 0
+    assert_select ".campaign-purpose p", /Avec <b>balises<\/b>\./
+    assert_select ".campaign-purpose br", count: 1
+  end
+
   test "show offers a resend button only to respondents who can still answer" do
     respondents(:rose).update!(submitted_at: Time.current)
     respondents(:sam).update!(last_invited_at: Time.zone.local(2026, 10, 20, 9, 30))

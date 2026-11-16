@@ -1,0 +1,7 @@
+<%# Motif de la campagne, partagé par la page du manager et le formulaire du sondé. Rien s'il est vide. %>
+<% if campaign.purpose.present? %>
+  <section class="campaign-purpose" aria-labelledby="campaign-purpose-title">
+    <h2 id="campaign-purpose-title">Pourquoi cette campagne ?</h2>
+    <%= simple_format(h(campaign.purpose), {}, sanitize: false) %>
+  </section>
+<% end %>

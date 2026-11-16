@@ -6,6 +6,8 @@
   </p>
 </div>
 
+<%= render "purpose", campaign: @campaign %>
+
 <% if @campaign.closed? && @campaign.all_submitted? %>
   <p class="callout">Clôturée : tous les sondés ont répondu.</p>
 <% end %>
