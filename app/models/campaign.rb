@@ -12,6 +12,7 @@ class Campaign < ApplicationRecord
   enum :status, { draft: 0, running: 1, closed: 2 }, default: :draft
 
   validates :name, :deadline_on, presence: true
+  validates :purpose, length: { maximum: 1000 }
   validate :deadline_in_future, on: :create
   validate :content_frozen_once_launched, on: :update
 

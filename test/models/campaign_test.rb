@@ -8,6 +8,19 @@ class CampaignTest < ActiveSupport::TestCase
     assert campaign.draft?
   end
 
+  test "purpose is optional and limited to 1000 characters" do
+    campaign = managers(:alice).campaigns.build(name: "Nouvelle", deadline_on: 10.days.from_now.to_date)
+    [ nil, "", "   ", "a" * 1000 ].each do |purpose|
+      campaign.purpose = purpose
+      assert campaign.valid?, "#{purpose.inspect} devrait être accepté"
+    end
+
+    campaign.purpose = "a" * 1001
+    assert_not campaign.valid?
+    assert campaign.errors.key?(:purpose)
+    assert_includes campaign.errors.full_messages.join, "Pourquoi cette campagne ?"
+  end
+
   test "requires a future deadline on creation" do
     campaign = managers(:alice).campaigns.build(name: "Passée", deadline_on: Date.current)
     assert_not campaign.valid?

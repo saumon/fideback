@@ -30,6 +30,7 @@ fr:
       campaign:
         name: Nom
         deadline_on: Date limite de réponse
+        purpose: Pourquoi cette campagne ?
         subjects: Managés
         respondents: Sondés
         questions: Questions

@@ -1,6 +1,13 @@
 <p>Bonjour <%= @respondent.name %>,</p>
 
-<p><%= @manager.name %> prépare ses entretiens individuels et vous invite à donner votre feedback dans la campagne « <%= @campaign.name %> ».</p>
+<p><%= @manager.name %> vous invite à donner votre feedback dans la campagne « <%= @campaign.name %> ».</p>
+
+<% if @campaign.purpose.present? %>
+  <div style="margin: 16px 0; padding: 12px 16px; border: 2px solid #2F8CFF; border-radius: 12px; background: #E8F2FF;">
+    <p style="margin: 0 0 4px; font-weight: bold;">Pourquoi cette campagne ?</p>
+    <%= simple_format(h(@campaign.purpose), { style: "margin: 0 0 8px;" }, sanitize: false) %>
+  </div>
+<% end %>
 
 <p>Vos réponses seront communiquées nominativement à <%= @manager.name %>.</p>
 

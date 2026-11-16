@@ -73,7 +73,7 @@ class CampaignsController < ApplicationController
 
   def campaign_params
     params.expect(campaign: [
-      :name, :deadline_on,
+      :name, :deadline_on, :purpose,
       subject_contact_ids: [], respondent_contact_ids: [],
       new_subject_contacts: [ [ :name, :email ] ], new_respondent_contacts: [ [ :name, :email ] ],
       questions_attributes: [ [ :id, :position, :prompt, :rating, :comment, :_destroy ] ]

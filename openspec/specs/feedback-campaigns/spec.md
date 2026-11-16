@@ -7,7 +7,7 @@ Permettre à un manager de définir et piloter une campagne de feedback visant u
 ## Requirements
 
 ### Requirement: Création d'une campagne
-Le système SHALL permettre à un manager de créer une campagne avec un nom, une date limite de réponse, au moins un managé et au moins un sondé.
+Le système SHALL permettre à un manager de créer une campagne avec un nom, une date limite de réponse, au moins un managé et au moins un sondé, et, facultativement, un motif intitulé « Pourquoi cette campagne ? » de 1000 caractères au plus.
 
 #### Scenario: Création valide
 - **WHEN** un manager soumet un nom, une date limite future, un managé et un sondé valides
@@ -16,6 +16,18 @@ Le système SHALL permettre à un manager de créer une campagne avec un nom, un
 #### Scenario: Campagne sans sondé
 - **WHEN** un manager tente de lancer une campagne sans sondé ou sans managé
 - **THEN** le lancement est refusé et l'erreur est indiquée
+
+#### Scenario: Création avec motif
+- **WHEN** un manager renseigne « Pourquoi cette campagne ? » avec un texte de 1000 caractères ou moins
+- **THEN** la campagne est créée avec ce motif, qu'il retrouve en la modifiant tant qu'elle est en brouillon
+
+#### Scenario: Création sans motif
+- **WHEN** un manager laisse « Pourquoi cette campagne ? » vide
+- **THEN** la campagne est créée normalement, sans motif
+
+#### Scenario: Motif trop long
+- **WHEN** un manager saisit un motif de plus de 1000 caractères
+- **THEN** l'enregistrement est refusé et l'erreur est indiquée sur ce champ
 
 ### Requirement: Gestion des managés et des sondés
 Le système SHALL constituer les managés et les sondés d'une campagne à partir des contacts de l'annuaire du manager ayant respectivement le rôle managé et le rôle sondable, chaque contact figurant au plus une fois par liste. La campagne conserve sa propre copie du nom et de l'e-mail, qui suit l'annuaire tant qu'elle est brouillon et est figée à son lancement.

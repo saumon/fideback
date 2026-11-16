@@ -5,6 +5,43 @@ class CampaignsTest < ActionDispatch::IntegrationTest
 
   setup { sign_in managers(:alice) }
 
+  test "the form offers an optional « Pourquoi cette campagne ? » field" do
+    get new_campaign_path
+    assert_select "label[for=campaign_purpose]", text: "Pourquoi cette campagne ?"
+    assert_select "textarea#campaign_purpose[maxlength='1000']"
+  end
+
+  test "a campaign is created with its purpose, then edited while draft" do
+    contact = managers(:alice).contacts.find_by!(managed: true)
+    assert_difference "Campaign.count", 1 do
+      post campaigns_path, params: { campaign: { name: "Avec motif", deadline_on: 10.days.from_now.to_date, purpose: "Faire le point après le projet.",
+        subject_contact_ids: [ contact.id ], questions_attributes: [ { prompt: "Q", rating: "1", comment: "0" } ] } }
+    end
+    campaign = Campaign.find_by!(name: "Avec motif")
+    assert_equal "Faire le point après le projet.", campaign.purpose
+
+    get edit_campaign_path(campaign)
+    assert_select "textarea#campaign_purpose", text: /Faire le point/
+    patch campaign_path(campaign), params: { campaign: { purpose: "Nouveau motif" } }
+    assert_equal "Nouveau motif", campaign.reload.purpose
+  end
+
+  test "a campaign can be created without purpose" do
+    assert_difference "Campaign.count", 1 do
+      post campaigns_path, params: { campaign: { name: "Sans motif", deadline_on: 10.days.from_now.to_date, purpose: "",
+        questions_attributes: [ { prompt: "Q", rating: "1", comment: "0" } ] } }
+    end
+    assert Campaign.find_by!(name: "Sans motif").purpose.blank?
+  end
+
+  test "a purpose over 1000 characters is refused with an error on that field" do
+    assert_no_difference "Campaign.count" do
+      post campaigns_path, params: { campaign: { name: "Trop long", deadline_on: 10.days.from_now.to_date, purpose: "a" * 1001 } }
+    end
+    assert_response :unprocessable_content
+    assert_select ".callout-alert li", /Pourquoi cette campagne \?/
+  end
+
   test "index lists only my campaigns" do
     get campaigns_path
     assert_response :success

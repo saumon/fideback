@@ -36,6 +36,30 @@ class RespondentFormsTest < ActionDispatch::IntegrationTest
     assert_select ".notice-transparency", /nominativement/
   end
 
+  test "the campaign purpose is shown above the questions when set, as plain text" do
+    campaigns(:running_campaign).update!(purpose: "Faire le point <b>après</b> le projet.\nMerci !")
+    get form_path
+    assert_select ".campaign-purpose h2", text: "Pourquoi cette campagne ?"
+    assert_select ".campaign-purpose p", /Faire le point <b>après<\/b> le projet\./
+    assert_select ".campaign-purpose b", count: 0
+    assert_select ".campaign-purpose br", count: 1
+  end
+
+  test "no purpose block without a purpose, even blank" do
+    get form_path
+    assert_select ".campaign-purpose", count: 0
+    campaigns(:running_campaign).update!(purpose: "   ")
+    get form_path
+    assert_select ".campaign-purpose", count: 0
+  end
+
+  test "the purpose stays visible once the campaign is closed" do
+    campaigns(:running_campaign).update!(purpose: "Bilan de projet")
+    campaigns(:running_campaign).close!
+    get form_path
+    assert_select ".campaign-purpose", /Bilan de projet/
+  end
+
   test "a respondent who is also managed does not rate themself" do
     get form_path(respondents(:dana_as_respondent))
     assert_select "legend", text: "Dana Managée", count: 0

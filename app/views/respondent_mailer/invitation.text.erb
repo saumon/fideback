@@ -1,7 +1,12 @@
 Bonjour <%= @respondent.name %>,
 
-<%= @manager.name %> prépare ses entretiens individuels et vous invite à donner votre feedback dans la campagne « <%= @campaign.name %> ».
+<%= @manager.name %> vous invite à donner votre feedback dans la campagne « <%= @campaign.name %> ».
 
+<% if @campaign.purpose.present? -%>
+Pourquoi cette campagne ?
+<%= @campaign.purpose.strip %>
+
+<% end -%>
 Vos réponses seront communiquées nominativement à <%= @manager.name %>.
 
 Donner mon feedback : <%= @url %>

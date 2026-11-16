@@ -1,6 +1,12 @@
 <header class="respondent-intro">
   <h1><%= @campaign.name %></h1>
   <p class="lead">Bonjour <%= @respondent.name %>, <%= @campaign.manager.name %> vous invite à donner votre feedback.</p>
+  <% if @campaign.purpose.present? %>
+    <section class="campaign-purpose" aria-labelledby="campaign-purpose-title">
+      <h2 id="campaign-purpose-title">Pourquoi cette campagne ?</h2>
+      <%= simple_format(h(@campaign.purpose), {}, sanitize: false) %>
+    </section>
+  <% end %>
   <p class="notice-transparency"><strong>Important :</strong> vos réponses seront communiquées nominativement à <%= @campaign.manager.name %>.</p>
 </header>
 

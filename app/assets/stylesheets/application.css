@@ -1360,6 +1360,20 @@ legend span { font-size: 0.8125rem; font-weight: 500; font-stretch: 100%; letter
 .respondent-intro { margin-bottom: 2rem; }
 .respondent-intro h1 { font-size: clamp(2.25rem, 6vw, 3.25rem); }
 
+.campaign-purpose {
+  margin: 1.5rem 0 0;
+  padding: 0.85rem 1.1rem 0.4rem;
+  border: 2px solid var(--azure);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--azure) 12%, var(--surface));
+  box-shadow: 4px 4px 0 var(--azure);
+  overflow-wrap: anywhere;
+  animation: purpose-in 0.5s ease-out both;
+}
+.campaign-purpose h2 { margin: 0 0 0.4rem; font-size: 1.125rem; }
+.campaign-purpose p { margin: 0 0 0.6rem; }
+@keyframes purpose-in { from { opacity: 0; transform: translateY(0.6rem) rotate(-0.6deg); } }
+
 .notice-transparency {
   margin: 1.5rem 0 0;
   padding: 0.85rem 1.1rem;
